@@ -1,0 +1,50 @@
+{
+  "algorithm": "sha256",
+  "command": "duplicates",
+  "complete": true,
+  "errors": [],
+  "groups": [
+    {
+      "paths": [
+        "logs/app.log",
+        "logs/nested/app.log"
+      ],
+      "sha256": "9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857",
+      "size_bytes": 4
+    },
+    {
+      "paths": [
+        "empty/a",
+        "empty/b"
+      ],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    }
+  ],
+  "root": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\workspace",
+  "schema_version": 1,
+  "scope": {
+    "exclusions": [
+      ".git",
+      ".venv*",
+      "venv",
+      "__pycache__",
+      "node_modules",
+      ".pytest_cache",
+      ".mypy_cache",
+      ".ruff_cache",
+      ".tox",
+      ".nox"
+    ],
+    "includes": []
+  },
+  "summary": {
+    "candidate_files": 4,
+    "duplicate_groups": 2,
+    "error_count": 0,
+    "excluded_entries": 2,
+    "file_count": 7,
+    "hashed_files": 4,
+    "redundant_bytes": 4
+  }
+}

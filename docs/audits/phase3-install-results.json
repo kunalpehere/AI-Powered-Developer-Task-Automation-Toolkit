@@ -1,0 +1,456 @@
+{
+  "cwd": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\workspace",
+  "checks": [
+    {
+      "check": "wheel module help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "taskmaster",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: __main__.py [-h] [--interactive] {task,inspect,organize,duplicates} ...\n\nTaskMaster - Developer workspace inspection and safe artifact organization\n\npositional arguments:\n  {task,inspect,organize,duplicates}\n                        Available commands\n    task                Task management\n    inspect             Inspect a developer workspace\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  __main__.py --interactive              Launch interactive mode\n  __main__.py task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  __main__.py task list\n  __main__.py inspect --source . --format json\n  __main__.py organize --source . --destination ../organized --include \"logs/**/*.log\" --dry-run\n  __main__.py duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel taskmaster.exe help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\taskmaster.exe",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: taskmaster [-h] [--interactive] {task,inspect,organize,duplicates} ...\n\nTaskMaster - Developer workspace inspection and safe artifact organization\n\npositional arguments:\n  {task,inspect,organize,duplicates}\n                        Available commands\n    task                Task management\n    inspect             Inspect a developer workspace\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  taskmaster --interactive              Launch interactive mode\n  taskmaster task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  taskmaster task list\n  taskmaster inspect --source . --format json\n  taskmaster organize --source . --destination ../organized --include \"logs/**/*.log\" --dry-run\n  taskmaster duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel tm.exe help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: tm [-h] [--interactive] {task,inspect,organize,duplicates} ...\n\nTaskMaster - Developer workspace inspection and safe artifact organization\n\npositional arguments:\n  {task,inspect,organize,duplicates}\n                        Available commands\n    task                Task management\n    inspect             Inspect a developer workspace\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  tm --interactive              Launch interactive mode\n  tm task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  tm task list\n  tm inspect --source . --format json\n  tm organize --source . --destination ../organized --include \"logs/**/*.log\" --dry-run\n  tm duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "editable module help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "taskmaster",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: __main__.py [-h] [--interactive] {task,inspect,organize,duplicates} ...\n\nTaskMaster - Developer workspace inspection and safe artifact organization\n\npositional arguments:\n  {task,inspect,organize,duplicates}\n                        Available commands\n    task                Task management\n    inspect             Inspect a developer workspace\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  __main__.py --interactive              Launch interactive mode\n  __main__.py task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  __main__.py task list\n  __main__.py inspect --source . --format json\n  __main__.py organize --source . --destination ../organized --include \"logs/**/*.log\" --dry-run\n  __main__.py duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "editable taskmaster.exe help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv\\Scripts\\taskmaster.exe",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: taskmaster [-h] [--interactive] {task,inspect,organize,duplicates} ...\n\nTaskMaster - Developer workspace inspection and safe artifact organization\n\npositional arguments:\n  {task,inspect,organize,duplicates}\n                        Available commands\n    task                Task management\n    inspect             Inspect a developer workspace\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  taskmaster --interactive              Launch interactive mode\n  taskmaster task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  taskmaster task list\n  taskmaster inspect --source . --format json\n  taskmaster organize --source . --destination ../organized --include \"logs/**/*.log\" --dry-run\n  taskmaster duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "editable tm.exe help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv\\Scripts\\tm.exe",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: tm [-h] [--interactive] {task,inspect,organize,duplicates} ...\n\nTaskMaster - Developer workspace inspection and safe artifact organization\n\npositional arguments:\n  {task,inspect,organize,duplicates}\n                        Available commands\n    task                Task management\n    inspect             Inspect a developer workspace\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  tm --interactive              Launch interactive mode\n  tm task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  tm task list\n  tm inspect --source . --format json\n  tm organize --source . --destination ../organized --include \"logs/**/*.log\" --dry-run\n  tm duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel MVP imports outside checkout",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\python.exe",
+        "-I",
+        "-c",
+        "import taskmaster, taskmaster.scanning, taskmaster.inspection, taskmaster.duplicates, taskmaster.reporting, importlib.util; print(taskmaster.__file__); assert '.venv-phase3' in taskmaster.__file__; assert importlib.util.find_spec('PIL') is None; assert importlib.util.find_spec('PyPDF2') is None"
+      ],
+      "exit_code": 0,
+      "stdout": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Lib\\site-packages\\taskmaster\\__init__.py\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel disposable full MVP demo",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "taskmaster.demo",
+        "--directory",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68"
+      ],
+      "exit_code": 0,
+      "stdout": "Inspection: {'file_count': 2, 'size_bytes': 24, 'directories_visited': 1, 'excluded_entries': 0, 'error_count': 0}\n{'total_files': 2, 'history_failed': 0, 'filesystem_changed': 0, 'successful': 0, 'failed': 0, 'skipped': 0, 'dry_run': 2, 'total_size_mb': 0.0, 'timestamp': '2026-10-15T17:41:33.773226'}\nCopy result: {'total_files': 2, 'history_failed': 0, 'filesystem_changed': 2, 'successful': 2, 'failed': 0, 'skipped': 0, 'dry_run': 0, 'total_size_mb': 0.0, 'timestamp': '2026-10-15T17:41:34.133088'}\nFull SHA-256 duplicate groups: 1\nOnly disposable copies were created; no database was initialized.\nDemo complete; disposable fixtures removed.\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel inspection JSON",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "inspect",
+        "--source",
+        ".",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"command\": \"inspect\",\n  \"complete\": true,\n  \"errors\": [],\n  \"extensions\": [\n    {\n      \"extension\": \"\",\n      \"file_count\": 3,\n      \"size_bytes\": 7\n    },\n    {\n      \"extension\": \".csv\",\n      \"file_count\": 1,\n      \"size_bytes\": 8\n    },\n    {\n      \"extension\": \".log\",\n      \"file_count\": 2,\n      \"size_bytes\": 8\n    },\n    {\n      \"extension\": \".py\",\n      \"file_count\": 1,\n      \"size_bytes\": 14\n    }\n  ],\n  \"largest_files\": [\n    {\n      \"path\": \"src/main.py\",\n      \"size_bytes\": 14\n    },\n    {\n      \"path\": \"reports/\\u603b\\u7ed3.csv\",\n      \"size_bytes\": 8\n    },\n    {\n      \"path\": \"LICENSE\",\n      \"size_bytes\": 7\n    },\n    {\n      \"path\": \"logs/app.log\",\n      \"size_bytes\": 4\n    },\n    {\n      \"path\": \"logs/nested/app.log\",\n      \"size_bytes\": 4\n    },\n    {\n      \"path\": \"empty/a\",\n      \"size_bytes\": 0\n    },\n    {\n      \"path\": \"empty/b\",\n      \"size_bytes\": 0\n    }\n  ],\n  \"root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\",\n  \"schema_version\": 1,\n  \"scope\": {\n    \"exclusions\": [\n      \".git\",\n      \".venv*\",\n      \"venv\",\n      \"__pycache__\",\n      \"node_modules\",\n      \".pytest_cache\",\n      \".mypy_cache\",\n      \".ruff_cache\",\n      \".tox\",\n      \".nox\"\n    ],\n    \"includes\": []\n  },\n  \"summary\": {\n    \"directories_visited\": 6,\n    \"error_count\": 0,\n    \"excluded_entries\": 2,\n    \"file_count\": 7,\n    \"size_bytes\": 37\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel inspection text",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "inspect",
+        "--source",
+        ".",
+        "--top",
+        "3"
+      ],
+      "exit_code": 0,
+      "stdout": "Inspect: C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4\ns68\\workspace\nFiles: 7; bytes: 37\n(no extension): 3 files, 7 bytes\n.csv: 1 files, 8 bytes\n.log: 2 files, 8 bytes\n.py: 1 files, 14 bytes\nLargest files:\n14 bytes | src/main.py\n8 bytes | reports/\\u603b\\u7ed3.csv\n7 bytes | LICENSE\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel repeated inspection JSON",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "inspect",
+        "--source",
+        ".",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"command\": \"inspect\",\n  \"complete\": true,\n  \"errors\": [],\n  \"extensions\": [\n    {\n      \"extension\": \"\",\n      \"file_count\": 3,\n      \"size_bytes\": 7\n    },\n    {\n      \"extension\": \".csv\",\n      \"file_count\": 1,\n      \"size_bytes\": 8\n    },\n    {\n      \"extension\": \".log\",\n      \"file_count\": 2,\n      \"size_bytes\": 8\n    },\n    {\n      \"extension\": \".py\",\n      \"file_count\": 1,\n      \"size_bytes\": 14\n    }\n  ],\n  \"largest_files\": [\n    {\n      \"path\": \"src/main.py\",\n      \"size_bytes\": 14\n    },\n    {\n      \"path\": \"reports/\\u603b\\u7ed3.csv\",\n      \"size_bytes\": 8\n    },\n    {\n      \"path\": \"LICENSE\",\n      \"size_bytes\": 7\n    },\n    {\n      \"path\": \"logs/app.log\",\n      \"size_bytes\": 4\n    },\n    {\n      \"path\": \"logs/nested/app.log\",\n      \"size_bytes\": 4\n    },\n    {\n      \"path\": \"empty/a\",\n      \"size_bytes\": 0\n    },\n    {\n      \"path\": \"empty/b\",\n      \"size_bytes\": 0\n    }\n  ],\n  \"root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\",\n  \"schema_version\": 1,\n  \"scope\": {\n    \"exclusions\": [\n      \".git\",\n      \".venv*\",\n      \"venv\",\n      \"__pycache__\",\n      \"node_modules\",\n      \".pytest_cache\",\n      \".mypy_cache\",\n      \".ruff_cache\",\n      \".tox\",\n      \".nox\"\n    ],\n    \"includes\": []\n  },\n  \"summary\": {\n    \"directories_visited\": 6,\n    \"error_count\": 0,\n    \"excluded_entries\": 2,\n    \"file_count\": 7,\n    \"size_bytes\": 37\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel duplicate JSON",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "duplicates",
+        "--dir",
+        ".",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"algorithm\": \"sha256\",\n  \"command\": \"duplicates\",\n  \"complete\": true,\n  \"errors\": [],\n  \"groups\": [\n    {\n      \"paths\": [\n        \"logs/app.log\",\n        \"logs/nested/app.log\"\n      ],\n      \"sha256\": \"9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857\",\n      \"size_bytes\": 4\n    },\n    {\n      \"paths\": [\n        \"empty/a\",\n        \"empty/b\"\n      ],\n      \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n      \"size_bytes\": 0\n    }\n  ],\n  \"root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\",\n  \"schema_version\": 1,\n  \"scope\": {\n    \"exclusions\": [\n      \".git\",\n      \".venv*\",\n      \"venv\",\n      \"__pycache__\",\n      \"node_modules\",\n      \".pytest_cache\",\n      \".mypy_cache\",\n      \".ruff_cache\",\n      \".tox\",\n      \".nox\"\n    ],\n    \"includes\": []\n  },\n  \"summary\": {\n    \"candidate_files\": 4,\n    \"duplicate_groups\": 2,\n    \"error_count\": 0,\n    \"excluded_entries\": 2,\n    \"file_count\": 7,\n    \"hashed_files\": 4,\n    \"redundant_bytes\": 4\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel duplicate text",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "duplicates",
+        "--dir",
+        "."
+      ],
+      "exit_code": 0,
+      "stdout": "Duplicates: C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4\ns68\\workspace\nFound 2 duplicate groups (full SHA-256; 4 files hashed)\n9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857 | 4 bytes\nlogs/app.log\nlogs/nested/app.log\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 | 0 bytes\nempty/a\nempty/b\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel repeated duplicate JSON",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "duplicates",
+        "--dir",
+        ".",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"algorithm\": \"sha256\",\n  \"command\": \"duplicates\",\n  \"complete\": true,\n  \"errors\": [],\n  \"groups\": [\n    {\n      \"paths\": [\n        \"logs/app.log\",\n        \"logs/nested/app.log\"\n      ],\n      \"sha256\": \"9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857\",\n      \"size_bytes\": 4\n    },\n    {\n      \"paths\": [\n        \"empty/a\",\n        \"empty/b\"\n      ],\n      \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n      \"size_bytes\": 0\n    }\n  ],\n  \"root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\",\n  \"schema_version\": 1,\n  \"scope\": {\n    \"exclusions\": [\n      \".git\",\n      \".venv*\",\n      \"venv\",\n      \"__pycache__\",\n      \"node_modules\",\n      \".pytest_cache\",\n      \".mypy_cache\",\n      \".ruff_cache\",\n      \".tox\",\n      \".nox\"\n    ],\n    \"includes\": []\n  },\n  \"summary\": {\n    \"candidate_files\": 4,\n    \"duplicate_groups\": 2,\n    \"error_count\": 0,\n    \"excluded_entries\": 2,\n    \"file_count\": 7,\n    \"hashed_files\": 4,\n    \"redundant_bytes\": 4\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel custom excludes",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "inspect",
+        "--source",
+        ".",
+        "--exclude",
+        "logs/",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"command\": \"inspect\",\n  \"complete\": true,\n  \"errors\": [],\n  \"extensions\": [\n    {\n      \"extension\": \"\",\n      \"file_count\": 3,\n      \"size_bytes\": 7\n    },\n    {\n      \"extension\": \".csv\",\n      \"file_count\": 1,\n      \"size_bytes\": 8\n    },\n    {\n      \"extension\": \".py\",\n      \"file_count\": 1,\n      \"size_bytes\": 14\n    }\n  ],\n  \"largest_files\": [\n    {\n      \"path\": \"src/main.py\",\n      \"size_bytes\": 14\n    },\n    {\n      \"path\": \"reports/\\u603b\\u7ed3.csv\",\n      \"size_bytes\": 8\n    },\n    {\n      \"path\": \"LICENSE\",\n      \"size_bytes\": 7\n    },\n    {\n      \"path\": \"empty/a\",\n      \"size_bytes\": 0\n    },\n    {\n      \"path\": \"empty/b\",\n      \"size_bytes\": 0\n    }\n  ],\n  \"root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\",\n  \"schema_version\": 1,\n  \"scope\": {\n    \"exclusions\": [\n      \".git\",\n      \".venv*\",\n      \"venv\",\n      \"__pycache__\",\n      \"node_modules\",\n      \".pytest_cache\",\n      \".mypy_cache\",\n      \".ruff_cache\",\n      \".tox\",\n      \".nox\",\n      \"logs/**\"\n    ],\n    \"includes\": []\n  },\n  \"summary\": {\n    \"directories_visited\": 4,\n    \"error_count\": 0,\n    \"excluded_entries\": 3,\n    \"file_count\": 5,\n    \"size_bytes\": 29\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel default-exclusion override",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "inspect",
+        "--source",
+        ".",
+        "--no-default-excludes",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"command\": \"inspect\",\n  \"complete\": true,\n  \"errors\": [],\n  \"extensions\": [\n    {\n      \"extension\": \"\",\n      \"file_count\": 4,\n      \"size_bytes\": 10\n    },\n    {\n      \"extension\": \".csv\",\n      \"file_count\": 1,\n      \"size_bytes\": 8\n    },\n    {\n      \"extension\": \".log\",\n      \"file_count\": 2,\n      \"size_bytes\": 8\n    },\n    {\n      \"extension\": \".py\",\n      \"file_count\": 2,\n      \"size_bytes\": 18\n    }\n  ],\n  \"largest_files\": [\n    {\n      \"path\": \"src/main.py\",\n      \"size_bytes\": 14\n    },\n    {\n      \"path\": \"reports/\\u603b\\u7ed3.csv\",\n      \"size_bytes\": 8\n    },\n    {\n      \"path\": \"LICENSE\",\n      \"size_bytes\": 7\n    },\n    {\n      \"path\": \"logs/app.log\",\n      \"size_bytes\": 4\n    },\n    {\n      \"path\": \"logs/nested/app.log\",\n      \"size_bytes\": 4\n    },\n    {\n      \"path\": \"venv/skip.py\",\n      \"size_bytes\": 4\n    },\n    {\n      \"path\": \".git/config\",\n      \"size_bytes\": 3\n    },\n    {\n      \"path\": \"empty/a\",\n      \"size_bytes\": 0\n    },\n    {\n      \"path\": \"empty/b\",\n      \"size_bytes\": 0\n    }\n  ],\n  \"root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\",\n  \"schema_version\": 1,\n  \"scope\": {\n    \"exclusions\": [],\n    \"includes\": []\n  },\n  \"summary\": {\n    \"directories_visited\": 8,\n    \"error_count\": 0,\n    \"excluded_entries\": 0,\n    \"file_count\": 9,\n    \"size_bytes\": 44\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel selected preview JSON",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        ".",
+        "--include",
+        "logs/**/*.log",
+        "--include",
+        "reports/**",
+        "--format",
+        "json",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\copy"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"command\": \"organize\",\n  \"complete\": true,\n  \"destination_root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\copy\",\n  \"mode\": \"preview\",\n  \"operations\": [\n    {\n      \"action\": \"move\",\n      \"checksum\": \"9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857\",\n      \"conflict_policy\": \"error\",\n      \"destination\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\copy\\\\misc\\\\logs\\\\app.log\",\n      \"destination_created\": false,\n      \"error\": null,\n      \"filesystem_status\": \"unchanged\",\n      \"history_error\": null,\n      \"history_status\": \"not_requested\",\n      \"skipped_reason\": null,\n      \"source\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\\\\logs\\\\app.log\",\n      \"source_removed\": false,\n      \"source_state\": {\n        \"changed_ns\": 1792066278584015200,\n        \"device\": 11446573977672496805,\n        \"inode\": 5910974513199644,\n        \"modified_ns\": 1792066278586036800,\n        \"sha256\": \"9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857\",\n        \"size\": 4\n      },\n      \"status\": \"dry_run\",\n      \"validation_error\": null\n    },\n    {\n      \"action\": \"move\",\n      \"checksum\": \"9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857\",\n      \"conflict_policy\": \"error\",\n      \"destination\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\copy\\\\misc\\\\logs\\\\nested\\\\app.log\",\n      \"destination_created\": false,\n      \"error\": null,\n      \"filesystem_status\": \"unchanged\",\n      \"history_error\": null,\n      \"history_status\": \"not_requested\",\n      \"skipped_reason\": null,\n      \"source\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\\\\logs\\\\nested\\\\app.log\",\n      \"source_removed\": false,\n      \"source_state\": {\n        \"changed_ns\": 1792066278590101700,\n        \"device\": 11446573977672496805,\n        \"inode\": 3940649676225129,\n        \"modified_ns\": 1792066278592349400,\n        \"sha256\": \"9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857\",\n        \"size\": 4\n      },\n      \"status\": \"dry_run\",\n      \"validation_error\": null\n    },\n    {\n      \"action\": \"move\",\n      \"checksum\": \"492d5ea496056f1a6a6592241032fab764c321596317930b4fa0e1e8bc3b7470\",\n      \"conflict_policy\": \"error\",\n      \"destination\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\copy\\\\data\\\\reports\\\\\\u603b\\u7ed3.csv\",\n      \"destination_created\": false,\n      \"error\": null,\n      \"filesystem_status\": \"unchanged\",\n      \"history_error\": null,\n      \"history_status\": \"not_requested\",\n      \"skipped_reason\": null,\n      \"source\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\\\\reports\\\\\\u603b\\u7ed3.csv\",\n      \"source_removed\": false,\n      \"source_state\": {\n        \"changed_ns\": 1792066278595351800,\n        \"device\": 11446573977672496805,\n        \"inode\": 4222124652935788,\n        \"modified_ns\": 1792066278596352500,\n        \"sha256\": \"492d5ea496056f1a6a6592241032fab764c321596317930b4fa0e1e8bc3b7470\",\n        \"size\": 8\n      },\n      \"status\": \"dry_run\",\n      \"validation_error\": null\n    }\n  ],\n  \"schema_version\": 1,\n  \"scope\": {\n    \"all_files\": false,\n    \"exclusions\": [\n      \".git\",\n      \".venv*\",\n      \"venv\",\n      \"__pycache__\",\n      \"node_modules\",\n      \".pytest_cache\",\n      \".mypy_cache\",\n      \".ruff_cache\",\n      \".tox\",\n      \".nox\"\n    ],\n    \"includes\": [\n      \"logs/**/*.log\",\n      \"reports/**\"\n    ]\n  },\n  \"source_root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\",\n  \"summary\": {\n    \"dry_run\": 3,\n    \"failed\": 0,\n    \"filesystem_changed\": 0,\n    \"history_failed\": 0,\n    \"skipped\": 0,\n    \"successful\": 0,\n    \"total_files\": 3,\n    \"total_size_mb\": 0.0\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel JSON requires approval",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        ".",
+        "--include",
+        "logs/**/*.log",
+        "--include",
+        "reports/**",
+        "--format",
+        "json",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\copy",
+        "--apply"
+      ],
+      "exit_code": 1,
+      "stdout": "{\n  \"command\": \"organize\",\n  \"complete\": false,\n  \"error\": \"Confirmation required; inspect preview, then use --apply --yes\",\n  \"schema_version\": 1\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel missing source selection",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        ".",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\copy"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "usage: tm organize [-h] --source SOURCE (--include INCLUDE | --all-files)\n                   [--exclude EXCLUDE] [--no-default-excludes]\n                   [--no-recursive] [--format {text,json}] --destination\n                   DESTINATION [--action {copy,move}]\n                   [--conflict {error,skip}] [--template TEMPLATE] [--yes]\n                   [--strategy {type,date,size}] [--dry-run | --apply]\ntm organize: error: one of the arguments --include --all-files is required\n"
+    },
+    {
+      "check": "wheel selected copy JSON",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        ".",
+        "--include",
+        "logs/**/*.log",
+        "--include",
+        "reports/**",
+        "--format",
+        "json",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\copy",
+        "--action",
+        "copy",
+        "--apply"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"command\": \"organize\",\n  \"complete\": true,\n  \"destination_root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\copy\",\n  \"mode\": \"apply\",\n  \"operations\": [\n    {\n      \"action\": \"copy\",\n      \"checksum\": \"9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857\",\n      \"conflict_policy\": \"error\",\n      \"destination\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\copy\\\\misc\\\\logs\\\\app.log\",\n      \"destination_created\": true,\n      \"error\": null,\n      \"filesystem_status\": \"copied\",\n      \"history_error\": null,\n      \"history_status\": \"recorded\",\n      \"skipped_reason\": null,\n      \"source\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\\\\logs\\\\app.log\",\n      \"source_removed\": false,\n      \"source_state\": {\n        \"changed_ns\": 1792066278584015200,\n        \"device\": 11446573977672496805,\n        \"inode\": 5910974513199644,\n        \"modified_ns\": 1792066278586036800,\n        \"sha256\": \"9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857\",\n        \"size\": 4\n      },\n      \"status\": \"success\",\n      \"validation_error\": null\n    },\n    {\n      \"action\": \"copy\",\n      \"checksum\": \"9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857\",\n      \"conflict_policy\": \"error\",\n      \"destination\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\copy\\\\misc\\\\logs\\\\nested\\\\app.log\",\n      \"destination_created\": true,\n      \"error\": null,\n      \"filesystem_status\": \"copied\",\n      \"history_error\": null,\n      \"history_status\": \"recorded\",\n      \"skipped_reason\": null,\n      \"source\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\\\\logs\\\\nested\\\\app.log\",\n      \"source_removed\": false,\n      \"source_state\": {\n        \"changed_ns\": 1792066278590101700,\n        \"device\": 11446573977672496805,\n        \"inode\": 3940649676225129,\n        \"modified_ns\": 1792066278592349400,\n        \"sha256\": \"9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857\",\n        \"size\": 4\n      },\n      \"status\": \"success\",\n      \"validation_error\": null\n    },\n    {\n      \"action\": \"copy\",\n      \"checksum\": \"492d5ea496056f1a6a6592241032fab764c321596317930b4fa0e1e8bc3b7470\",\n      \"conflict_policy\": \"error\",\n      \"destination\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\copy\\\\data\\\\reports\\\\\\u603b\\u7ed3.csv\",\n      \"destination_created\": true,\n      \"error\": null,\n      \"filesystem_status\": \"copied\",\n      \"history_error\": null,\n      \"history_status\": \"recorded\",\n      \"skipped_reason\": null,\n      \"source\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\\\\reports\\\\\\u603b\\u7ed3.csv\",\n      \"source_removed\": false,\n      \"source_state\": {\n        \"changed_ns\": 1792066278595351800,\n        \"device\": 11446573977672496805,\n        \"inode\": 4222124652935788,\n        \"modified_ns\": 1792066278596352500,\n        \"sha256\": \"492d5ea496056f1a6a6592241032fab764c321596317930b4fa0e1e8bc3b7470\",\n        \"size\": 8\n      },\n      \"status\": \"success\",\n      \"validation_error\": null\n    }\n  ],\n  \"schema_version\": 1,\n  \"scope\": {\n    \"all_files\": false,\n    \"exclusions\": [\n      \".git\",\n      \".venv*\",\n      \"venv\",\n      \"__pycache__\",\n      \"node_modules\",\n      \".pytest_cache\",\n      \".mypy_cache\",\n      \".ruff_cache\",\n      \".tox\",\n      \".nox\"\n    ],\n    \"includes\": [\n      \"logs/**/*.log\",\n      \"reports/**\"\n    ]\n  },\n  \"source_root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\",\n  \"summary\": {\n    \"dry_run\": 0,\n    \"failed\": 0,\n    \"filesystem_changed\": 3,\n    \"history_failed\": 0,\n    \"skipped\": 0,\n    \"successful\": 3,\n    \"total_files\": 3,\n    \"total_size_mb\": 0.0\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel project-root selection with existing history",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        ".",
+        "--include",
+        "logs/**/*.log",
+        "--include",
+        "reports/**",
+        "--format",
+        "json",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\move",
+        "--apply",
+        "--yes"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"command\": \"organize\",\n  \"complete\": true,\n  \"destination_root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\move\",\n  \"mode\": \"apply\",\n  \"operations\": [\n    {\n      \"action\": \"move\",\n      \"checksum\": \"9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857\",\n      \"conflict_policy\": \"error\",\n      \"destination\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\move\\\\misc\\\\logs\\\\app.log\",\n      \"destination_created\": true,\n      \"error\": null,\n      \"filesystem_status\": \"moved\",\n      \"history_error\": null,\n      \"history_status\": \"recorded\",\n      \"skipped_reason\": null,\n      \"source\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\\\\logs\\\\app.log\",\n      \"source_removed\": true,\n      \"source_state\": {\n        \"changed_ns\": 1792066278584015200,\n        \"device\": 11446573977672496805,\n        \"inode\": 5910974513199644,\n        \"modified_ns\": 1792066278586036800,\n        \"sha256\": \"9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857\",\n        \"size\": 4\n      },\n      \"status\": \"success\",\n      \"validation_error\": null\n    },\n    {\n      \"action\": \"move\",\n      \"checksum\": \"9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857\",\n      \"conflict_policy\": \"error\",\n      \"destination\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\move\\\\misc\\\\logs\\\\nested\\\\app.log\",\n      \"destination_created\": true,\n      \"error\": null,\n      \"filesystem_status\": \"moved\",\n      \"history_error\": null,\n      \"history_status\": \"recorded\",\n      \"skipped_reason\": null,\n      \"source\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\\\\logs\\\\nested\\\\app.log\",\n      \"source_removed\": true,\n      \"source_state\": {\n        \"changed_ns\": 1792066278590101700,\n        \"device\": 11446573977672496805,\n        \"inode\": 3940649676225129,\n        \"modified_ns\": 1792066278592349400,\n        \"sha256\": \"9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857\",\n        \"size\": 4\n      },\n      \"status\": \"success\",\n      \"validation_error\": null\n    },\n    {\n      \"action\": \"move\",\n      \"checksum\": \"492d5ea496056f1a6a6592241032fab764c321596317930b4fa0e1e8bc3b7470\",\n      \"conflict_policy\": \"error\",\n      \"destination\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\move\\\\data\\\\reports\\\\\\u603b\\u7ed3.csv\",\n      \"destination_created\": true,\n      \"error\": null,\n      \"filesystem_status\": \"moved\",\n      \"history_error\": null,\n      \"history_status\": \"recorded\",\n      \"skipped_reason\": null,\n      \"source\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\\\\reports\\\\\\u603b\\u7ed3.csv\",\n      \"source_removed\": true,\n      \"source_state\": {\n        \"changed_ns\": 1792066278595351800,\n        \"device\": 11446573977672496805,\n        \"inode\": 4222124652935788,\n        \"modified_ns\": 1792066278596352500,\n        \"sha256\": \"492d5ea496056f1a6a6592241032fab764c321596317930b4fa0e1e8bc3b7470\",\n        \"size\": 8\n      },\n      \"status\": \"success\",\n      \"validation_error\": null\n    }\n  ],\n  \"schema_version\": 1,\n  \"scope\": {\n    \"all_files\": false,\n    \"exclusions\": [\n      \".git\",\n      \".venv*\",\n      \"venv\",\n      \"__pycache__\",\n      \"node_modules\",\n      \".pytest_cache\",\n      \".mypy_cache\",\n      \".ruff_cache\",\n      \".tox\",\n      \".nox\"\n    ],\n    \"includes\": [\n      \"logs/**/*.log\",\n      \"reports/**\"\n    ]\n  },\n  \"source_root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\",\n  \"summary\": {\n    \"dry_run\": 0,\n    \"failed\": 0,\n    \"filesystem_changed\": 3,\n    \"history_failed\": 0,\n    \"skipped\": 0,\n    \"successful\": 3,\n    \"total_files\": 3,\n    \"total_size_mb\": 0.0\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel no matching artifacts",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        ".",
+        "--include",
+        "logs/**/*.log",
+        "--include",
+        "reports/**",
+        "--format",
+        "json",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\absent"
+      ],
+      "exit_code": 1,
+      "stdout": "{\n  \"command\": \"organize\",\n  \"complete\": false,\n  \"error\": \"No files matched the selected include patterns after exclusions\",\n  \"schema_version\": 1\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel history-file protection",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        ".",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\unsafe",
+        "--all-files",
+        "--format",
+        "json"
+      ],
+      "exit_code": 1,
+      "stdout": "{\n  \"command\": \"organize\",\n  \"complete\": false,\n  \"error\": \"History database must be outside source selections and destination roots; refine includes/exclusions\",\n  \"schema_version\": 1\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel size strategy",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        ".",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\size",
+        "--include",
+        "LICENSE",
+        "--strategy",
+        "size",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"command\": \"organize\",\n  \"complete\": true,\n  \"destination_root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\size\",\n  \"mode\": \"preview\",\n  \"operations\": [\n    {\n      \"action\": \"move\",\n      \"checksum\": \"cc1d3b0234846714b0aeda6cc34b057b4305bb83dd447fb88f816efeb59a4e96\",\n      \"conflict_policy\": \"error\",\n      \"destination\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\size\\\\small\\\\LICENSE\",\n      \"destination_created\": false,\n      \"error\": null,\n      \"filesystem_status\": \"unchanged\",\n      \"history_error\": null,\n      \"history_status\": \"not_requested\",\n      \"skipped_reason\": null,\n      \"source\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\\\\LICENSE\",\n      \"source_removed\": false,\n      \"source_state\": {\n        \"changed_ns\": 1792066278599761900,\n        \"device\": 11446573977672496805,\n        \"inode\": 3940649676225133,\n        \"modified_ns\": 1792066278600759600,\n        \"sha256\": \"cc1d3b0234846714b0aeda6cc34b057b4305bb83dd447fb88f816efeb59a4e96\",\n        \"size\": 7\n      },\n      \"status\": \"dry_run\",\n      \"validation_error\": null\n    }\n  ],\n  \"schema_version\": 1,\n  \"scope\": {\n    \"all_files\": false,\n    \"exclusions\": [\n      \".git\",\n      \".venv*\",\n      \"venv\",\n      \"__pycache__\",\n      \"node_modules\",\n      \".pytest_cache\",\n      \".mypy_cache\",\n      \".ruff_cache\",\n      \".tox\",\n      \".nox\"\n    ],\n    \"includes\": [\n      \"LICENSE\"\n    ]\n  },\n  \"source_root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\",\n  \"summary\": {\n    \"dry_run\": 1,\n    \"failed\": 0,\n    \"filesystem_changed\": 0,\n    \"history_failed\": 0,\n    \"skipped\": 0,\n    \"successful\": 0,\n    \"total_files\": 1,\n    \"total_size_mb\": 0.0\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel traversal refusal",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        ".",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\bad",
+        "--include",
+        "LICENSE",
+        "--template",
+        "../escape",
+        "--format",
+        "json"
+      ],
+      "exit_code": 1,
+      "stdout": "{\n  \"command\": \"organize\",\n  \"complete\": false,\n  \"destination_root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\bad\",\n  \"mode\": \"preview\",\n  \"operations\": [\n    {\n      \"action\": \"move\",\n      \"checksum\": null,\n      \"conflict_policy\": \"error\",\n      \"destination\": null,\n      \"destination_created\": false,\n      \"error\": \"Destination traversal (..) is not allowed\",\n      \"filesystem_status\": \"unchanged\",\n      \"history_error\": null,\n      \"history_status\": \"not_requested\",\n      \"skipped_reason\": null,\n      \"source\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\\\\LICENSE\",\n      \"source_removed\": false,\n      \"source_state\": {\n        \"changed_ns\": 1792066278599761900,\n        \"device\": 11446573977672496805,\n        \"inode\": 3940649676225133,\n        \"modified_ns\": 1792066278600759600,\n        \"sha256\": \"cc1d3b0234846714b0aeda6cc34b057b4305bb83dd447fb88f816efeb59a4e96\",\n        \"size\": 7\n      },\n      \"status\": \"failed\",\n      \"validation_error\": \"Destination traversal (..) is not allowed\"\n    }\n  ],\n  \"schema_version\": 1,\n  \"scope\": {\n    \"all_files\": false,\n    \"exclusions\": [\n      \".git\",\n      \".venv*\",\n      \"venv\",\n      \"__pycache__\",\n      \"node_modules\",\n      \".pytest_cache\",\n      \".mypy_cache\",\n      \".ruff_cache\",\n      \".tox\",\n      \".nox\"\n    ],\n    \"includes\": [\n      \"LICENSE\"\n    ]\n  },\n  \"source_root\": \"C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\",\n  \"summary\": {\n    \"dry_run\": 0,\n    \"failed\": 1,\n    \"filesystem_changed\": 0,\n    \"history_failed\": 0,\n    \"skipped\": 0,\n    \"successful\": 0,\n    \"total_files\": 1,\n    \"total_size_mb\": 0.0\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel missing-root JSON",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "inspect",
+        "--source",
+        "missing",
+        "--format",
+        "json"
+      ],
+      "exit_code": 1,
+      "stdout": "{\n  \"command\": \"inspect\",\n  \"complete\": false,\n  \"error\": \"Source directory does not exist: C:\\\\Users\\\\LOCAL_USER\\\\Desktop\\\\Resume Project\\\\1_404Minds\\\\taskmaster-main\\\\.install-check\\\\phase3-outside\\\\verified-cajx4s68\\\\workspace\\\\missing\",\n  \"schema_version\": 1\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel automatic deletion disabled",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "duplicates",
+        "--dir",
+        ".",
+        "--delete"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "usage: tm [-h] [--interactive] {task,inspect,organize,duplicates} ...\ntm: error: Duplicate deletion is disabled; omit --delete to report full SHA-256 matches.\n"
+    },
+    {
+      "check": "wheel retained task dispatch",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "task",
+        "add",
+        "--name",
+        "probe",
+        "--command",
+        "echo phase3",
+        "--schedule",
+        "2026-10-15 12:00"
+      ],
+      "exit_code": 0,
+      "stdout": "Task created: dc15f638\nExperimental: commands cannot be restored after this process exits.\n",
+      "stderr": "INFO:TaskMaster:Registered task: probe (ID: dc15f638)\n"
+    },
+    {
+      "check": "wheel retained task list",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\tm.exe",
+        "task",
+        "list"
+      ],
+      "exit_code": 0,
+      "stdout": "                                Tasks (1 total)                                \n+-----------------------------------------------------------------------------+\n| ID      || Status      | Priori\u2026 | Schedule        | Runs | Next Run        |\n|---------++-------------+---------+-----------------+------+-----------------|\n| dc15f6\u2026 || PENDING     | 2       | 2026-10-15T12:\u2026 | 0    | 2026-10-15T12:\u2026 |\n+-----------------------------------------------------------------------------+\n",
+      "stderr": ""
+    },
+    {
+      "check": "clean dependency consistency",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pip",
+        "--python",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase3\\Scripts\\python.exe",
+        "check"
+      ],
+      "exit_code": 0,
+      "stdout": "No broken requirements found.\n",
+      "stderr": ""
+    }
+  ]
+}

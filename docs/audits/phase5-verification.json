@@ -1,0 +1,17 @@
+{
+  "tests_passed": 195,
+  "tests_skipped": 1,
+  "coverage_percent": 74.46643383779589,
+  "covered_branches": 430,
+  "total_branches": 628,
+  "audited_dependencies": {
+    "runtime": 4,
+    "dev": 43
+  },
+  "installed_checks": 43,
+  "wheel_sha256": "391df5f886b0c7358f108349bb63255709a75eed10366897a66068b9a132142e",
+  "runtime_ast_unchanged_except_imports": true,
+  "hosted_ci_executed": false,
+  "upstream_provenance_verified": false,
+  "release_published": false
+}

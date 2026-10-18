@@ -1,0 +1,211 @@
+{
+  "cwd": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\outside",
+  "checks": [
+    {
+      "check": "wheel module help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-clean\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "taskmaster",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: __main__.py [-h] [--interactive] {task,organize,duplicates} ...\n\nTaskMaster - Advanced Task Scheduler & File Organizer\n\npositional arguments:\n  {task,organize,duplicates}\n                        Available commands\n    task                Task management\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  __main__.py --interactive              Launch interactive mode\n  __main__.py task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  __main__.py task list\n  __main__.py organize --source ./sample-artifacts --strategy type --dry-run\n  __main__.py duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel taskmaster.exe help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-clean\\Scripts\\taskmaster.exe",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: taskmaster [-h] [--interactive] {task,organize,duplicates} ...\n\nTaskMaster - Advanced Task Scheduler & File Organizer\n\npositional arguments:\n  {task,organize,duplicates}\n                        Available commands\n    task                Task management\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  taskmaster --interactive              Launch interactive mode\n  taskmaster task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  taskmaster task list\n  taskmaster organize --source ./sample-artifacts --strategy type --dry-run\n  taskmaster duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel tm.exe help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-clean\\Scripts\\tm.exe",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: tm [-h] [--interactive] {task,organize,duplicates} ...\n\nTaskMaster - Advanced Task Scheduler & File Organizer\n\npositional arguments:\n  {task,organize,duplicates}\n                        Available commands\n    task                Task management\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  tm --interactive              Launch interactive mode\n  tm task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  tm task list\n  tm organize --source ./sample-artifacts --strategy type --dry-run\n  tm duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "editable module help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "taskmaster",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: __main__.py [-h] [--interactive] {task,organize,duplicates} ...\n\nTaskMaster - Advanced Task Scheduler & File Organizer\n\npositional arguments:\n  {task,organize,duplicates}\n                        Available commands\n    task                Task management\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  __main__.py --interactive              Launch interactive mode\n  __main__.py task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  __main__.py task list\n  __main__.py organize --source ./sample-artifacts --strategy type --dry-run\n  __main__.py duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "editable taskmaster.exe help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv\\Scripts\\taskmaster.exe",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: taskmaster [-h] [--interactive] {task,organize,duplicates} ...\n\nTaskMaster - Advanced Task Scheduler & File Organizer\n\npositional arguments:\n  {task,organize,duplicates}\n                        Available commands\n    task                Task management\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  taskmaster --interactive              Launch interactive mode\n  taskmaster task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  taskmaster task list\n  taskmaster organize --source ./sample-artifacts --strategy type --dry-run\n  taskmaster duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "editable tm.exe help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv\\Scripts\\tm.exe",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: tm [-h] [--interactive] {task,organize,duplicates} ...\n\nTaskMaster - Advanced Task Scheduler & File Organizer\n\npositional arguments:\n  {task,organize,duplicates}\n                        Available commands\n    task                Task management\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  tm --interactive              Launch interactive mode\n  tm task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  tm task list\n  tm organize --source ./sample-artifacts --strategy type --dry-run\n  tm duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel imports outside source",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-clean\\Scripts\\python.exe",
+        "-I",
+        "-c",
+        "import taskmaster, taskmaster.plugins, importlib.metadata as m, importlib.util; print(taskmaster.__file__); assert '.venv-clean' in taskmaster.__file__; assert hasattr(taskmaster.plugins, 'PluginManager'); assert m.version('taskmaster') == '2.0.1'; assert importlib.util.find_spec('PIL') is None; assert importlib.util.find_spec('PyPDF2') is None"
+      ],
+      "exit_code": 0,
+      "stdout": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-clean\\Lib\\site-packages\\taskmaster\\__init__.py\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel disposable demo",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-clean\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "taskmaster.demo",
+        "--directory",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\outside"
+      ],
+      "exit_code": 0,
+      "stdout": "[DRY RUN] Would copy C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\outside\\taskmaster-demo-y8c90vz5\\samples\\first.log -> C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\outside\\taskmaster-demo-y8c90vz5\\output\\first.log\n[DRY RUN] Would copy C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\outside\\taskmaster-demo-y8c90vz5\\samples\\second.log -> C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\outside\\taskmaster-demo-y8c90vz5\\output\\second.log\n{'total_files': 2, 'successful': 0, 'failed': 0, 'skipped': 0, 'dry_run': 2, 'total_size_mb': 0.0, 'timestamp': '2026-10-15T15:49:13.249991'}\nFull SHA-256 duplicate groups: 1\nPreview and duplicate scans write disposable database records only.\nDemo complete; disposable fixtures removed.\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel duplicate report",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-clean\\Scripts\\tm.exe",
+        "duplicates",
+        "--dir",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\outside\\artifacts"
+      ],
+      "exit_code": 0,
+      "stdout": "Found 1 duplicate groups\nC:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\outside\\artifacts\\one.log\nC:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\outside\\artifacts\\two.log\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel preview",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-clean\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\outside\\artifacts",
+        "--dry-run"
+      ],
+      "exit_code": 0,
+      "stdout": "[DRY RUN] Would move C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\outside\\artifacts\\one.log -> organized\\misc\\one.log\n[DRY RUN] Would move C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\outside\\artifacts\\two.log -> organized\\misc\\two.log\nOrganized 0 files\nPreviewed 2 files; no file changes applied.\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel organization",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-clean\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\outside\\artifacts"
+      ],
+      "exit_code": 0,
+      "stdout": "Organized 2 files\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel missing source exit",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-clean\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        "missing"
+      ],
+      "exit_code": 1,
+      "stdout": "Error: Source directory does not exist: missing\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel deletion disabled exit",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-clean\\Scripts\\tm.exe",
+        "duplicates",
+        "--dir",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\outside\\artifacts",
+        "--delete"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "usage: tm [-h] [--interactive] {task,organize,duplicates} ...\ntm: error: Duplicate deletion is disabled; omit --delete to report full SHA-256 matches.\n"
+    },
+    {
+      "check": "wheel task add dispatch",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-clean\\Scripts\\tm.exe",
+        "task",
+        "add",
+        "--name",
+        "probe",
+        "--command",
+        "echo phase1",
+        "--schedule",
+        "2026-10-15 12:00"
+      ],
+      "exit_code": 0,
+      "stdout": "Task created: 52800adc\nExperimental: commands cannot be restored after this process exits.\n",
+      "stderr": "INFO:TaskMaster:Registered task: probe (ID: 52800adc)\n"
+    },
+    {
+      "check": "wheel task list",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-clean\\Scripts\\tm.exe",
+        "task",
+        "list"
+      ],
+      "exit_code": 0,
+      "stdout": "                                Tasks (1 total)                                \n+-----------------------------------------------------------------------------+\n| ID      || Status      | Priori\u2026 | Schedule        | Runs | Next Run        |\n|---------++-------------+---------+-----------------+------+-----------------|\n| 52800a\u2026 || PENDING     | 2       | 2026-10-15T12:\u2026 | 0    | 2026-10-15T12:\u2026 |\n+-----------------------------------------------------------------------------+\n",
+      "stderr": ""
+    },
+    {
+      "check": "editable dependency consistency",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pip",
+        "check"
+      ],
+      "exit_code": 0,
+      "stdout": "No broken requirements found.\n",
+      "stderr": ""
+    },
+    {
+      "check": "editable installed versions",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pip",
+        "freeze"
+      ],
+      "exit_code": 0,
+      "stdout": "colorama==0.4.6\niniconfig==2.3.1\nmarkdown-it-py==4.2.0\nmdurl==0.1.2\npackaging==26.3\npluggy==1.7.0\nPygments==2.21.0\npytest==9.1.1\nrich==13.9.4\n# Editable install with no version control (taskmaster==2.0.1)\n-e c:\\users\\LOCAL_USER\\desktop\\resume project\\1_404minds\\taskmaster-main\n",
+      "stderr": ""
+    }
+  ]
+}

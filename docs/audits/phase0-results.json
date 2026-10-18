@@ -1,0 +1,159 @@
+{
+  "date": "2026-10-15",
+  "python": "3.12.4 (tags/v3.12.4:8e8a4ba, Jun  6 2024, 19:30:16) [MSC v.1940 64 bit (AMD64)]",
+  "inventory_sha256": {
+    "taskmaster/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "taskmaster/__main__.py": "e408fdc08e0b72a63b3fe4f915eac5f93ec6c62bff714275fd6bc1c641b5a8f4",
+    "taskmaster/cli.py": "b2dc2d42aaa6fe58d9325f3bb70774f28d5230f37f40736a8f45db3009e69930",
+    "taskmaster/database.py": "1f5e26b89384ce6a099c3fedd6cd85f1135d1141b5087e254c4f7cc65aa036ec",
+    "taskmaster/demo.py": "be50a10a368d490e46c41047a299b8c44cd0248776b8ddfc17fcb07b9e1ea2a5",
+    "taskmaster/models.py": "d958cb123708c2879a1dad26eae093b45b85900ef97c7c846202fb18a75179d1",
+    "taskmaster/organizer.py": "0357bbdae1f0a197fe3acd005ffdf45db2658e0e2b7bffe3a396a5238c66735c",
+    "taskmaster/plugins/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "taskmaster/plugins.py": "3caa659a8de2051a4a30dc33a9a0c7658028def4f30154d88ef02bd4d83f8f0f",
+    "taskmaster/scheduler.py": "4895b1bdf6340a5f1a1c5881e90b5065c4d28353da168ef76435acb205f80c10",
+    "taskmaster/setup.py": "67438a70465946d1ceb2481e37d6902fc1ef53689d4d9b3b0a19bbf3dfbd9ab6",
+    "README.md": "d98b2c11fda8bcb70c48801ca968e4ebaa510dbd99369daed45ed0909e022e46",
+    "taskmaster/README.md": "d98b2c11fda8bcb70c48801ca968e4ebaa510dbd99369daed45ed0909e022e46"
+  },
+  "checks": {
+    "parse": {
+      "taskmaster\\__init__.py": "parsed",
+      "taskmaster\\__main__.py": "parsed",
+      "taskmaster\\cli.py": {
+        "line": 162,
+        "message": "unterminated string literal (detected at line 162)"
+      },
+      "taskmaster\\database.py": "parsed",
+      "taskmaster\\demo.py": {
+        "line": 20,
+        "message": "unterminated string literal (detected at line 20)"
+      },
+      "taskmaster\\models.py": "parsed",
+      "taskmaster\\organizer.py": "parsed",
+      "taskmaster\\plugins\\__init__.py": "parsed",
+      "taskmaster\\plugins.py": "parsed",
+      "taskmaster\\scheduler.py": "parsed",
+      "taskmaster\\setup.py": "parsed"
+    },
+    "cli_help": {
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-B",
+        "-m",
+        "taskmaster",
+        "--help"
+      ],
+      "cwd": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\taskmaster\\__main__.py\", line 4, in <module>\n    from .cli import main\n  File \"C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\taskmaster\\cli.py\", line 162\n    console.print(\"\n                  ^\nSyntaxError: unterminated string literal (detected at line 162)\n"
+    },
+    "test_collection": {
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-B",
+        "-m",
+        "pytest",
+        "--collect-only",
+        "-q",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "cwd": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main",
+      "exit_code": 5,
+      "stdout": "\nno tests collected in 0.05s\n",
+      "stderr": ""
+    },
+    "git": {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--is-inside-work-tree"
+      ],
+      "cwd": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main",
+      "exit_code": 128,
+      "stdout": "",
+      "stderr": "fatal: not a git repository (or any of the parent directories): .git\n"
+    },
+    "package_discovery": {
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-B",
+        "-c",
+        "from setuptools import find_packages; print(find_packages())"
+      ],
+      "cwd": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\taskmaster",
+      "exit_code": 0,
+      "stdout": "['plugins']\n",
+      "stderr": ""
+    },
+    "plugin_import": {
+      "loaded": "taskmaster\\plugins\\__init__.py",
+      "has_PluginManager": false
+    },
+    "readmes_identical": true,
+    "provenance_files": [],
+    "parser_dispatch": {
+      "interactive": false,
+      "command": "echo phase0",
+      "task_cmd": "add",
+      "name": "probe",
+      "schedule": "2026-10-15 12:00",
+      "recurrence": "once",
+      "priority": 2
+    },
+    "memory_database": "OperationalError: no such table: tasks",
+    "duplicate_false_positive": {
+      "quick_groups": 1,
+      "full_groups": 0,
+      "index_rows": 2
+    },
+    "database_duplicate_members": [
+      {
+        "count": 2,
+        "returned_path_fields": 1
+      }
+    ],
+    "overwrite": {
+      "status": "success",
+      "destination_contents": "new"
+    },
+    "invalid_action": {
+      "status": "success",
+      "source_preserved": true
+    },
+    "missing_source": 0,
+    "size_template": "{size_category}\\source.txt",
+    "dry_run": {
+      "status": "dry_run",
+      "new_history_rows": 1,
+      "source_preserved": true,
+      "destination_created": false
+    },
+    "metadata_error": "escaped: simulated metadata denial",
+    "due_time": {
+      "future_next_run_returned_as_due": true,
+      "command_persisted": false
+    },
+    "failure_log": {
+      "persisted": [],
+      "fail_count": 1
+    },
+    "blocked_dependency": {
+      "error": "Dependencies not satisfied",
+      "run_count": 1,
+      "fail_count": 1,
+      "status": "PENDING"
+    }
+  },
+  "installed_versions": {
+    "pip": "25.0.1",
+    "pytest": "9.1.1",
+    "rich": "13.8.0",
+    "setuptools": "73.0.1",
+    "Pillow": "10.4.0",
+    "PyPDF2": null
+  },
+  "application_files_unchanged": true
+}

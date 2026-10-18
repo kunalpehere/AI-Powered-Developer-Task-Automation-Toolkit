@@ -1,0 +1,60 @@
+{
+  "action": "validate",
+  "command": "workflow",
+  "complete": true,
+  "config_sha256": "2f9929f8a061d55954ae3a649673cf43f2de7f605c295b001c7926081f220db4",
+  "schema_version": 1,
+  "workflow": {
+    "name": "Review and copy development artifacts",
+    "on_failure": "stop",
+    "steps": [
+      {
+        "id": "inspect",
+        "operation": "inspect",
+        "parameters": {
+          "exclusions": [],
+          "includes": [],
+          "min_size": 0,
+          "recursive": true,
+          "source": "../fixtures/workspace",
+          "top": 5,
+          "use_default_excludes": true
+        }
+      },
+      {
+        "id": "duplicates",
+        "operation": "duplicates",
+        "parameters": {
+          "exclusions": [],
+          "includes": [
+            "*.log"
+          ],
+          "recursive": true,
+          "source": "../fixtures/workspace",
+          "use_default_excludes": true
+        }
+      },
+      {
+        "id": "copy_artifacts",
+        "operation": "organize",
+        "parameters": {
+          "action": "copy",
+          "all_files": false,
+          "conflict_policy": "skip",
+          "destination": "../fixtures/organized",
+          "exclusions": [],
+          "includes": [
+            "logs/**/*.log",
+            "reports/*.csv"
+          ],
+          "recursive": true,
+          "source": "../fixtures/workspace",
+          "strategy": "type",
+          "template": null,
+          "use_default_excludes": true
+        }
+      }
+    ],
+    "version": 1
+  }
+}

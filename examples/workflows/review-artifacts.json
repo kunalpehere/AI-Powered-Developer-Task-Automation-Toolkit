@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "name": "Review and copy development artifacts",
+  "on_failure": "stop",
+  "steps": [
+    {
+      "id": "inspect",
+      "operation": "inspect",
+      "parameters": {"source": "../fixtures/workspace", "top": 5}
+    },
+    {
+      "id": "duplicates",
+      "operation": "duplicates",
+      "parameters": {"source": "../fixtures/workspace", "includes": ["*.log"]}
+    },
+    {
+      "id": "copy_artifacts",
+      "operation": "organize",
+      "parameters": {
+        "source": "../fixtures/workspace",
+        "destination": "../fixtures/organized",
+        "includes": ["logs/**/*.log", "reports/*.csv"],
+        "action": "copy",
+        "conflict_policy": "skip"
+      }
+    }
+  ]
+}

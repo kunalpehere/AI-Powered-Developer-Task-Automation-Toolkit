@@ -1,0 +1,242 @@
+{
+  ".github/workflows/ci.yml": {
+    "before_sha256": "4e10ba771ad933da5711c57c678b2f64990b1e6f9373ad7010ff78e0fc0df5d3",
+    "after_sha256": "4e10ba771ad933da5711c57c678b2f64990b1e6f9373ad7010ff78e0fc0df5d3"
+  },
+  ".gitignore": {
+    "before_sha256": "b8911a5476d4c73bf1d4fb259e30fa6d1ecf4f93c8d327c66d0c0a0e45b9c499",
+    "after_sha256": "1062097003084f48427ac9312a472ae7c175a6bb383f1d8d71032aa2a6a6b545"
+  },
+  "ATTRIBUTION.md": {
+    "before_sha256": "74342d157713f29c5407d11fc3e11bbe9b110edd8cd244c2e6473c374c84dd8a",
+    "after_sha256": "3e4c6f8c5497ff89285f5d49b9485b603b0e09efd559cb82f32458e621162339"
+  },
+  "DEVELOPMENT_PLAN.md": {
+    "before_sha256": "29ca52ce57daa4fe8b3293e43d176c4ed6b309f80993b5f9d9f9447a568d01e6",
+    "after_sha256": "8d9d6acd5a9ed10a223824d5a3a04e1d0135bf40ebd7915a3e01195ac7672293"
+  },
+  "MANIFEST.in": {
+    "before_sha256": "5c8e80053e9a37de354c7c263b5913ba3a6509465aa3e4e31a3ae7225624894e",
+    "after_sha256": "5c8e80053e9a37de354c7c263b5913ba3a6509465aa3e4e31a3ae7225624894e"
+  },
+  "README.md": {
+    "before_sha256": "55e0ad955f82158ada2f42bc64911d896737218dae5c9934ae4e173b14ea59d2",
+    "after_sha256": "cac44beff54b09ff1cdd8f54a2d636f66a82782357eaea8a7ed01b63acee001c"
+  },
+  "docs/DEPENDENCIES.md": {
+    "before_sha256": "1f97d90e1771e567c9e72cd8062c8e68673acb231eeb7e930095661189dcdf91",
+    "after_sha256": "1f97d90e1771e567c9e72cd8062c8e68673acb231eeb7e930095661189dcdf91"
+  },
+  "docs/DESIGN.md": {
+    "before_sha256": "f04e5de3f92bac5a5938418d9e10984543ece9d3feec2ed393983e2164096a1b",
+    "after_sha256": "61ecaed23a86b791ef18905ab42670d0947dc2d6fd07db751d3ad81107ddfbe8"
+  },
+  "docs/FEATURE_EVIDENCE.md": {
+    "before_sha256": "8d64509d2aa9cfb7d7cf4185f5f9f1cee50eeb02d7c7e0d2ad9b1cb79affe337",
+    "after_sha256": "0e9b96372b7d3108c032e83497b52301dc2d8527fd3e7e21b73f1e101c162da5"
+  },
+  "docs/PHASE_1.md": {
+    "before_sha256": "495f1fa895edac5457974eb7e75e8ed2a4a8020923e86763d10aa77bae80a086",
+    "after_sha256": "495f1fa895edac5457974eb7e75e8ed2a4a8020923e86763d10aa77bae80a086"
+  },
+  "docs/PHASE_2.md": {
+    "before_sha256": "7da26e6f254cc8600f82b827d3778470b5e2fb2f5ce54bbf4f0b056784558b63",
+    "after_sha256": "7da26e6f254cc8600f82b827d3778470b5e2fb2f5ce54bbf4f0b056784558b63"
+  },
+  "docs/PHASE_3.md": {
+    "before_sha256": "12bc6bd0e6bfd912485687018e3ea075a2617a0ddd08fb1c97fa36b7d291d9ac",
+    "after_sha256": "12bc6bd0e6bfd912485687018e3ea075a2617a0ddd08fb1c97fa36b7d291d9ac"
+  },
+  "docs/PHASE_4.md": {
+    "before_sha256": "e89bd98ec4e3a4474d0a208582dcf29ff42327af08e43a5770304d94a1fadce6",
+    "after_sha256": "e89bd98ec4e3a4474d0a208582dcf29ff42327af08e43a5770304d94a1fadce6"
+  },
+  "docs/PHASE_5.md": {
+    "before_sha256": "e89e914ac1636869b491c1d6ae6ec27138b244431a9354ef10139216d6c4586a",
+    "after_sha256": "e89e914ac1636869b491c1d6ae6ec27138b244431a9354ef10139216d6c4586a"
+  },
+  "docs/PHASE_6.md": {
+    "before_sha256": null,
+    "after_sha256": "50b463855007528e545e64ad78537f083f584db8726dbeafa17aefc6e91c75d2"
+  },
+  "docs/PLATFORMS.md": {
+    "before_sha256": "27c3ef1b4eb276e11ec42c85a131f1b9099405b042da4924a35d2f02373abdf7",
+    "after_sha256": "9565aad0eff5ec804af385e217251846173bcd7e0bacc3cc66577bd9dae9ea0e"
+  },
+  "docs/RELEASE.md": {
+    "before_sha256": "c910f87118ce1e520fee1e5058142b84a3e474c0be393c689f32efd8c712f58e",
+    "after_sha256": "e4951b0f22ae2c18cb448c6dfe239e516e7c24821229c3eb63bb9509dd0ae892"
+  },
+  "docs/audits/capture_phase6_evidence.py": {
+    "before_sha256": null,
+    "after_sha256": "aafd31946288d5617368a5aac05fe893db0fd2e93790667ebfd96bc129b64452"
+  },
+  "examples/fixtures/workspace/logs/app.log": {
+    "before_sha256": "51feb86a4458b449c9e2e21f1494e2bfb4265ce99dd5c2fd11abccc198ff046c",
+    "after_sha256": "51feb86a4458b449c9e2e21f1494e2bfb4265ce99dd5c2fd11abccc198ff046c"
+  },
+  "examples/fixtures/workspace/logs/archive/app.log": {
+    "before_sha256": "51feb86a4458b449c9e2e21f1494e2bfb4265ce99dd5c2fd11abccc198ff046c",
+    "after_sha256": "51feb86a4458b449c9e2e21f1494e2bfb4265ce99dd5c2fd11abccc198ff046c"
+  },
+  "examples/fixtures/workspace/reports/summary.csv": {
+    "before_sha256": "cc7a868245a55869117009b7f26a9b1566a56ad157d49afb3f40014a4ae4273c",
+    "after_sha256": "cc7a868245a55869117009b7f26a9b1566a56ad157d49afb3f40014a4ae4273c"
+  },
+  "examples/fixtures/workspace/src/app.py": {
+    "before_sha256": "f19f009cdc9936fde08d367869301b3bedf5b5f08fed96eb8b2e0a2c56a0f861",
+    "after_sha256": "f19f009cdc9936fde08d367869301b3bedf5b5f08fed96eb8b2e0a2c56a0f861"
+  },
+  "examples/workflows/review-artifacts.json": {
+    "before_sha256": "d923d2cf77587d86e5e11bda176ef1911ba8b191afaf1e55f08e72828ce718d0",
+    "after_sha256": "d923d2cf77587d86e5e11bda176ef1911ba8b191afaf1e55f08e72828ce718d0"
+  },
+  "examples/workflows/scheduled-project-review.json": {
+    "before_sha256": null,
+    "after_sha256": "2f2e9cb8fbb6fbbfb6d452207e9c16a1c0abbcf780239e5f3359c17269415d75"
+  },
+  "pyproject.toml": {
+    "before_sha256": "3ba0a691cdf59dd7bda1f29227399c288a1d27e346682a535ccc4f93b36c881c",
+    "after_sha256": "3ba0a691cdf59dd7bda1f29227399c288a1d27e346682a535ccc4f93b36c881c"
+  },
+  "requirements/README.md": {
+    "before_sha256": "460d7fe52849368c0ec7977715d67de4231d37f7e1b0d8070a20bb018f3d7635",
+    "after_sha256": "460d7fe52849368c0ec7977715d67de4231d37f7e1b0d8070a20bb018f3d7635"
+  },
+  "requirements/dev.txt": {
+    "before_sha256": "28ecad95bb43c6143a7ce681e3b6f8fc36426060cb730ec231edf71eb2db9c12",
+    "after_sha256": "28ecad95bb43c6143a7ce681e3b6f8fc36426060cb730ec231edf71eb2db9c12"
+  },
+  "requirements/runtime.txt": {
+    "before_sha256": "bbe066267d1ca2eab7283c8600f82e2ca3824d5b12b977aad56158096e298ad7",
+    "after_sha256": "bbe066267d1ca2eab7283c8600f82e2ca3824d5b12b977aad56158096e298ad7"
+  },
+  "scripts/check_dist.py": {
+    "before_sha256": "25f088517e62a43bafa888fc8afabdd69f63944bd8b3c2474e485a26daac3619",
+    "after_sha256": "25f088517e62a43bafa888fc8afabdd69f63944bd8b3c2474e485a26daac3619"
+  },
+  "scripts/check_project.py": {
+    "before_sha256": "c8aff600e4de41f371b0c3b7d36fd7451f18c7d257b7747aa1810828ed99c1e8",
+    "after_sha256": "c8aff600e4de41f371b0c3b7d36fd7451f18c7d257b7747aa1810828ed99c1e8"
+  },
+  "scripts/verify_install.py": {
+    "before_sha256": "9c6ab884fed3fe8e9266fa689d9c9e4d7be17f8bbaf8da1f3a77a42e780ba91d",
+    "after_sha256": "a4723f120b785f5932bfdb84ddf33a4ff40d3315edc44b76989647e394841b8b"
+  },
+  "taskmaster/README.md": {
+    "before_sha256": "bdecc1698dbb36bbcbd265c7545676116d050e6d24f019d81123e554ee56ffed",
+    "after_sha256": "bdecc1698dbb36bbcbd265c7545676116d050e6d24f019d81123e554ee56ffed"
+  },
+  "taskmaster/__init__.py": {
+    "before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "after_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "taskmaster/__main__.py": {
+    "before_sha256": "de2c4dea22bd0000645688157ab3d58e347ff21dc6b0d36a22b53ca418822b9b",
+    "after_sha256": "de2c4dea22bd0000645688157ab3d58e347ff21dc6b0d36a22b53ca418822b9b"
+  },
+  "taskmaster/cli.py": {
+    "before_sha256": "816ed63a763cdc74729cc9e0c2eba097383a2de1ff81eb4bdc70371a6cef0f68",
+    "after_sha256": "a0b2e07072ccb81d6942ff5f4889684c6f627e91143bd7c1173c7190bfa830d9"
+  },
+  "taskmaster/config.py": {
+    "before_sha256": "9f37610288e233bc118c28564970c816e0643293d861b4d0738938dbc66973e7",
+    "after_sha256": "9f37610288e233bc118c28564970c816e0643293d861b4d0738938dbc66973e7"
+  },
+  "taskmaster/database.py": {
+    "before_sha256": "694a1acb4b84f5bbed674ac9d727702b7305a00f05ddde7c3e4c53e77a9b56fd",
+    "after_sha256": "3390805e26661433753e247d2bbff5986d8d381f5b52c107feb81f0b822d927e"
+  },
+  "taskmaster/demo.py": {
+    "before_sha256": "c8bbddcc20be75207242610fa49314109ae74306342e3297340cff0e7b0c1cb5",
+    "after_sha256": "c8bbddcc20be75207242610fa49314109ae74306342e3297340cff0e7b0c1cb5"
+  },
+  "taskmaster/duplicates.py": {
+    "before_sha256": "aed686cb02ab6a9801c129a6fa0d356c59f0696d89b1859b7e848b311e49ebff",
+    "after_sha256": "aed686cb02ab6a9801c129a6fa0d356c59f0696d89b1859b7e848b311e49ebff"
+  },
+  "taskmaster/errors.py": {
+    "before_sha256": "9505f51df19a82b11d219c8b6b96a9d0dcfb9d006615a337c8554513c3cc2967",
+    "after_sha256": "9505f51df19a82b11d219c8b6b96a9d0dcfb9d006615a337c8554513c3cc2967"
+  },
+  "taskmaster/execution.py": {
+    "before_sha256": "f0fb9bcb64553eaddcd9db632c37afccc2f4a31b8513eee02c0ba0a8e5a228a8",
+    "after_sha256": "f0fb9bcb64553eaddcd9db632c37afccc2f4a31b8513eee02c0ba0a8e5a228a8"
+  },
+  "taskmaster/inspection.py": {
+    "before_sha256": "956f77afeb32fce3a9650716ecc35b1a14db78c5bbbb3575c7653305002a0897",
+    "after_sha256": "956f77afeb32fce3a9650716ecc35b1a14db78c5bbbb3575c7653305002a0897"
+  },
+  "taskmaster/models.py": {
+    "before_sha256": "c568d777b973499ebbe1a424ed12b2130f25852d9ec260b05557235979c63ee7",
+    "after_sha256": "c568d777b973499ebbe1a424ed12b2130f25852d9ec260b05557235979c63ee7"
+  },
+  "taskmaster/operations.py": {
+    "before_sha256": "2b19f26a6d4085b11d855ac7e79b782a87e8c8ad9e8fbcf8a8a2222994bb2b57",
+    "after_sha256": "2b19f26a6d4085b11d855ac7e79b782a87e8c8ad9e8fbcf8a8a2222994bb2b57"
+  },
+  "taskmaster/organizer.py": {
+    "before_sha256": "e2a41744788356815b453fff67b97b1ef36910dea0e9f75295db1739c79c91fc",
+    "after_sha256": "134367dceff6e4e94b5c5a90c8e478cdb165cdcd1be06bab9ace80ad13e36b20"
+  },
+  "taskmaster/planning.py": {
+    "before_sha256": "00ed251f35e6ca67a63948400ff214da6ec2d58646b4f307ecdc4bba3e43cf4f",
+    "after_sha256": "00ed251f35e6ca67a63948400ff214da6ec2d58646b4f307ecdc4bba3e43cf4f"
+  },
+  "taskmaster/plugins/__init__.py": {
+    "before_sha256": "da0700110e86d8552e4cea100981062994eb329b90c36068e606f6d22b428ff1",
+    "after_sha256": "da0700110e86d8552e4cea100981062994eb329b90c36068e606f6d22b428ff1"
+  },
+  "taskmaster/processes.py": {
+    "before_sha256": null,
+    "after_sha256": "a45a7197dbd50dd0179cf8ee13602db9b77aa86182f6c34716fdedbaadabb980"
+  },
+  "taskmaster/reporting.py": {
+    "before_sha256": "8c34cc7084ef4d494e666f734bda9a17e577731cabc3cef0f78685e9cb996d4c",
+    "after_sha256": "8c34cc7084ef4d494e666f734bda9a17e577731cabc3cef0f78685e9cb996d4c"
+  },
+  "taskmaster/scanning.py": {
+    "before_sha256": "4a471c5083f4134afc9548c745f3422d0ca1bb0ef42ae4e2054b84c8cf99dc9a",
+    "after_sha256": "4a471c5083f4134afc9548c745f3422d0ca1bb0ef42ae4e2054b84c8cf99dc9a"
+  },
+  "taskmaster/scheduled_worker.py": {
+    "before_sha256": null,
+    "after_sha256": "e6b68f79231ef325beb5a632d95f4f14bbdd2cc76269670cf80b8564fae75f92"
+  },
+  "taskmaster/scheduler.py": {
+    "before_sha256": "03a44fd678ed2176cfc3e4f2cb809a35a290ee86f273ac871a1e22882a1848df",
+    "after_sha256": "e9fdbc0f3485bbafa5395df85738ba7864b0f78b5f5f49a6cc724b7993b72ec4"
+  },
+  "taskmaster/schedules.py": {
+    "before_sha256": null,
+    "after_sha256": "437f9ad4dc8b9a3f6e261b6a4fadd1a2e451b726ce82b8fe7af2a74da00556c7"
+  },
+  "taskmaster/workflows.py": {
+    "before_sha256": "449040f31f8ee38cafc6a7f09e2ac84a859a6f4d6a6001292d7f4e3f2258ce79",
+    "after_sha256": "449040f31f8ee38cafc6a7f09e2ac84a859a6f4d6a6001292d7f4e3f2258ce79"
+  },
+  "tests/conftest.py": {
+    "before_sha256": "3b2f6c392051b5b1dc5fc1b5963fdc44424f071a17c44fcb1c82583b4ca27507",
+    "after_sha256": "3b2f6c392051b5b1dc5fc1b5963fdc44424f071a17c44fcb1c82583b4ca27507"
+  },
+  "tests/test_baseline.py": {
+    "before_sha256": "8727345af3e6558d1f7ec32330f34cd2fbf464ecaa86ac0309a221a424fc9d6e",
+    "after_sha256": "4b808cd8fe69cc0a98b8ab5eb2c9deff86a91dfbfd6ee3fba3b2d0104af318fb"
+  },
+  "tests/test_mvp.py": {
+    "before_sha256": "d95501a4e7bef6cd27ec4dbc27a82b1167eba7ee7ba399854a1c68bcd4c7775d",
+    "after_sha256": "d95501a4e7bef6cd27ec4dbc27a82b1167eba7ee7ba399854a1c68bcd4c7775d"
+  },
+  "tests/test_planning_execution.py": {
+    "before_sha256": "70ae8cbd8deed2d2367825dae6570fba9d99ac150bff49b818cf8cd1c56a8220",
+    "after_sha256": "70ae8cbd8deed2d2367825dae6570fba9d99ac150bff49b818cf8cd1c56a8220"
+  },
+  "tests/test_scheduler.py": {
+    "before_sha256": null,
+    "after_sha256": "9d01095197e785a21183a1c37208a28bbd4d262b9187edba4300180e380d0c75"
+  },
+  "tests/test_workflows.py": {
+    "before_sha256": "8a9c8ce3cd91ace4ed9a654362cfe8309a76edd63519fa0724c313c813f5256d",
+    "after_sha256": "370995be289ff8a99a88311e0c42e5a1078d4a26d29e669c42316baa11a00353"
+  }
+}

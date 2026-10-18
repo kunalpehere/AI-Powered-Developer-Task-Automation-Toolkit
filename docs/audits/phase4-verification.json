@@ -1,0 +1,9 @@
+{
+  "source_modules": 19,
+  "manifest_files": 38,
+  "changed_files": 22,
+  "wheel_sha256": "55570eb2ee992d2192d231014568163f58204cbb8001794a3e47aee896b67f40",
+  "tests_passed": 195,
+  "tests_skipped": 1,
+  "installed_checks": 32
+}

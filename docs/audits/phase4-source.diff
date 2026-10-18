@@ -1,0 +1,2001 @@
+--- before/.gitignore
++++ after/.gitignore
+@@ -11,4 +11,6 @@
+ .test-links/
+ .venv-phase2/
+ .venv-phase3/
++.venv-phase4/
++examples/fixtures/organized/
+ .install-check/
+--- before/ATTRIBUTION.md
++++ after/ATTRIBUTION.md
+@@ -11,24 +11,27 @@
+ archive must remain available as provenance evidence until a verified upstream
+ history and notices can be established. No Git history was created in this phase.
+ 
+-| Component | Origin and treatment through Phase 3 |
++| Component | Origin and treatment through Phase 4 |
+ | --- | --- |
+-| Models | Inherited task/rule types retained; Phase 2 adds immutable plan/source-state records and independent filesystem/history outcome fields |
+-| Database | Inherited persistence retained; Phase 2 adds backward-compatible file-outcome columns; scheduling defects remain |
+-| Scheduler | Inherited, unchanged; known defects remain |
++| Models | Inherited task/rule types retained; Phase 2 adds immutable plan/source-state records and independent filesystem/history outcome fields; Phase 4 adds run/step links and full UUID file-operation IDs |
++| Database | Inherited persistence retained; Phase 2 adds backward-compatible file-outcome columns; Phase 4 adds transactional versioned initialization, runs/steps, file associations and read-only run queries; scheduling defects remain |
++| Scheduler | Inherited; Phase 4 removes import-time root logging configuration only; known scheduling defects remain |
+ | Organizer | Adapted: source/action validation, scoped plan/preview/apply adapters, read-only size-first duplicate reporting, conflict preservation; implicit unmatched-file movement removed |
+ | Planning, execution, errors | Newly added in Phase 2 for root/template/state validation, confirmation, execution, and partial-failure reporting |
+ | Scanning, inspection, duplicates, reporting | Newly added in Phase 3 for explicit selections/exclusions, project summaries, sequential full hashing of size candidates, readable/JSON output |
+-| CLI and module entry point | Adapted: syntax, dispatch, error exits, lazy resources, default preview, explicit destination/apply/approval, safety restrictions, accurate warnings |
++| Configuration, operations, workflows | Newly added in Phase 4 for strict versioned JSON, shared parameter validation, sequential named operations, failure policy, contextual diagnostics and run journaling |
++| CLI and module entry point | Adapted: syntax, dispatch, error exits, lazy resources, default preview, explicit destination/apply/approval, safety restrictions, accurate warnings; Phase 4 adds workflow/history commands, database selection and tracked direct/interactive application |
+ | Plugin classes and manager | Inherited code consolidated from `plugins.py` into `plugins/__init__.py`; discovery default adjusted for that location |
+ | Demo | Replaced with disposable inspection, preview/apply-copy, and duplicate reporting |
+ | Nested packaging and duplicated docs | Replaced by root `pyproject.toml` and authoritative README; nested README redirects |
+ | Regression tests and phase records | Newly added for this implementation |
++| Workflow example and fixtures | Newly added in Phase 4 to demonstrate inspection, duplicate reporting and copying disposable log/CSV artifacts |
+ 
+ The pre-Phase-2 state is separately preserved in
+ `docs/audits/phase2-reference.zip`; the pre-Phase-3 source/tests/root docs are in
+-`docs/audits/phase3-reference.zip`. Earlier reports describe their historical
+-snapshots; current behavior is documented in the root README and Phase 3 record.
++`docs/audits/phase3-reference.zip`; the pre-Phase-4 snapshot is in
++`docs/audits/phase4-reference.zip`. Earlier reports describe their historical
++snapshots; current behavior is documented in the root README and Phase 4 record.
+ 
+ The inherited project is not represented as wholly original work. Resolve the
+ upstream reuse terms and preserve required copyright/license notices before
+--- before/DEVELOPMENT_PLAN.md
++++ after/DEVELOPMENT_PLAN.md
+@@ -1,7 +1,7 @@
+ # Developer Task Automation Toolkit — Development Plan
+ 
+ Date: 15 October 2026  
+-Status: Phases 0–3 completed; Phase 4 and later remain proposed and have not started.
++Status: Phases 0–4 completed; Phase 5 remains proposed and has not started.
+ 
+ ## 1. Purpose and engineering goals
+ 
+@@ -242,7 +242,7 @@
+ 
+ ### Phase 3 — Deliver the developer-focused MVP
+ 
+-**Status:** completed on 15 October 2026. See the [Phase 3 implementation record](docs/PHASE_3.md): project inspection, configurable exclusions, sequential size-first/full-SHA duplicate reporting, explicit artifact selection, size sorting, and readable/JSON reports. Final validation: 132 regression tests passed, 1 skipped for unavailable Windows file-symlink privileges, and 30 installed-package checks passed. Actual junction checks passed. Phase 4 has not started.
++**Status:** completed on 15 October 2026. See the [Phase 3 implementation record](docs/PHASE_3.md): project inspection, configurable exclusions, sequential size-first/full-SHA duplicate reporting, explicit artifact selection, size sorting, and readable/JSON reports. Final validation: 132 regression tests passed, 1 skipped for unavailable Windows file-symlink privileges, and 30 installed-package checks passed. Actual junction checks passed. These are the Phase 3 completion results.
+ 
+ **Objective:** complete project inspection, verified duplicate reporting, and safe artifact organization.
+ 
+@@ -268,6 +268,8 @@
+ **Acceptance criteria:** all three workflows work on fixture projects; invalid inputs produce actionable errors; source trees are not changed unexpectedly; duplicate reporting verifies full content.
+ 
+ ### Phase 4 — Validated workflows and execution history
++
++**Status:** completed on 15 October 2026. See the [Phase 4 implementation record](docs/PHASE_4.md): version-1 validated JSON workflows, shared named-operation validation, stop/continue policies, structured diagnostics, UUID run/step/file associations, versioned SQLite migration, read-only history, and tracked direct/interactive organization. Final regression validation: 195 passed, 1 skipped for unavailable Windows file-symlink privileges; actual junction checks passed. Fresh wheel verification is recorded in `docs/audits/phase4-install-results.json`. Phase 5 has not started.
+ 
+ **Objective:** make supported operations reusable and auditable.
+ 
+@@ -387,6 +389,6 @@
+ 
+ ## 9. Recommended next action
+ 
+-Review the completed [Phase 3 MVP](docs/PHASE_3.md). The next implementation phase is **Phase 4: validated workflows and execution history**, after approval. Versioned JSON workflow configuration, named-operation composition, failure policies, and structured run history remain to be developed there.
++Review the completed [Phase 4 workflows and history](docs/PHASE_4.md). The next implementation phase is **Phase 5: documentation, testing, and release readiness**, after approval. CI, coverage reporting, dependency auditing, broader platform checks, and release/provenance work remain there.
+ 
+ Saving or updating this document does not authorize implementation of subsequent phases.
+--- before/README.md
++++ after/README.md
+@@ -2,8 +2,8 @@
+ 
+ Inspect a developer workspace, report fully verified duplicate files, and
+ organize explicitly selected artifacts through plan → preview → apply → report.
+-Phase 3 delivers these three MVP workflows. JSON workflows and expanded execution
+-history belong to Phase 4; this is a development build, not a production release.
++Phase 4 adds validated JSON workflows and structured run history to these MVP
++workflows. This is a development build, not a production release.
+ 
+ ## Install and verify
+ 
+@@ -178,13 +178,129 @@
+ partial fingerprints. Explicit legacy indexing is possible only with
+ `record_index=True` and a supplied Database; ordinary reports never write it.
+ 
++## Validated workflows and run history
++
++A workflow is a JSON document with integer `version: 1`, a public `name`, optional
++`on_failure: "stop"` (or `"continue"`), and 1–100 ordered steps. Each step has a
++unique `id` (letter followed by letters/digits/underscore/hyphen, at most 64
++characters), an `operation`, and a `parameters` object. The closed operation
++registry supports only `inspect`, `duplicates`, and `organize`. No shell/Python
++execution, dynamic imports, environment settings, or credentials are accepted.
++Unknown fields, duplicate JSON keys, nonfinite numbers, wrong types, unsupported
++versions, and invalid selections/template syntax are rejected before any step runs.
++Source existence, destination containment and filesystem state are checked as
++each step is prepared.
++JSON files use UTF-8 (a BOM is accepted) and are limited to 1 MiB.
++
++```json
++{
++  "version": 1,
++  "name": "Copy selected logs",
++  "on_failure": "stop",
++  "steps": [
++    {
++      "id": "copy_logs",
++      "operation": "organize",
++      "parameters": {
++        "source": "./artifacts",
++        "destination": "../organized",
++        "includes": ["logs/**/*.log"],
++        "action": "copy"
++      }
++    }
++  ]
++}
++```
++
++Relative paths resolve against the workflow file's directory, independently of
++the shell's current directory. Absolute paths and home-relative paths are also
++supported. The **database path** is execution context: it is relative to the
++shell's working directory, or an absolute path, and its parent must exist. Global
++`--database` goes **before** the command.
++
++Try the included [artifact-review workflow](examples/workflows/review-artifacts.json)
++against its tiny bundled fixture; the copy step preserves the source fixture:
++
++```powershell
++.\.venv\Scripts\tm.exe workflow validate .\examples\workflows\review-artifacts.json --format json
++.\.venv\Scripts\tm.exe workflow run .\examples\workflows\review-artifacts.json --format json
++.\.venv\Scripts\tm.exe --database .\taskmaster.db workflow run .\examples\workflows\review-artifacts.json --apply --format json
++.\.venv\Scripts\tm.exe history list --format json
++.\.venv\Scripts\tm.exe history show <run-id> --format json
++```
++
++Validation checks configuration shape/parameters without scanning source trees.
++Run defaults to preview; it executes read-only inspection/duplicate steps and
++previews organization with **no journal/database creation**. Preview does not
++simulate copies/moves: a later step referring to an output that does not exist
++yet can fail in preview. Apply prepares each step immediately before running it,
++so later steps can consume actual earlier outputs. The complete configuration is
++validated and held as an immutable canonical snapshot before execution.
++
++Move workflows require `--apply --yes` even in a text terminal. Copy workflows
++require `--apply`. `--yes` without apply is a usage error. Named workflow approval
++covers the configured steps; current per-step plans and results are recorded.
++There is no saved-plan execution or transactional multi-step simulation.
++
++| Parameters | Supported fields/defaults |
++| --- | --- |
++| Shared | Required `source`; `includes: []`, `exclusions: []`, `use_default_excludes: true`, `recursive: true` |
++| `inspect` | Shared fields plus `top: 10`, `min_size: 0` (nonnegative integers) |
++| `duplicates` | Shared fields only |
++| `organize` | Shared fields plus required `destination`; `action: "move"`, `strategy: "type"`, `template: null`, `conflict_policy: "error"`, `all_files: false`; requires nonempty includes or explicit all_files=true, never both |
++
++Saved and direct named commands use the same parameter validator, scanner,
++planner, and executor. Workflow configuration does not expose legacy
++rename/delete rules or arbitrary Python callbacks. `Workflow.to_json()` returns
++canonical JSON with defaults; parsing it again preserves the validated meaning.
++Config fingerprints hash that canonical form. The config file itself cannot be
++selected for movement/replacement, and known history files are protected.
++
++`on_failure` acts **between steps**. `stop` marks remaining steps `not_run` after
++an incomplete/failed step; `continue` attempts the remaining steps and still
++returns exit 1 when anything failed. Within an organization step, the existing
++file executor continues to report mixed successes/failures. Skips caused by the
++explicit conflict policy remain nonfailures. No automatic rollback or retries
++are introduced.
++
++Every workflow preview/apply has a UUID run ID and UTC times. Apply records the
++run before executing anything and records each step as `running` before starting
++it. A run/step start-journal failure blocks that action. A completed file change
++followed by file/step/final-journal failure remains visible as a real file change
++and causes exit 1. A final-journal failure can leave a persisted run marked
++`running`; history displays saved step states rather than claiming completion.
++An interrupted run is not automatically resumed/retried.
++
++Direct `organize --apply` and the interactive organizer also use this tracked path
++while retaining the exact displayed plan. Their reports include `run_id` and
++`run_history`. Low-level Python `FileOrganizer.apply` remains an execution API;
++use `run_workflow` for run/step journaling. Direct read-only inspect/duplicates
++remain deterministic and do not create journal rows.
++
++History list/show use SQLite read-only connections and never initialize/migrate a
++missing or older database. A missing history file lists no runs; an unknown run
++ID returns exit 1. `history list --limit N` accepts 1–1000, default 20. Writable
++initialization transactionally upgrades unversioned Phase 1–3 files to SQLite
++`user_version=1`, retaining existing rows/outcomes and adding runs, steps, and
++nullable run/step links on file history. New file-operation IDs are full UUIDs;
++old IDs are retained. Newer unsupported schemas are rejected without downgrade.
++
++Reports/history retain public operation IDs, paths, file outcomes, and structured
++codes/messages. Raw configuration contents and arbitrary parameter values are
++not included in validation errors or logs. Common credential assignments and URL
++userinfo are redacted in diagnostic text; credentials are not supported workflow
++parameters. Standard-library logging adds run/step context without configuring
++logging at import time. Run history is separate from legacy scheduler records;
++serializable named workflows do not repair scheduled-command restoration.
++
+ ## Reports, history, and safety limits
+ 
+ JSON is one unwrapped document on stdout, with `schema_version: 1`, command,
+ completion status, scope, summaries, and command-specific details. Inspection and
+ duplicate reports are deterministic for an unchanged tree. Organization reports
+ include planned identity/content fingerprints, intended paths, and actual
+-filesystem/history outcomes, without random IDs or execution timestamps.
++filesystem/history outcomes. Preview data has no random result IDs/timestamps;
++tracked apply and workflow reports additionally include run IDs and UTC times.
+ JSON application never prompts. Runtime errors after valid argument parsing also
+ produce JSON; invalid CLI syntax/required options use argparse's stderr usage
+ message and exit 2. Reports can be redirected by the caller; no report file is
+@@ -192,7 +308,8 @@
+ terminal/pipe encoding cannot represent (for example Chinese paths in CP1252),
+ instead of crashing. JSON escapes remain lossless when parsed.
+ 
+-The CLI writes apply attempts to `taskmaster.db` in its working directory. That
++The CLI writes apply attempts to `taskmaster.db` in its working directory
++(unless global `--database` selects another file). That
+ file and its SQLite sidecars must be outside the selected sources and destination
+ root. A project root may contain history while includes select only logs/reports;
+ selecting the history file itself is rejected. The Python API records history
+@@ -231,13 +348,13 @@
+ remain unavailable. Plugin imports/explicit registration work; dynamic discovery
+ and image/PDF processing are deferred. Plugins execute trusted Python.
+ 
+-Phase 4 covers validated JSON workflows and expanded history, not this phase's
+-JSON output reports. CI, release testing, dependency assurance, broader platform
+-coverage, and verified upstream attribution remain later work.
+-See [development plan](DEVELOPMENT_PLAN.md), [Phase 3 record](docs/PHASE_3.md),
++Phase 4 workflows are separate from JSON output reports. Phase 5 release work—
++CI, release testing, dependency assurance, broader platform coverage, and verified
++upstream attribution—has not started.
++See [development plan](DEVELOPMENT_PLAN.md), [Phase 4 record](docs/PHASE_4.md), [Phase 3 record](docs/PHASE_3.md),
+ [Phase 2 record](docs/PHASE_2.md), and [original audit](docs/audits/PHASE_0_AUDIT.md).
+-The pre-Phase-3 code/tests/docs are preserved in
+-[phase3-reference.zip](docs/audits/phase3-reference.zip); earlier archives/evidence
++The pre-Phase-4 code/tests/docs are preserved in
++[phase4-reference.zip](docs/audits/phase4-reference.zip); earlier archives/evidence
+ remain historical.
+ 
+ This derives from the supplied TaskMaster snapshot. Its upstream URL/revision,
+--- /dev/null
++++ after/docs/PHASE_4.md
+@@ -0,0 +1,147 @@
++# Phase 4 — Validated workflows and execution history
++
++Date: 15 October 2026 (Asia/Calcutta)
++
++Status: complete. Phase 5 has not started.
++
++Phase 4 adds versioned JSON workflows, sequential named operations, and durable
++run/step history to the existing file planning/execution contract. The
++[README](../README.md#validated-workflows-and-run-history) documents commands,
++parameters, defaults, and a runnable [example](../examples/workflows/review-artifacts.json).
++
++## Implementation
++
++| Component | Responsibility |
++| --- | --- |
++| `config.py` | Strict version-1 JSON schema, immutable validated steps, canonical serialization and SHA-256 fingerprint |
++| `operations.py` | Closed inspect/duplicates/organize registry, parameter normalization shared with direct commands, prepare/run adapters |
++| `workflows.py` | Sequential execution, stop/continue policy, UUID run IDs, UTC times, structured diagnostics and journaling |
++| `database.py` | Transactional version-1 schema initialization/migration, run/step records, linked file outcomes, read-only history queries |
++| CLI/reporting | Validate/run/history commands, tracked direct and interactive organization, readable and JSON reports, useful exit codes |
++
++The whole configuration is validated before execution. Unknown fields and
++operations, duplicate keys, nonfinite numbers, wrong types, invalid patterns or
++template syntax, duplicate step IDs and unsupported versions fail before any step
++runs. Source existence and destination containment are checked when each step is
++prepared against the current filesystem. Configurations contain 1–100 steps, use UTF-8 with optional BOM, and have a
++1 MiB file limit. No eval, shell execution, dynamic imports, credentials or
++environment mutation are exposed by the workflow registry. The inherited task
++scheduler remains a separate prototype.
++
++Relative operation paths resolve against the configuration's parent; home paths
++expand before resolving relative paths. Database paths belong to execution
++context and resolve against the shell's current directory. Names, IDs and paths
++are public metadata stored in reports. Validation errors omit unknown values;
++diagnostic text redacts common credential assignments and URL userinfo. This is
++not a universal secret detector: do not put secrets in names or paths. Logging
++uses standard-library loggers and run/step context; importing modules no longer
++configures the root logger through the scheduler.
++
++Preview reads current inputs without creating a database or outputs. It does not
++simulate earlier copies for later steps. Apply prepares steps just before their
++execution, permitting later steps to consume actual earlier outputs. Workflows
++that contain a move require `--apply --yes` before journaling or execution; copy
++workflows require `--apply`. Direct and interactive organization still execute
++the exact captured plan shown for approval, now within a tracked single-step run.
++
++Stop/continue policy operates between steps. Organization continues reporting
++individual file outcomes within a step. Any incomplete operation or journal
++failure produces exit 1; explicit conflict skips remain nonfailures. Successful
++files are retained when other files/steps fail. There is no rollback or retry.
++
++## Persistence contract
++
++Writable initialization uses an explicit SQLite transaction and `user_version=1`.
++It preserves legacy task/file/index rows, including historical outcome fields,
++while adding runs, ordered steps and nullable run/step links to file operations.
++New file-operation IDs use full UUIDs; old IDs are not rewritten. Unsupported
++newer schemas are rejected without downgrade. History uses file-backed SQLite;
++the inherited per-operation connection design does not support persistent
++`:memory:` databases.
++
++Run creation commits before any step executes; step start commits before its
++operation. Failure to write either start record blocks the corresponding action.
++File results keep filesystem and history outcomes separate. Failure to save a
++completed step/run cannot undo completed file changes and returns an incomplete
++report. An interruption or final-journal failure may leave a durable run marked
++`running`; history merges saved step states without inventing completion. There
++is no automatic recovery, resume, timeout reconciliation or concurrent runner.
++
++History list/show use read-only connections without creating missing databases
++or migrating legacy ones. A missing file lists zero runs; an unknown ID fails.
++The journal and its SQLite sidecars must be outside selected inputs and the
++destination root. Apply creates the journal before preparing workflow steps, so
++selecting an entire project that contains the journal will fail protection checks;
++use explicit artifact includes or place history elsewhere. The workflow config
++cannot itself be selected or replaced.
++
++Low-level `FileOrganizer.apply` remains available without run journaling; use
++`run_workflow` or the CLI for tracked execution. The filesystem and SQLite are
++separate transactions. Existing race, link, metadata and copy/unlink limits from
++[Phase 2](PHASE_2.md) and [Phase 3](PHASE_3.md) still apply.
++
++## Verification
++
++On Python 3.12.4 / Windows, the final full suite passed **195 tests**, with **one
++skip** for unavailable file-symlink creation privileges (WinError 1314). Actual
++Windows junction tests passed. Permission and journal failures are primarily
++injected, rather than claiming broad real ACL coverage.
++
++```powershell
++.\.venv\Scripts\python.exe -B -m pytest -q -p no:cacheprovider --basetemp=.test-tmp --junitxml=docs\audits\phase4-test-results.xml
++```
++
++The final run took 49.80 seconds. Evidence:
++[JUnit XML](audits/phase4-test-results.xml). Existing Phase 1–3 regressions remain,
++with new schema/round-trip, direct-validation parity, path resolution, source
++preservation, preview, copy/move approval, mixed file outcomes, stop/continue,
++dependent-step, interrupted-run, migration, read-only history and diagnostic
++redaction checks. Start/file/step/final journal failures are tested independently
++to verify both actual filesystem outcomes and persisted run states.
++
++A normal wheel was built with existing setuptools and installed offline from
++cached runtime wheels into a new `.venv-phase4`, without global site-packages:
++
++```powershell
++# Set TEMP and TMP to the writable .install-check\tmp directory first.
++python -m pip wheel --no-deps --no-build-isolation --wheel-dir .install-check\phase4-wheels .
++python -m venv --without-pip .venv-phase4
++.\.venv\Scripts\python.exe -m pip --python .venv-phase4\Scripts\python.exe install --no-index --find-links .install-check\wheels .install-check\phase4-wheels\taskmaster-2.0.1-py3-none-any.whl
++.\.venv\Scripts\python.exe -B docs\audits\verify_phase4_install.py
++```
++
++The [verification helper](audits/verify_phase4_install.py) uses a new disposable
++fixture on every run, removes `PYTHONPATH`, and launches both wheel and editable
++entry points outside the source tree. All **32 installed-package checks passed**.
++It checks workflow validation/preview/apply,
++config-relative paths, conflict skips, failure policies, move approval before
++journal creation, linked full UUID history, unknown/legacy history, direct-command
++tracking, invalid configurations, read-only deterministic commands and installed
++dependency consistency. Results are in
++[installed-package evidence](audits/phase4-install-results.json).
++
++Sample reports: [validation](audits/phase4-sample-validation.json),
++[preview](audits/phase4-sample-preview.json), [apply](audits/phase4-sample-run.json),
++and [history](audits/phase4-sample-history.json). Fixture paths and timestamps in
++these artifacts are examples from the recorded run.
++
++The package retains the unreleased baseline version 2.0.1 and its existing
++dependencies. No release was published. Before/after evidence is preserved in
++[reference archive](audits/phase4-reference.zip),
++[source diff](audits/phase4-source.diff), and
++[SHA-256 manifest](audits/phase4-change-manifest.json). Earlier phase reports
++describe historical snapshots; their earlier deferral statements remain intact.
++The [consistency checks](audits/phase4-verification.json) compare all 19 Python
++modules in the source, wheel and fresh installation, parse source/tests, check
++local documentation links, and confirm that execution and plugins are unchanged.
++The final wheel SHA-256 is
++`55570eb2ee992d2192d231014568163f58204cbb8001794a3e47aee896b67f40`.
++
++## Phase boundary
++
++Phase 4 acceptance is covered by shared validation, accurate file/run outcomes,
++explicit failure policy, versioned history and contextual diagnostics. Phase 5
++CI, coverage reporting, dependency auditing/locking, broader platform validation,
++release/provenance work remain pending. Scheduler correctness, plugin execution,
++image/PDF features, automatic duplicate deletion, recovery/resume and distributed
++execution are outside this implementation.
+--- /dev/null
++++ after/docs/audits/capture_phase4_evidence.py
+@@ -0,0 +1,65 @@
++"""Capture the Phase 4 source diff and verify source/wheel/install consistency."""
++import ast
++import difflib
++import hashlib
++import json
++from pathlib import Path
++import re
++import xml.etree.ElementTree as ET
++from zipfile import ZipFile
++
++ROOT = Path(__file__).resolve().parents[2]
++OUT = ROOT / 'docs/audits'
++with ZipFile(OUT / 'phase4-reference.zip') as archive:
++    before = {name: archive.read(name) for name in archive.namelist() if not name.endswith('/')}
++paths = set(before)
++paths.update(path.relative_to(ROOT).as_posix() for folder in ('taskmaster', 'tests', 'examples')
++             for path in (ROOT / folder).rglob('*')
++             if path.is_file() and '__pycache__' not in path.parts and path.suffix != '.pyc'
++             and 'organized' not in path.parts)
++paths.update(('docs/PHASE_4.md', 'docs/audits/verify_phase4_install.py',
++              'docs/audits/capture_phase4_evidence.py'))
++manifest = {}
++diff = []
++sha = lambda data: hashlib.sha256(data).hexdigest() if data is not None else None
++for name in sorted(paths):
++    old = before.get(name)
++    path = ROOT / name
++    new = path.read_bytes() if path.is_file() else None
++    manifest[name] = {'before_sha256': sha(old), 'after_sha256': sha(new)}
++    if old != new:
++        diff.extend(difflib.unified_diff([line + '\n' for line in (old or b'').decode('utf-8-sig').splitlines()],
++                    [line + '\n' for line in (new or b'').decode('utf-8-sig').splitlines()],
++                    fromfile='before/' + name if old is not None else '/dev/null',
++                    tofile='after/' + name if new is not None else '/dev/null'))
++(OUT / 'phase4-source.diff').write_text(''.join(diff), encoding='utf-8')
++(OUT / 'phase4-change-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
++
++modules = {path.relative_to(ROOT).as_posix(): path for path in (ROOT / 'taskmaster').rglob('*.py')}
++for path in [*modules.values(), *(ROOT / 'tests').glob('*.py')]:
++    ast.parse(path.read_text(encoding='utf-8-sig'))
++wheel = ROOT / '.install-check/phase4-wheels/taskmaster-2.0.1-py3-none-any.whl'
++with ZipFile(wheel) as archive:
++    assert {name for name in archive.namelist() if name.endswith('.py')} == set(modules)
++    for name, path in modules.items():
++        assert archive.read(name) == path.read_bytes(), name
++        assert (ROOT / '.venv-phase4/Lib/site-packages' / name).read_bytes() == path.read_bytes(), name
++assert before['taskmaster/plugins/__init__.py'] == (ROOT / 'taskmaster/plugins/__init__.py').read_bytes()
++assert before['taskmaster/execution.py'] == (ROOT / 'taskmaster/execution.py').read_bytes()
++assert before['taskmaster/scheduler.py'].decode('utf-8-sig').replace('\r\n', '\n').replace(
++    'logging.basicConfig(level=logging.INFO)\n', '') == (ROOT / 'taskmaster/scheduler.py').read_text(encoding='utf-8-sig')
++suite = ET.parse(OUT / 'phase4-test-results.xml').getroot().find('testsuite')
++assert (suite.get('tests'), suite.get('failures'), suite.get('errors'), suite.get('skipped')) == ('196', '0', '0', '1')
++installed = json.loads((OUT / 'phase4-install-results.json').read_text(encoding='utf-8'))
++assert len(installed['checks']) == 32
++verification = {'source_modules': len(modules), 'manifest_files': len(manifest),
++                  'changed_files': sum(item['before_sha256'] != item['after_sha256'] for item in manifest.values()),
++                  'wheel_sha256': sha(wheel.read_bytes()), 'tests_passed': 195,
++                  'tests_skipped': 1, 'installed_checks': 32}
++(OUT / 'phase4-verification.json').write_text(json.dumps(verification, indent=2) + '\n', encoding='utf-8')
++for name in ('README.md', 'DEVELOPMENT_PLAN.md', 'docs/PHASE_4.md'):
++    path = ROOT / name
++    for target in re.findall(r'\]\(([^)]+)\)', path.read_text(encoding='utf-8')):
++        if '://' not in target and not target.startswith('#'):
++            assert (path.parent / target.split('#')[0]).exists(), (name, target)
++print(json.dumps(verification, indent=2))
+--- /dev/null
++++ after/docs/audits/verify_phase4_install.py
+@@ -0,0 +1,138 @@
++"""Exercise wheel and editable Phase 4 CLIs outside the source checkout.
++
++Requires a wheel installed into .venv-phase4. Uses only newly created fixtures;
++retains results under .install-check and replaces this phase's JSON evidence.
++"""
++import json
++import os
++from pathlib import Path
++import shutil
++import sqlite3
++import subprocess
++import tempfile
++
++ROOT = Path(__file__).resolve().parents[2]
++scratch = ROOT / '.install-check/phase4-outside'
++scratch.mkdir(parents=True, exist_ok=True)
++work = Path(tempfile.mkdtemp(prefix='verified-', dir=scratch))
++cwd = work / 'other-cwd'
++cwd.mkdir()
++shutil.copytree(ROOT / 'examples', work / 'examples')
++config = work / 'examples/workflows/review-artifacts.json'
++source = work / 'examples/fixtures/workspace'
++destination = work / 'examples/fixtures/organized'
++history = work / 'history.sqlite'
++clean = ROOT / '.venv-phase4/Scripts'
++editable = ROOT / '.venv/Scripts'
++environment = dict(os.environ)
++environment.pop('PYTHONPATH', None)
++environment['PYTHONDONTWRITEBYTECODE'] = '1'
++results = []
++
++
++def check(label, args, expected=0, as_json=False):
++    args = [str(arg) for arg in args]
++    result = subprocess.run(args, cwd=cwd, env=environment, capture_output=True,
++                            text=True, timeout=30)
++    results.append(dict(check=label, argv=args, exit_code=result.returncode,
++                        stdout=result.stdout, stderr=result.stderr))
++    assert result.returncode == expected, (label, result.stdout, result.stderr)
++    print(f'{len(results)}: {label} passed', flush=True)
++    return json.loads(result.stdout) if as_json else result.stdout
++
++
++def cli(label, *args, expected=0, database=history, as_json=True):
++    return check(label, [clean / 'tm.exe', '--database', database, *args,
++                        *(['--format', 'json'] if as_json else [])], expected, as_json)
++
++
++def save_config(name, document):
++    path = work / (name + '.json')
++    path.write_text(json.dumps(document), encoding='utf-8')
++    return path
++
++
++for prefix, label in ((clean, 'wheel'), (editable, 'editable')):
++    check(label + ' module help', [prefix / 'python.exe', '-B', '-m', 'taskmaster', '--help'])
++    for entry in ('tm.exe', 'taskmaster.exe'):
++        check(label + ' ' + entry, [prefix / entry, '--help'])
++check('wheel imports without optional processors', [clean / 'python.exe', '-I', '-c',
++      "import taskmaster, taskmaster.config, taskmaster.operations, taskmaster.workflows, importlib.util; "
++      "print(taskmaster.__file__); assert '.venv-phase4' in taskmaster.__file__; "
++      "assert importlib.util.find_spec('PIL') is None; assert importlib.util.find_spec('PyPDF2') is None"])
++validated = cli('canonical configuration', 'workflow', 'validate', config)
++assert validated['complete']
++preview = cli('read-only example preview from other cwd', 'workflow', 'run', config)
++assert preview['complete'] and len(preview['steps']) == 3
++assert not history.exists() and not destination.exists()
++applied = cli('apply copy example', 'workflow', 'run', config, '--apply')
++assert applied['complete'] and applied['history']['status'] == 'recorded'
++assert applied['steps'][2]['report']['summary']['successful'] == 3
++assert (source / 'src/app.py').exists() and len(list(destination.rglob('*.log'))) == 2
++listed = cli('history list', 'history', 'list')
++shown = cli('history exact run', 'history', 'show', applied['run_id'])['run']
++assert shown == applied
++check('history rows link run and step', [clean / 'python.exe', '-I', '-c',
++      "import sqlite3,uuid,sys; c=sqlite3.connect(sys.argv[1]); "
++      "assert c.execute('pragma user_version').fetchone()[0]==1; "
++      "rows=c.execute('select id,run_id,step_id from file_operations').fetchall(); "
++      "assert len(rows)==3; assert all(str(uuid.UUID(r[0]))==r[0] and r[1]==sys.argv[2] "
++      "and r[2]=='copy_artifacts' for r in rows)", history, applied['run_id']])
++repeated = cli('repeat copy skips conflicts', 'workflow', 'run', config, '--apply')
++assert repeated['complete'] and repeated['run_id'] != applied['run_id']
++assert repeated['steps'][2]['report']['summary']['skipped'] == 3
++cli('text workflow preview', 'workflow', 'run', config, as_json=False)
++cli('text history', 'history', 'show', applied['run_id'], as_json=False)
++for policy in ('stop', 'continue'):
++    path = save_config(policy, {'version': 1, 'name': policy, 'on_failure': policy, 'steps': [
++        {'id': 'missing', 'operation': 'inspect', 'parameters': {'source': 'absent'}},
++        {'id': 'valid', 'operation': 'inspect', 'parameters': {'source': str(source)}}]})
++    report = cli(policy + ' after runtime failure', 'workflow', 'run', path, '--apply', expected=1)
++    assert report['steps'][0]['status'] == 'failed'
++    assert report['steps'][1]['status'] == ('not_run' if policy == 'stop' else 'success')
++move_source = work / 'move-source'
++move_source.mkdir()
++(move_source / 'one.log').write_text('move fixture', encoding='utf-8')
++move = save_config('move', {'version': 1, 'name': 'move', 'steps': [
++    {'id': 'move', 'operation': 'organize', 'parameters': {'source': str(move_source),
++     'destination': str(work / 'moved'), 'includes': ['*.log'], 'action': 'move'}}]})
++move_db = work / 'move.sqlite'
++cli('move requires approval before journal', 'workflow', 'run', move, '--apply', expected=1, database=move_db)
++assert not move_db.exists() and (move_source / 'one.log').exists()
++assert cli('approved move', 'workflow', 'run', move, '--apply', '--yes', database=move_db)['complete']
++assert not (move_source / 'one.log').exists()
++bad = save_config('invalid', {'version': 1, 'name': 'invalid', 'steps': [
++    {'id': 'bad', 'operation': 'inspect', 'parameters': {'source': str(source), 'password': 'never-echo-this'}}]})
++rejected = cli('unknown secret parameter rejected without echo', 'workflow', 'validate', bad, expected=1)
++assert 'never-echo-this' not in json.dumps(rejected)
++bad.write_text('{broken', encoding='utf-8')
++cli('malformed JSON rejected', 'workflow', 'validate', bad, expected=1)
++bad.write_text('{"version":99,"name":"bad","steps":[]}', encoding='utf-8')
++cli('unsupported version rejected', 'workflow', 'validate', bad, expected=1)
++absent_db = work / 'absent.sqlite'
++cli('missing history listing is read-only', 'history', 'list', database=absent_db)
++cli('unknown run returns failure', 'history', 'show', 'unknown', expected=1, database=absent_db)
++assert not absent_db.exists()
++inspection = cli('direct inspection', 'inspect', '--source', source, database=absent_db)
++assert cli('direct inspection deterministic', 'inspect', '--source', source, database=absent_db) == inspection
++cli('direct duplicates', 'duplicates', '--dir', source, database=absent_db)
++assert not absent_db.exists()
++direct = cli('direct organization gets run history', 'organize', '--source', source,
++             '--destination', work / 'direct-copy', '--include', '*.log', '--action', 'copy', '--apply')
++assert direct['complete'] and direct['run_id']
++direct_run = cli('direct history association', 'history', 'show', direct['run_id'])['run']
++assert direct_run['workflow']['name'] == 'direct-organize'
++legacy = work / 'legacy.sqlite'
++with sqlite3.connect(legacy) as connection:
++    connection.execute('create table old_data(value text)')
++    connection.execute("insert into old_data values ('preserved')")
++before = legacy.read_bytes()
++cli('legacy history read does not migrate', 'history', 'list', database=legacy)
++assert legacy.read_bytes() == before
++check('clean dependency consistency', [editable / 'python.exe', '-m', 'pip', '--python', clean / 'python.exe', 'check'])
++output = ROOT / 'docs/audits'
++for name, report in (('phase4-install-results.json', {'cwd': str(cwd), 'checks': results}),
++                     ('phase4-sample-preview.json', preview), ('phase4-sample-run.json', applied),
++                     ('phase4-sample-history.json', shown), ('phase4-sample-validation.json', validated)):
++    (output / name).write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
++print(f'{len(results)} installed-package checks passed; evidence saved.')
+--- /dev/null
++++ after/examples/fixtures/workspace/logs/app.log
+@@ -0,0 +1 @@
++Example development log.
+--- /dev/null
++++ after/examples/fixtures/workspace/logs/archive/app.log
+@@ -0,0 +1 @@
++Example development log.
+--- /dev/null
++++ after/examples/fixtures/workspace/reports/summary.csv
+@@ -0,0 +1,2 @@
++metric,value
++example_count,2
+--- /dev/null
++++ after/examples/fixtures/workspace/src/app.py
+@@ -0,0 +1,3 @@
++"""A source-file fixture that artifact selection must preserve."""
++
++EXAMPLE = "source files stay in place"
+--- /dev/null
++++ after/examples/workflows/review-artifacts.json
+@@ -0,0 +1,28 @@
++{
++  "version": 1,
++  "name": "Review and copy development artifacts",
++  "on_failure": "stop",
++  "steps": [
++    {
++      "id": "inspect",
++      "operation": "inspect",
++      "parameters": {"source": "../fixtures/workspace", "top": 5}
++    },
++    {
++      "id": "duplicates",
++      "operation": "duplicates",
++      "parameters": {"source": "../fixtures/workspace", "includes": ["*.log"]}
++    },
++    {
++      "id": "copy_artifacts",
++      "operation": "organize",
++      "parameters": {
++        "source": "../fixtures/workspace",
++        "destination": "../fixtures/organized",
++        "includes": ["logs/**/*.log", "reports/*.csv"],
++        "action": "copy",
++        "conflict_policy": "skip"
++      }
++    }
++  ]
++}
+--- /dev/null
++++ after/taskmaster/README.md
+@@ -0,0 +1,6 @@
++# TaskMaster documentation
++
++The authoritative [README is at the repository root](../README.md).
++Install from that root using `pyproject.toml`; the old nested `setup.py` has been
++retired. The earlier README and source files are preserved in
++[the Phase 1 baseline archive](../docs/audits/phase1-reference.zip).
+--- before/taskmaster/cli.py
++++ after/taskmaster/cli.py
+@@ -5,6 +5,7 @@
+ import asyncio
+ import argparse
+ import sqlite3
++import logging
+ import sys
+ from datetime import datetime, timedelta
+ from pathlib import Path
+@@ -29,7 +30,10 @@
+ from .errors import ConfirmationRequired
+ from .inspection import inspect_project
+ from .duplicates import duplicate_report
+-from .reporting import emit_json, organization_report, show_scan_report
++from .reporting import emit_json, organization_report, show_scan_report, show_step_report
++from .config import load_workflow, validate_workflow
++from .operations import prepare_operation, run_prepared
++from .workflows import run_workflow, safe_message
+ 
+ console = Console()
+ 
+@@ -37,7 +41,7 @@
+     """Main CLI interface for TaskMaster."""
+ 
+     def __init__(self, db_path: str = "taskmaster.db"):
+-        self.db_path = str(Path(db_path).absolute()) if db_path != ":memory:" else db_path
++        self.db_path = str(Path(db_path).expanduser().absolute()) if db_path != ":memory:" else db_path
+         self.output_format = "text"
+         self.report_command = None
+ 
+@@ -290,6 +294,27 @@
+             console.print(f"Previewed {report['dry_run']} files; no file or history changes applied.")
+         return 1 if report["failed"] or report["history_failed"] else 0
+ 
++    def apply_tracked(self, prepared, *, confirmed: bool):
++        prepared.results = None
++        workflow = validate_workflow({"version": 1, "name": "direct-organize", "steps": [
++            {"id": "organize", "operation": "organize", "parameters": prepared.parameters}]})
++        run = run_workflow(workflow, base_dir=Path.cwd(), apply=True, confirmed=confirmed,
++                           history_path=Path(self.db_path), database_factory=lambda: self.db,
++                           _prepared={"organize": prepared})
++        report = run["steps"][0]["report"] or {"schema_version": 1, "command": "organize",
++            "mode": "not_run", "complete": False, "operations": [],
++            "error": "Application did not start because its run journal could not be written"}
++        report = {**report, "complete": run["complete"], "run_id": run["run_id"], "run_history": run["history"]}
++        if self.output_format == "json":
++            emit_json(report)
++        else:
++            console.print(f"Run ID: {run['run_id']}")
++            if prepared.results is not None:
++                self.show_results(prepared.results)
++            for error in run["history"]["errors"]:
++                console.print(f"{error['code']}: {error['message']}", markup=False)
++        return 0 if run["complete"] else 1
++
+     def organize_files_interactive(self):
+         source = Path(Prompt.ask("Source directory"))
+         destination = Path(Prompt.ask("Destination root (separate from the source)"))
+@@ -302,13 +327,15 @@
+                     if strategy == "custom" else templates[strategy])
+         action = Prompt.ask("Action", choices=["copy", "move"], default="move")
+         conflict = Prompt.ask("Existing destination", choices=["error", "skip"], default="error")
+-        self.organizer.rules.clear()
+-        self.organizer.add_rule(FileRule("interactive", "*", template, action=action))
+-        plan = self.organizer.plan_directory(source, destination, conflict_policy=conflict, includes=includes)
+-        self.show_plan(plan)
+-        self.show_results(self.organizer.preview(plan))
++        prepared = prepare_operation("organize", {"source": str(source), "destination": str(destination),
++            "includes": list(includes), "strategy": strategy if strategy != "custom" else "type",
++            "template": template, "action": action, "conflict_policy": conflict},
++            base_dir=Path.cwd(), organizer=self.organizer)
++        self.show_plan(prepared.plan)
++        run_prepared(prepared)
++        self.show_results(prepared.results)
+         if Confirm.ask("Apply this displayed plan? Source files will be removed for moves.", default=False):
+-            return self.show_results(self.organizer.apply(plan, confirmed=True))
++            return self.apply_tracked(prepared, confirmed=True)
+         return 0
+ 
+     def find_duplicates_interactive(self):
+@@ -430,6 +457,7 @@
+             """
+         )
+ 
++        parser.add_argument("--database", default=self.db_path, help="Run/history database path (before subcommand)")
+         parser.add_argument("--interactive", "-i", action="store_true", 
+                            help="Launch interactive mode")
+ 
+@@ -488,7 +516,28 @@
+         dup_parser.add_argument("--delete", action="store_true",
+                                  help="Unavailable: duplicate deletion is disabled")
+ 
++        workflow_parser = subparsers.add_parser("workflow", help="Validate or run named JSON workflows")
++        workflow_sub = workflow_parser.add_subparsers(dest="workflow_cmd", required=True)
++        for name in ("validate", "run"):
++            command_parser = workflow_sub.add_parser(name)
++            command_parser.add_argument("file", type=Path)
++            command_parser.add_argument("--format", choices=["text", "json"], default="text")
++            if name == "run":
++                mode = command_parser.add_mutually_exclusive_group()
++                mode.add_argument("--apply", action="store_true")
++                mode.add_argument("--dry-run", action="store_true")
++                command_parser.add_argument("--yes", action="store_true")
++        history_parser = subparsers.add_parser("history", help="Read run history without creating or migrating a database")
++        history_sub = history_parser.add_subparsers(dest="history_cmd", required=True)
++        listing = history_sub.add_parser("list")
++        listing.add_argument("--limit", type=int, default=20)
++        showing = history_sub.add_parser("show")
++        showing.add_argument("run_id")
++        for command_parser in (listing, showing):
++            command_parser.add_argument("--format", choices=["text", "json"], default="text")
++
+         parsed = parser.parse_args(args)
++        self.db_path = str(Path(parsed.database).expanduser().absolute())
+         self.output_format = getattr(parsed, "format", "text")
+         self.report_command = parsed.subcommand
+         if parsed.interactive and parsed.subcommand:
+@@ -498,15 +547,79 @@
+         if parsed.subcommand == "organize" and parsed.yes and not parsed.apply:
+             parser.error("--yes requires --apply; the default is preview only")
+ 
++        if parsed.subcommand == "workflow" and parsed.workflow_cmd == "run" and parsed.yes and not parsed.apply:
++            parser.error("--yes requires --apply")
++
+         if parsed.interactive or not parsed.subcommand:
+             self.run_interactive()
+             return
+ 
+-        if parsed.subcommand == "inspect":
+-            report = inspect_project(Path(parsed.source), top=parsed.top, min_size=parsed.min_size,
+-                                     includes=parsed.include, exclusions=parsed.exclude,
+-                                     use_default_excludes=not parsed.no_default_excludes,
+-                                     recursive=not parsed.no_recursive)
++        if parsed.subcommand == "workflow":
++            path = parsed.file.expanduser().absolute()
++            workflow = load_workflow(path)
++            if parsed.workflow_cmd == "validate":
++                report = {"schema_version": 1, "command": "workflow", "action": "validate", "complete": True,
++                          "config_sha256": workflow.fingerprint, "workflow": workflow.to_dict()}
++                if self.output_format == "json":
++                    emit_json(report)
++                else:
++                    console.print(f"Valid workflow: {workflow.name} ({len(workflow.steps)} steps)", markup=False)
++                return 0
++            report = run_workflow(workflow, base_dir=path.parent, config_path=path,
++                                  apply=parsed.apply, confirmed=parsed.yes,
++                                  history_path=Path(self.db_path), database_factory=lambda: self.db)
++            if self.output_format == "json":
++                emit_json(report)
++            else:
++                console.print(f"Run {report['run_id']}: {report['status']} ({report['mode']})")
++                for step in report["steps"]:
++                    console.print(f"{step['id']} | {step['operation']} | {step['status']}", markup=False)
++                    if step["report"] is not None:
++                        show_step_report(console, step["report"])
++                    for error in step["diagnostics"]:
++                        console.print(f"{error['code']}: {error['message']}", markup=False)
++                for error in report["history"]["errors"]:
++                    console.print(f"{error['code']}: {error['message']}", markup=False)
++            return 0 if report["complete"] else 1
++
++        if parsed.subcommand == "history":
++            if parsed.history_cmd == "list":
++                report = {"schema_version": 1, "command": "history", "complete": True,
++                          "runs": Database.read_runs(self.db_path, limit=parsed.limit)}
++                if self.output_format == "json":
++                    emit_json(report)
++                else:
++                    for entry in report["runs"]:
++                        console.print(f"{entry['run_id']} | {entry['status']} | {entry['workflow_name']}", markup=False)
++                    if not report["runs"]:
++                        console.print("No recorded runs.")
++            else:
++                run = Database.read_runs(self.db_path, run_id=parsed.run_id)
++                if run is None:
++                    raise ValueError("Run was not found")
++                report = {"schema_version": 1, "command": "history", "complete": True, "run": run}
++                if self.output_format == "json":
++                    emit_json(report)
++                else:
++                    console.print(f"Run {run['run_id']}: {run['status']}")
++                    for step in run["steps"]:
++                        console.print(f"{step['id']} | {step['operation']} | {step['status']}", markup=False)
++                        if step["report"] is not None:
++                            show_step_report(console, step["report"])
++                        for error in step["diagnostics"]:
++                            console.print(f"{error['code']}: {error['message']}", markup=False)
++                    for error in run["history"]["errors"]:
++                        console.print(f"{error['code']}: {error['message']}", markup=False)
++            return 0
++
++        if parsed.subcommand in {"inspect", "duplicates"}:
++            operation = parsed.subcommand
++            parameters = {"source": parsed.source if operation == "inspect" else parsed.dir,
++                          "includes": parsed.include, "exclusions": parsed.exclude,
++                          "use_default_excludes": not parsed.no_default_excludes, "recursive": not parsed.no_recursive}
++            if operation == "inspect":
++                parameters.update(top=parsed.top, min_size=parsed.min_size)
++            report = run_prepared(prepare_operation(operation, parameters, base_dir=Path.cwd()))
+             emit_json(report) if self.output_format == "json" else show_scan_report(console, report)
+             return 0 if report["complete"] else 1
+ 
+@@ -545,29 +658,22 @@
+                     console.print("[red]Stopped.[/red]")
+ 
+         elif parsed.subcommand == "organize":
+-            templates = {"type": "{type}/{relative_dir}/{filename}", "date": "{year}/{month}/{relative_dir}/{filename}",
+-                     "size": "{size_category}/{relative_dir}/{filename}"}
+-            self.organizer.rules.clear()
+-            self.organizer.add_rule(FileRule("cli_organize", "*", parsed.template if parsed.template is not None else templates[parsed.strategy],
+-                                             action=parsed.action))
+-            plan = self.organizer.plan_directory(Path(parsed.source), Path(parsed.destination),
+-                                                 conflict_policy=parsed.conflict, includes=parsed.include or (),
+-                                                 all_files=parsed.all_files, exclusions=parsed.exclude,
+-                                                 use_default_excludes=not parsed.no_default_excludes,
+-                                                 recursive=not parsed.no_recursive)
+-            scope = {"includes": list(plan.includes), "all_files": plan.all_files, "exclusions": list(plan.exclusions)}
+-
+-            def output(results, mode):
+-                summary = self.organizer.generate_report(results)
+-                if self.output_format == "json":
+-                    emit_json(organization_report(plan, results, summary=summary, mode=mode, scope=scope))
+-                    return 1 if summary["failed"] or summary["history_failed"] else 0
+-                return self.show_results(results)
++            parameters = {"source": parsed.source, "destination": parsed.destination,
++                          "includes": parsed.include or [], "all_files": parsed.all_files,
++                          "exclusions": parsed.exclude, "use_default_excludes": not parsed.no_default_excludes,
++                          "recursive": not parsed.no_recursive, "strategy": parsed.strategy,
++                          "template": parsed.template, "action": parsed.action, "conflict_policy": parsed.conflict}
++            prepared = prepare_operation("organize", parameters, base_dir=Path.cwd(), organizer=self.organizer)
++            plan = prepared.plan
+ 
+             if self.output_format == "text":
+                 self.show_plan(plan)
+             if not parsed.apply:
+-                return output(self.organizer.preview(plan), "preview")
++                report = run_prepared(prepared)
++                if self.output_format == "json":
++                    emit_json(report)
++                    return 0 if report["complete"] else 1
++                return self.show_results(prepared.results)
+             confirmed = parsed.yes
+             if plan.requires_confirmation and not confirmed:
+                 if self.output_format == "json" or not sys.stdin.isatty():
+@@ -576,14 +682,8 @@
+                 if not confirmed:
+                     console.print("Plan not applied; no files or history changed.")
+                     return 0
+-            return output(self.organizer.apply(plan, confirmed=confirmed), "apply")
+-
+-        elif parsed.subcommand == "duplicates":
+-            report = duplicate_report(Path(parsed.dir), includes=parsed.include, exclusions=parsed.exclude,
+-                                      use_default_excludes=not parsed.no_default_excludes,
+-                                      recursive=not parsed.no_recursive)
+-            emit_json(report) if self.output_format == "json" else show_scan_report(console, report)
+-            return 0 if report["complete"] else 1
++            return self.apply_tracked(prepared, confirmed=confirmed)
++
+         return 0
+ 
+ 
+@@ -599,14 +699,15 @@
+                 reconfigure(errors="backslashreplace")
+             except (OSError, ValueError):
+                 pass  # Some embedding/capture streams cannot be reconfigured.
++    logging.basicConfig(level=logging.WARNING)
+     cli = TaskMasterCLI()
+     try:
+         return cli.run_cli(args) or 0
+     except (OSError, ValueError, sqlite3.Error) as error:
+         if cli.output_format == "json":
+-            emit_json({"schema_version": 1, "command": cli.report_command, "complete": False, "error": str(error)})
++            emit_json({"schema_version": 1, "command": cli.report_command, "complete": False, "error": safe_message(str(error))})
+         else:
+-            console.print(f"Error: {error}", markup=False)
++            console.print(f"Error: {safe_message(str(error))}", markup=False)
+         return 1
+     finally:
+         cli.close()
+--- /dev/null
++++ after/taskmaster/config.py
+@@ -0,0 +1,104 @@
++"""Versioned, strictly validated JSON workflows. No code evaluation/imports."""
++from dataclasses import dataclass
++import hashlib
++import json
++from pathlib import Path
++import re
++
++from .errors import PlanValidationError
++from .operations import normalize_parameters
++from .planning import absolute_path, reject_links
++
++VERSION = 1
++
++
++@dataclass(frozen=True)
++class WorkflowStep:
++    id: str
++    operation: str
++    parameters_json: str
++
++    @property
++    def parameters(self) -> dict:
++        return json.loads(self.parameters_json)
++
++
++@dataclass(frozen=True)
++class Workflow:
++    name: str
++    on_failure: str
++    steps: tuple[WorkflowStep, ...]
++    version: int = VERSION
++
++    def to_dict(self) -> dict:
++        return {"version": self.version, "name": self.name, "on_failure": self.on_failure,
++                "steps": [{"id": step.id, "operation": step.operation, "parameters": step.parameters}
++                          for step in self.steps]}
++
++    def to_json(self) -> str:
++        return json.dumps(self.to_dict(), indent=2, sort_keys=True) + "\n"
++
++    @property
++    def fingerprint(self) -> str:
++        return hashlib.sha256(self.to_json().encode("utf-8")).hexdigest()
++
++
++def validate_workflow(document: dict) -> Workflow:
++    if type(document) is not dict or document.keys() - {"version", "name", "on_failure", "steps"}:
++        raise PlanValidationError("Workflow must be an object with only version, name, on_failure, and steps")
++    if type(document.get("version")) is not int or document["version"] != VERSION:
++        raise PlanValidationError("Unsupported workflow version; expected integer version 1")
++    name = document.get("name")
++    if not isinstance(name, str) or not name.strip() or len(name) > 256:
++        raise PlanValidationError("Workflow name must contain 1–256 characters")
++    policy = document.get("on_failure", "stop")
++    if policy not in ("stop", "continue"):
++        raise PlanValidationError("on_failure must be stop or continue")
++    steps = document.get("steps")
++    if type(steps) is not list or not 1 <= len(steps) <= 100:
++        raise PlanValidationError("Workflow steps must be an array containing 1–100 steps")
++    validated, names = [], set()
++    for index, step in enumerate(steps):
++        if type(step) is not dict or set(step) != {"id", "operation", "parameters"}:
++            raise PlanValidationError(f"steps[{index}] must contain exactly id, operation, and parameters")
++        step_id = step["id"]
++        if not isinstance(step_id, str) or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{0,63}", step_id) or step_id in names:
++            raise PlanValidationError(f"steps[{index}].id must be a unique identifier starting with a letter")
++        try:
++            parameters = normalize_parameters(step["operation"], step["parameters"])
++        except ValueError as error:
++            raise PlanValidationError(f"steps[{index}]: {error}") from error
++        validated.append(WorkflowStep(step_id, step["operation"], json.dumps(parameters, sort_keys=True)))
++        names.add(step_id)
++    return Workflow(name, policy, tuple(validated))
++
++
++def parse_workflow(text: str) -> Workflow:
++    if not isinstance(text, str):
++        raise PlanValidationError("Workflow JSON must be text")
++    def pairs(items):
++        result = {}
++        for key, value in items:
++            if key in result:
++                raise PlanValidationError("Duplicate JSON object key")
++            result[key] = value
++        return result
++
++    def constant(_):
++        raise PlanValidationError("Non-finite numbers are not valid workflow JSON")
++
++    try:
++        document = json.loads(text, object_pairs_hook=pairs, parse_constant=constant)
++    except json.JSONDecodeError as error:
++        raise PlanValidationError(f"Malformed workflow JSON at line {error.lineno}, column {error.colno}") from error
++    except RecursionError as error:
++        raise PlanValidationError("Workflow JSON nesting is too deep") from error
++    return validate_workflow(document)
++
++
++def load_workflow(path: Path) -> Workflow:
++    path = absolute_path(path)
++    reject_links(path)
++    if path.stat().st_size > 1024 * 1024:
++        raise PlanValidationError("Workflow file exceeds the 1 MiB configuration limit")
++    return parse_workflow(path.read_text(encoding="utf-8-sig"))
+--- before/taskmaster/database.py
++++ after/taskmaster/database.py
+@@ -12,7 +12,9 @@
+ from .models import Task, FileOperation, TaskStatus, RecurrenceType, TaskPriority
+ 
+ class Database:
+-    """SQLite database manager with connection pooling."""
++    """Versioned SQLite persistence; one connection per operation."""
++
++    SCHEMA_VERSION = 1
+ 
+     def __init__(self, db_path: str = "taskmaster.db"):
+         self.db_path = db_path
+@@ -35,6 +37,10 @@
+     def _init_db(self):
+         """Initialize database schema."""
+         with self._connection() as conn:
++            conn.execute("BEGIN IMMEDIATE")
++            version = conn.execute("PRAGMA user_version").fetchone()[0]
++            if version > self.SCHEMA_VERSION:
++                raise ValueError("Database schema is newer than this application supports")
+             # Tasks table
+             conn.execute("""
+                 CREATE TABLE IF NOT EXISTS tasks (
+@@ -99,9 +105,23 @@
+                 "source_removed": "INTEGER DEFAULT 0",
+                 "history_status": "TEXT DEFAULT 'unknown'",
+                 "history_error": "TEXT",
++                "run_id": "TEXT",
++                "step_id": "TEXT",
+             }.items():
+                 if name not in columns:
+                     conn.execute(f"ALTER TABLE file_operations ADD COLUMN {name} {definition}")
++            conn.execute("""CREATE TABLE IF NOT EXISTS runs (
++                run_id TEXT PRIMARY KEY, workflow_name TEXT NOT NULL, mode TEXT NOT NULL,
++                on_failure TEXT NOT NULL, config_sha256 TEXT NOT NULL,
++                started_at TEXT NOT NULL, finished_at TEXT, status TEXT NOT NULL,
++                report_json TEXT NOT NULL)""")
++            conn.execute("""CREATE TABLE IF NOT EXISTS run_steps (
++                run_id TEXT NOT NULL, step_id TEXT NOT NULL, position INTEGER NOT NULL,
++                operation TEXT NOT NULL, status TEXT NOT NULL, report_json TEXT NOT NULL,
++                PRIMARY KEY (run_id, step_id))""")
++            conn.execute("CREATE INDEX IF NOT EXISTS idx_file_ops_run ON file_operations(run_id, step_id)")
++            conn.execute("CREATE INDEX IF NOT EXISTS idx_runs_started ON runs(started_at)")
++            conn.execute(f"PRAGMA user_version = {self.SCHEMA_VERSION}")
+ 
+     # Task operations
+     def save_task(self, task: Task) -> None:
+@@ -191,14 +211,74 @@
+             conn.execute("""
+                 INSERT INTO file_operations 
+                 (id, source, destination, operation, status, timestamp, size_bytes, checksum, error,
+-                 filesystem_status, destination_created, source_removed, history_status, history_error)
+-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
++                 filesystem_status, destination_created, source_removed, history_status, history_error, run_id, step_id)
++                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             """, (
+                 op.id, str(op.source), str(op.destination) if op.destination else None,
+                 op.operation, op.status, op.timestamp.isoformat(),
+                 op.size_bytes, op.checksum, op.error, op.filesystem_status,
+-                op.destination_created, op.source_removed, op.history_status, op.history_error
++                op.destination_created, op.source_removed, op.history_status, op.history_error, op.run_id, op.step_id
+             ))
++
++    def start_run(self, report: dict) -> None:
++        with self._connection() as conn:
++            conn.execute("""INSERT INTO runs (run_id, workflow_name, mode, on_failure,
++                config_sha256, started_at, status, report_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
++                (report["run_id"], report["workflow"]["name"], report["mode"], report["on_failure"],
++                 report["workflow"]["config_sha256"], report["started_at"], "running", json.dumps(report)))
++
++    def save_run_step(self, run_id: str, position: int, step: dict) -> None:
++        with self._connection() as conn:
++            conn.execute("""INSERT OR REPLACE INTO run_steps
++                (run_id, step_id, position, operation, status, report_json) VALUES (?, ?, ?, ?, ?, ?)""",
++                (run_id, step["id"], position, step["operation"], step["status"], json.dumps(step)))
++
++    def finish_run(self, report: dict) -> None:
++        with self._connection() as conn:
++            cursor = conn.execute("UPDATE runs SET finished_at=?, status=?, report_json=? WHERE run_id=?",
++                (report["finished_at"], report["status"], json.dumps(report), report["run_id"]))
++            if cursor.rowcount != 1:
++                raise ValueError("Run journal entry was not found")
++
++    @staticmethod
++    def read_runs(db_path: str, *, run_id: str | None = None, limit: int = 20):
++        """Read history without initialization, schema changes, or file creation."""
++        if run_id is not None and (not isinstance(run_id, str) or not run_id.strip()):
++            raise ValueError("Run ID must be a nonempty string")
++        if type(limit) is not int or not 1 <= limit <= 1000:
++            raise ValueError("History limit must be an integer from 1 to 1000")
++        path = Path(db_path).absolute()
++        if not path.exists():
++            return None if run_id else []
++        conn = sqlite3.connect(path.as_uri() + "?mode=ro", uri=True)
++        conn.row_factory = sqlite3.Row
++        try:
++            if conn.execute("PRAGMA user_version").fetchone()[0] > Database.SCHEMA_VERSION:
++                raise ValueError("Database schema is newer than this application supports")
++            if not conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='runs'").fetchone():
++                return None if run_id else []
++            if run_id is None:
++                return [dict(row) for row in conn.execute("""SELECT run_id, workflow_name, mode,
++                    on_failure, started_at, finished_at, status FROM runs
++                    ORDER BY started_at DESC, run_id DESC LIMIT ?""", (limit,))]
++            row = conn.execute("SELECT report_json, status FROM runs WHERE run_id=?", (run_id,)).fetchone()
++            if row is None:
++                return None
++            report = json.loads(row["report_json"])
++            if row["status"] == "running":
++                saved = {entry["step_id"]: json.loads(entry["report_json"]) for entry in conn.execute(
++                    "SELECT step_id, report_json FROM run_steps WHERE run_id=? ORDER BY position", (run_id,))}
++                report["steps"] = [saved.get(step["id"], step) for step in report["steps"]]
++                report["summary"] = {
++                    "successful_steps": sum(step["status"] == "success" for step in report["steps"]),
++                    "failed_steps": sum(step["status"] == "failed" for step in report["steps"]),
++                    "running_steps": sum(step["status"] == "running" for step in report["steps"]),
++                    "not_run_steps": sum(step["status"] == "not_run" for step in report["steps"]),
++                    "history_failures": len(report["history"]["errors"]),
++                }
++            return report
++        finally:
++            conn.close()
+ 
+     def get_file_operations(self, limit: int = 100) -> List[Dict[str, Any]]:
+         """Get recent file operations."""
+--- before/taskmaster/models.py
++++ after/taskmaster/models.py
+@@ -129,7 +129,7 @@
+ @dataclass
+ class FileOperation:
+     """Record of a file operation."""
+-    id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
++    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+     source: Path = field(default_factory=Path)
+     destination: Optional[Path] = None
+     operation: str = ""
+@@ -143,6 +143,8 @@
+     source_removed: bool = False
+     history_status: str = "not_requested"
+     history_error: Optional[str] = None
++    run_id: Optional[str] = None
++    step_id: Optional[str] = None
+ 
+ 
+ @dataclass(frozen=True)
+--- /dev/null
++++ after/taskmaster/operations.py
+@@ -0,0 +1,118 @@
++"""Closed operation registry and shared direct-command/workflow validation."""
++from dataclasses import dataclass
++from pathlib import Path
++
++from .errors import PlanValidationError
++from .inspection import inspect_project
++from .duplicates import duplicate_report
++from .models import FileRule, OperationPlan
++from .organizer import FileOrganizer
++from .planning import absolute_path, validate_template
++from .reporting import organization_report
++from .scanning import patterns
++
++OPERATION_REGISTRY = frozenset({"inspect", "duplicates", "organize"})
++TEMPLATES = {"type": "{type}/{relative_dir}/{filename}",
++             "date": "{year}/{month}/{relative_dir}/{filename}",
++             "size": "{size_category}/{relative_dir}/{filename}"}
++COMMON = {"source", "includes", "exclusions", "use_default_excludes", "recursive"}
++FIELDS = {"inspect": COMMON | {"top", "min_size"}, "duplicates": COMMON,
++          "organize": COMMON | {"destination", "action", "strategy", "template", "conflict_policy", "all_files"}}
++
++
++def normalize_parameters(operation: str, parameters: dict) -> dict:
++    if not isinstance(operation, str) or operation not in OPERATION_REGISTRY:
++        raise PlanValidationError("Unknown operation; supported names are inspect, duplicates, organize")
++    if type(parameters) is not dict:
++        raise PlanValidationError("parameters must be an object")
++    if parameters.keys() - FIELDS[operation]:
++        raise PlanValidationError(f"Unsupported parameter fields for {operation}")
++    result = {"includes": [], "exclusions": [], "use_default_excludes": True, "recursive": True, **parameters}
++    for field in ("source", "destination") if operation == "organize" else ("source",):
++        value = result.get(field)
++        if not isinstance(value, str) or not value.strip() or "\0" in value or "://" in value:
++            raise PlanValidationError(f"parameters.{field} must be a nonempty filesystem path")
++    for field in ("includes", "exclusions"):
++        if type(result[field]) is not list:
++            raise PlanValidationError(f"parameters.{field} must be an array of relative glob strings")
++        try:
++            result[field] = list(patterns(result[field]))
++        except ValueError as error:
++            # Do not echo arbitrary configuration values in validation errors.
++            raise PlanValidationError(f"parameters.{field} contains an invalid relative glob") from error
++    for field in ("use_default_excludes", "recursive"):
++        if type(result[field]) is not bool:
++            raise PlanValidationError(f"parameters.{field} must be a boolean")
++    if operation == "inspect":
++        result = {"top": 10, "min_size": 0, **result}
++        for field in ("top", "min_size"):
++            if type(result[field]) is not int or result[field] < 0:
++                raise PlanValidationError(f"parameters.{field} must be a nonnegative integer")
++    if operation == "organize":
++        result = {"action": "move", "strategy": "type", "template": None,
++                  "conflict_policy": "error", "all_files": False, **result}
++        for field, choices in (("action", {"copy", "move"}), ("strategy", set(TEMPLATES)),
++                               ("conflict_policy", {"error", "skip"})):
++            if not isinstance(result[field], str) or result[field] not in choices:
++                raise PlanValidationError(f"parameters.{field} must be one of {', '.join(sorted(choices))}")
++        if type(result["all_files"]) is not bool:
++            raise PlanValidationError("parameters.all_files must be a boolean")
++        if bool(result["includes"]) == result["all_files"]:
++            raise PlanValidationError("Select include patterns or explicitly choose all_files=true (not both)")
++        if result["template"] is not None:
++            try:
++                validate_template(result["template"])
++            except ValueError as error:
++                raise PlanValidationError("parameters.template contains an invalid or unsupported placeholder") from error
++    return result
++
++
++@dataclass
++class PreparedOperation:
++    operation: str
++    parameters: dict
++    base_dir: Path
++    organizer: FileOrganizer | None = None
++    plan: OperationPlan | None = None
++    results: list | None = None
++
++
++def resolve_local_path(base_dir: Path, value: str) -> Path:
++    candidate = Path(value).expanduser()
++    return absolute_path(candidate if candidate.is_absolute() else base_dir / candidate)
++
++
++def prepare_operation(operation: str, parameters: dict, *, base_dir: Path,
++                      organizer: FileOrganizer | None = None) -> PreparedOperation:
++    values = normalize_parameters(operation, parameters)
++    base_dir = absolute_path(base_dir)
++    prepared = PreparedOperation(operation, values, base_dir)
++    if operation == "organize":
++        organizer = organizer or FileOrganizer()
++        organizer.rules.clear()
++        organizer.add_rule(FileRule("named_organize", "*", values["template"] if values["template"] is not None
++                                    else TEMPLATES[values["strategy"]], action=values["action"]))
++        prepared.organizer = organizer
++        prepared.plan = organizer.plan_directory(resolve_local_path(base_dir, values["source"]),
++            resolve_local_path(base_dir, values["destination"]),
++            includes=values["includes"], all_files=values["all_files"], exclusions=values["exclusions"],
++            use_default_excludes=values["use_default_excludes"], recursive=values["recursive"],
++            conflict_policy=values["conflict_policy"])
++    return prepared
++
++
++def run_prepared(prepared: PreparedOperation, *, apply: bool = False, confirmed: bool = False) -> dict:
++    values = prepared.parameters
++    source = resolve_local_path(prepared.base_dir, values["source"])
++    scope = {key: values[key] for key in ("includes", "exclusions", "use_default_excludes", "recursive")}
++    if prepared.operation == "inspect":
++        return inspect_project(source, top=values["top"], min_size=values["min_size"], **scope)
++    if prepared.operation == "duplicates":
++        return duplicate_report(source, **scope)
++    if prepared.operation != "organize" or prepared.plan is None:
++        raise PlanValidationError("Prepared operation is invalid")
++    plan, organizer = prepared.plan, prepared.organizer
++    prepared.results = organizer.apply(plan, confirmed=confirmed) if apply else organizer.preview(plan)
++    return organization_report(plan, prepared.results, summary=organizer.generate_report(prepared.results),
++        mode="apply" if apply else "preview",
++        scope={"includes": list(plan.includes), "all_files": plan.all_files, "exclusions": list(plan.exclusions)})
+--- before/taskmaster/reporting.py
++++ after/taskmaster/reporting.py
+@@ -50,3 +50,17 @@
+         console.print(f"Error: {error['path']}: {error['error']}", markup=False)
+     if not report["complete"]:
+         console.print("Incomplete scan; totals and groups cover successfully inspected files only.")
++
++
++def show_step_report(console, report: dict) -> None:
++    if report["command"] in {"inspect", "duplicates"}:
++        show_scan_report(console, report)
++        return
++    for result in report["operations"]:
++        console.print(f"{result['status']}: {result['source']} | files={result['filesystem_status']}"
++                      f" | history={result['history_status']}"
++                      f"{(' | ' + result['error']) if result['error'] else ''}"
++                      f"{(' | History error: ' + result['history_error']) if result['history_error'] else ''}", markup=False)
++    summary = report["summary"]
++    console.print(f"Successful: {summary['successful']}; failed: {summary['failed']}; "
++                  f"skipped: {summary['skipped']}; history failures: {summary['history_failed']}")
+--- before/taskmaster/scheduler.py
++++ after/taskmaster/scheduler.py
+@@ -13,7 +13,6 @@
+ from .models import Task, TaskStatus, TaskPriority, RecurrenceType
+ from .database import Database
+ 
+-logging.basicConfig(level=logging.INFO)
+ logger = logging.getLogger("TaskMaster")
+ 
+ class TaskScheduler:
+--- /dev/null
++++ after/taskmaster/workflows.py
+@@ -0,0 +1,182 @@
++"""Sequential workflow execution with explicit failure and persistence policies."""
++from datetime import datetime, timezone
++import logging
++from pathlib import Path
++import re
++import uuid
++
++from .config import Workflow, validate_workflow
++from .database import Database
++from .errors import ConfirmationRequired, PlanValidationError
++from .operations import PreparedOperation, prepare_operation, run_prepared
++from .organizer import FileOrganizer
++from .planning import absolute_path
++
++logger = logging.getLogger("taskmaster.workflows")
++
++
++def timestamp() -> str:
++    return datetime.now(timezone.utc).isoformat()
++
++
++def safe_message(message: str) -> str:
++    text = re.sub(r"(?i)([a-z][a-z0-9+.-]*://)[^/\s@]+@", r"\1[REDACTED]@", str(message))
++    return re.sub(r'''(?ix)\b(password|token|secret|api[_-]?key|authorization)\b["']?\s*[:=]\s*
++                     (?:bearer\s+[^\s,;]+|"[^"]*"|'[^']*'|[^\s,;]+)''',
++                  lambda match: match.group(1) + "=[REDACTED]", text)
++
++
++def clean_diagnostics(value):
++    if isinstance(value, dict):
++        return {key: safe_message(item) if key in {"error", "history_error", "message"} and isinstance(item, str)
++                else clean_diagnostics(item) for key, item in value.items()}
++    if isinstance(value, list):
++        return [clean_diagnostics(item) for item in value]
++    return value
++
++
++def diagnostic(code, message):
++    return {"code": code, "message": safe_message(message)}
++
++
++def run_workflow(workflow: Workflow, *, base_dir: Path, apply: bool = False, confirmed: bool = False,
++                 history_path: Path | None = None, database_factory=None, config_path: Path | None = None,
++                 _prepared: dict[str, PreparedOperation] | None = None) -> dict:
++    # Revalidate even programmatically constructed objects; parameters are copied
++    # from canonical JSON so caller mutations cannot change an in-flight run.
++    workflow = validate_workflow(workflow.to_dict())
++    if type(apply) is not bool or type(confirmed) is not bool:
++        raise PlanValidationError("apply and confirmed must be booleans")
++    if apply and not confirmed and any(step.operation == "organize" and step.parameters["action"] == "move"
++                                       for step in workflow.steps):
++        raise ConfirmationRequired("Workflow move application requires explicit --apply --yes approval")
++    base_dir = absolute_path(base_dir)
++    history_path = absolute_path(history_path or Path.cwd() / "taskmaster.db")
++    config_path = absolute_path(config_path) if config_path is not None else None
++    run_id = str(uuid.uuid4())
++    report = {"schema_version": 1, "command": "workflow", "run_id": run_id,
++              "workflow": {"name": workflow.name, "version": workflow.version, "config_sha256": workflow.fingerprint},
++              "mode": "apply" if apply else "preview", "on_failure": workflow.on_failure,
++              "base_dir": str(base_dir), "config_path": str(config_path) if config_path else None,
++              "started_at": timestamp(), "finished_at": None, "status": "running", "complete": False,
++              "history": {"status": "not_requested", "errors": []}, "diagnostics": [],
++              "steps": [{"id": step.id, "operation": step.operation, "status": "not_run",
++                         "started_at": None, "finished_at": None, "diagnostics": [], "report": None}
++                        for step in workflow.steps],
++              "summary": {"successful_steps": 0, "failed_steps": 0, "not_run_steps": len(workflow.steps),
++                          "running_steps": 0, "history_failures": 0}}
++    db = None
++
++    def history_error(code, error, step_id=None):
++        entry = diagnostic(code, str(error))
++        if step_id:
++            entry["step_id"] = step_id
++        report["history"]["status"] = "failed"
++        report["history"]["errors"].append(entry)
++        logger.warning("run=%s step=%s code=%s", run_id, step_id or "-", code)
++
++    if apply:
++        try:
++            db = database_factory() if database_factory else Database(str(history_path))
++            report["history"]["status"] = "recorded"
++            db.start_run(report)
++        except Exception as error:
++            history_error("history_start_failed", error)
++            report["status"] = "failed"
++            report["finished_at"] = timestamp()
++            for step in report["steps"]:
++                step["diagnostics"] = [diagnostic("history_unavailable", "Run was not started because its journal could not be written")]
++            report["summary"] = {"successful_steps": 0, "failed_steps": 0, "not_run_steps": len(workflow.steps),
++                                 "running_steps": 0, "history_failures": len(report["history"]["errors"])}
++            return report
++
++    stopped = False
++    for index, step in enumerate(workflow.steps):
++        result = report["steps"][index]
++        prepared = None
++        start_failed = False
++        may_execute = not stopped
++        if stopped:
++            result["diagnostics"] = [diagnostic("previous_step_failed", "Not run because an earlier step failed")]
++        else:
++            result["status"], result["started_at"] = "running", timestamp()
++            if db is not None:
++                try:
++                    db.save_run_step(run_id, index, result)
++                except Exception as error:
++                    history_error("history_step_start_failed", error, step.id)
++                    start_failed, may_execute = True, False
++                    result["status"], result["started_at"] = "not_run", None
++                    result["diagnostics"] = [diagnostic("history_step_start_failed", "Step was not executed because its start journal failed")]
++        if may_execute:
++            organizer = FileOrganizer(history_path=history_path)
++            try:
++                if db is not None:
++                    def record_file(operation, step_id=step.id):
++                        operation.run_id, operation.step_id = run_id, step_id
++                        if operation.error:
++                            operation.error = safe_message(operation.error)
++                        try:
++                            db.log_file_operation(operation)
++                        except Exception as error:
++                            raise RuntimeError(safe_message(str(error))) from None
++                    organizer.history_recorder = record_file
++                prepared = (_prepared or {}).get(step.id)
++                if prepared is None:
++                    prepared = prepare_operation(step.operation, step.parameters, base_dir=base_dir, organizer=organizer)
++                elif (prepared.operation != step.operation or prepared.parameters != step.parameters
++                      or prepared.base_dir != base_dir):
++                    raise PlanValidationError("Captured operation does not match the validated workflow step")
++                elif prepared.organizer is not None:
++                    prepared.organizer.history_recorder = organizer.history_recorder
++                if prepared.plan is not None and config_path is not None and any(
++                        item.source == config_path or item.destination == config_path for item in prepared.plan.operations):
++                    raise PlanValidationError("The workflow configuration file cannot be selected or replaced")
++                result["report"] = clean_diagnostics(run_prepared(prepared, apply=apply, confirmed=confirmed))
++                if prepared.results:
++                    for outcome in prepared.results:
++                        if outcome.error:
++                            outcome.error = safe_message(outcome.error)
++                        if outcome.history_error:
++                            outcome.history_error = safe_message(outcome.history_error)
++                            history_error("file_history_failed", outcome.history_error, step.id)
++                result["status"] = "success" if result["report"]["complete"] else "failed"
++                if result["status"] == "failed":
++                    result["diagnostics"] = [diagnostic("operation_incomplete", "Operation reported file, scan, or history failures; see its report")]
++            except Exception as error:
++                result["status"] = "failed"
++                result["diagnostics"] = [diagnostic("operation_failed", str(error))]
++            finally:
++                organizer.close()
++                if prepared is not None and prepared.organizer is not None:
++                    prepared.organizer.close()
++            result["finished_at"] = timestamp()
++        if db is not None and not start_failed:
++            try:
++                db.save_run_step(run_id, index, result)
++            except Exception as error:
++                history_error("history_step_failed", error, step.id)
++                if result["status"] != "not_run":
++                    result["status"] = "failed"
++                    result["diagnostics"].append(diagnostic("history_step_failed", "Step journal could not be written"))
++        logger.info("run=%s step=%s operation=%s status=%s", run_id, step.id, step.operation, result["status"])
++        if (result["status"] == "failed" or start_failed) and workflow.on_failure == "stop":
++            stopped = True
++
++    report["summary"] = {"successful_steps": sum(step["status"] == "success" for step in report["steps"]),
++                         "failed_steps": sum(step["status"] == "failed" for step in report["steps"]),
++                         "not_run_steps": sum(step["status"] == "not_run" for step in report["steps"]),
++                         "running_steps": 0,
++                         "history_failures": len(report["history"]["errors"])}
++    report["complete"] = not report["summary"]["failed_steps"] and not report["history"]["errors"]
++    report["status"] = "success" if report["complete"] else "failed"
++    report["finished_at"] = timestamp()
++    if db is not None:
++        try:
++            db.finish_run(report)
++        except Exception as error:
++            history_error("history_finish_failed", error)
++            report["summary"]["history_failures"] = len(report["history"]["errors"])
++            report["status"] = "failed" if report["summary"]["failed_steps"] else "completed_with_errors"
++            report["complete"] = False
++    return report
+--- /dev/null
++++ after/tests/test_workflows.py
+@@ -0,0 +1,454 @@
++from copy import deepcopy
++import hashlib
++import json
++import logging
++import os
++from pathlib import Path
++import sqlite3
++import subprocess
++import sys
++import uuid
++from unittest.mock import Mock
++
++import pytest
++
++from taskmaster.cli import TaskMasterCLI, main
++from taskmaster.config import load_workflow, parse_workflow, validate_workflow
++from taskmaster.database import Database
++from taskmaster.errors import ConfirmationRequired, PlanValidationError
++from taskmaster.operations import normalize_parameters, prepare_operation, run_prepared
++from taskmaster.workflows import run_workflow
++
++
++def document(steps=None, policy="stop"):
++    return {"version": 1, "name": "Artifact review", "on_failure": policy,
++            "steps": steps if steps is not None else [
++                {"id": "inspect", "operation": "inspect", "parameters": {"source": ".", "includes": ["*.log"]}},
++                {"id": "duplicates", "operation": "duplicates", "parameters": {"source": ".", "includes": ["*.log"]}},
++                {"id": "copy", "operation": "organize", "parameters": {"source": ".", "destination": "../output",
++                    "includes": ["*.log"], "action": "copy"}}]}
++
++
++@pytest.fixture
++def workspace(tmp_path):
++    root = tmp_path / "project"
++    root.mkdir()
++    (root / "a.log").write_bytes(b"same log\n")
++    (root / "b.log").write_bytes(b"same log\n")
++    path = root / "workflow.json"
++    path.write_text(json.dumps(document()), encoding="utf-8")
++    return root, path, tmp_path / "history.sqlite"
++
++
++def snapshot(root):
++    return {path.relative_to(root).as_posix(): path.read_bytes() for path in root.rglob("*") if path.is_file()}
++
++
++def test_configuration_round_trip_normalizes_without_mutating_input():
++    value = document()
++    before = deepcopy(value)
++    workflow = validate_workflow(value)
++    assert value == before
++    assert parse_workflow(workflow.to_json()) == workflow
++    assert len(workflow.fingerprint) == 64
++    parameters = workflow.steps[0].parameters
++    parameters["includes"].append("*.py")
++    assert workflow.steps[0].parameters["includes"] == ["*.log"]
++
++
++@pytest.mark.parametrize("text", ["{", "[]", '{"version":true}', '{"version":1,"version":1}',
++    '{"version":1,"name":"a","steps":NaN}', '{"secret":"never-echo-this",', "[" * 2000])
++def test_invalid_json_does_not_echo_document_values(text):
++    with pytest.raises(PlanValidationError) as error:
++        parse_workflow(text)
++    assert "never-echo-this" not in str(error.value)
++
++
++@pytest.mark.parametrize("change", [
++    lambda d: d.update(version=2), lambda d: d.update(version=True), lambda d: d.update(name=""),
++    lambda d: d.update(on_failure="retry"), lambda d: d.update(steps=[]), lambda d: d.update(steps={}),
++    lambda d: d.update(secret="never-echo-this"), lambda d: d["steps"][0].update(operation="shell"),
++    lambda d: d["steps"][0].update(id="../unsafe"), lambda d: d["steps"][1].update(id="inspect"),
++    lambda d: d["steps"][0].pop("parameters"),
++    lambda d: d["steps"][0].update(parameters={"source": ".", "api_key": "never-echo-this"}),
++])
++def test_invalid_workflow_shapes_are_rejected(change):
++    value = document()
++    change(value)
++    with pytest.raises(PlanValidationError) as error:
++        validate_workflow(value)
++    assert "never-echo-this" not in str(error.value)
++
++
++@pytest.mark.parametrize("operation,parameters", [
++    ("inspect", {"source": ".", "top": True}), ("inspect", {"source": ".", "top": -1}),
++    ("inspect", {"source": ".", "min_size": 1.5}), ("inspect", {"source": ".", "recursive": "true"}),
++    ("duplicates", {"source": ".", "includes": "*.log"}),
++    ("duplicates", {"source": ".", "exclusions": [None]}),
++    ("duplicates", {"source": "https://user:never-echo-this@example.test"}),
++    ("duplicates", {"source": ".", "command": "never-echo-this"}),
++    ("organize", {"source": ".", "destination": "../out"}),
++    ("organize", {"source": ".", "destination": "../out", "all_files": "true"}),
++    ("organize", {"source": ".", "destination": "../out", "all_files": True, "includes": ["*.log"]}),
++    ("organize", {"source": ".", "destination": "../out", "all_files": True, "action": "delete"}),
++    ("organize", {"source": ".", "destination": "../out", "all_files": True, "conflict_policy": "overwrite"}),
++    ("organize", {"source": ".", "destination": "../out", "all_files": True, "template": "{unknown}"}),
++])
++def test_shared_parameter_validation_rejects_bad_types_and_unsafe_options(operation, parameters):
++    with pytest.raises(PlanValidationError) as error:
++        normalize_parameters(operation, parameters)
++    assert "never-echo-this" not in str(error.value)
++
++
++def test_bom_and_configuration_size_limit(workspace):
++    _, path, _ = workspace
++    path.write_text(json.dumps(document()), encoding="utf-8-sig")
++    assert load_workflow(path).name == "Artifact review"
++    path.write_bytes(b" " * (1024 * 1024 + 1))
++    with pytest.raises(PlanValidationError, match="1 MiB"):
++        load_workflow(path)
++
++
++def test_entire_configuration_is_validated_before_any_execution(workspace, tmp_path):
++    root, _, history = workspace
++    value = document()
++    value["steps"].append({"id": "invalid", "operation": "shell", "parameters": {}})
++    before = snapshot(tmp_path)
++    with pytest.raises(PlanValidationError):
++        validate_workflow(value)
++    assert snapshot(tmp_path) == before and not history.exists()
++
++
++def test_preview_is_read_only_with_uuid_and_complete_step_reports(workspace, tmp_path):
++    root, path, history = workspace
++    before = snapshot(tmp_path)
++    factory = Mock(side_effect=AssertionError("Preview must never initialize persistence"))
++    report = run_workflow(load_workflow(path), base_dir=root, history_path=history, config_path=path,
++                          database_factory=factory)
++    assert report["complete"] and report["mode"] == "preview"
++    assert str(uuid.UUID(report["run_id"])) == report["run_id"]
++    assert report["summary"]["successful_steps"] == 3
++    assert report["steps"][1]["report"]["summary"]["duplicate_groups"] == 1
++    assert report["steps"][2]["report"]["mode"] == "preview"
++    assert report["history"]["status"] == "not_requested"
++    factory.assert_not_called()
++    assert snapshot(tmp_path) == before
++
++
++def test_apply_persists_runs_steps_and_linked_file_outcomes(workspace, tmp_path):
++    root, path, history = workspace
++    workflow = load_workflow(path)
++    report = run_workflow(workflow, base_dir=root, history_path=history, config_path=path, apply=True)
++    assert report["complete"] and report["status"] == "success"
++    assert (tmp_path / "output/misc/a.log").read_bytes() == b"same log\n"
++    assert (root / "a.log").exists()
++    stored = Database.read_runs(str(history), run_id=report["run_id"])
++    assert stored == report
++    db = Database(str(history))
++    operations = db.get_file_operations()
++    assert len(operations) == 2
++    assert {entry["run_id"] for entry in operations} == {report["run_id"]}
++    assert {entry["step_id"] for entry in operations} == {"copy"}
++    assert all(str(uuid.UUID(entry["id"])) == entry["id"] for entry in operations)
++    with sqlite3.connect(history) as connection:
++        assert connection.execute("SELECT COUNT(*) FROM run_steps").fetchone()[0] == 3
++        assert connection.execute("PRAGMA user_version").fetchone()[0] == 1
++    second = run_workflow(workflow, base_dir=root, history_path=history, apply=True)
++    assert second["run_id"] != report["run_id"]
++    assert not second["complete"]  # Copy conflicts remain failures, never overwrites.
++
++
++@pytest.mark.parametrize("policy,expected", [("stop", ["failed", "not_run"]), ("continue", ["failed", "success"])])
++def test_step_failure_policy_uses_actual_outcomes(workspace, policy, expected):
++    root, _, history = workspace
++    config = document([
++        {"id": "missing", "operation": "inspect", "parameters": {"source": "missing"}},
++        {"id": "valid", "operation": "inspect", "parameters": {"source": "."}}], policy)
++    report = run_workflow(validate_workflow(config), base_dir=root, history_path=history, apply=True)
++    assert not report["complete"] and [step["status"] for step in report["steps"]] == expected
++    assert Database.read_runs(str(history), run_id=report["run_id"])["steps"] == report["steps"]
++
++
++def test_later_steps_see_outputs_of_earlier_steps(workspace, tmp_path):
++    root, _, history = workspace
++    copy_step = document()["steps"][2]
++    value = document([copy_step, {"id": "inspect_output", "operation": "inspect", "parameters": {"source": "../output"}}])
++    preview = run_workflow(validate_workflow(value), base_dir=root, history_path=history)
++    assert not preview["complete"] and not history.exists()  # Preview does not simulate copies.
++    applied = run_workflow(validate_workflow(value), base_dir=root, history_path=history, apply=True)
++    assert applied["complete"] and applied["steps"][1]["report"]["summary"]["file_count"] == 2
++
++
++def test_move_approval_happens_before_history_or_any_step(workspace, tmp_path):
++    root, _, history = workspace
++    value = document()
++    value["steps"][2]["parameters"]["action"] = "move"
++    workflow = validate_workflow(value)
++    before = snapshot(tmp_path)
++    with pytest.raises(ConfirmationRequired):
++        run_workflow(workflow, base_dir=root, history_path=history, apply=True)
++    assert snapshot(tmp_path) == before
++    applied = run_workflow(workflow, base_dir=root, history_path=history, apply=True, confirmed=True)
++    assert applied["complete"] and not (root / "a.log").exists()
++
++
++def test_start_journal_failure_prevents_file_changes(workspace, tmp_path, monkeypatch):
++    root, _, history = workspace
++    monkeypatch.setattr(Database, "start_run", Mock(side_effect=sqlite3.OperationalError("start denied")))
++    report = run_workflow(validate_workflow(document()), base_dir=root, history_path=history, apply=True)
++    assert not report["complete"] and report["history"]["errors"][0]["code"] == "history_start_failed"
++    assert all(step["status"] == "not_run" for step in report["steps"])
++    assert not (tmp_path / "output").exists()
++
++
++def test_file_history_failure_retains_success_and_stops_later_step(workspace, tmp_path, monkeypatch):
++    root, _, history = workspace
++    value = document([document()["steps"][2], {"id": "after", "operation": "inspect", "parameters": {"source": "."}}])
++    monkeypatch.setattr(Database, "log_file_operation", Mock(side_effect=sqlite3.OperationalError("file history full")))
++    report = run_workflow(validate_workflow(value), base_dir=root, history_path=history, apply=True)
++    assert [step["status"] for step in report["steps"]] == ["failed", "not_run"]
++    outcomes = report["steps"][0]["report"]["operations"]
++    assert all(entry["status"] == "completed_with_errors" and entry["filesystem_status"] == "copied" for entry in outcomes)
++    assert (tmp_path / "output/misc/a.log").exists()
++    assert report["summary"]["history_failures"] == 2
++
++
++def test_step_journal_failure_is_not_a_file_rollback(workspace, tmp_path, monkeypatch):
++    root, _, history = workspace
++    actual = Database.save_run_step
++
++    def denied_finish(database, run_id, position, step):
++        if step["status"] != "running":
++            raise sqlite3.OperationalError("step history denied")
++        return actual(database, run_id, position, step)
++
++    monkeypatch.setattr(Database, "save_run_step", denied_finish)
++    value = document([document()["steps"][2]])
++    report = run_workflow(validate_workflow(value), base_dir=root, history_path=history, apply=True)
++    assert not report["complete"] and report["steps"][0]["status"] == "failed"
++    assert report["steps"][0]["report"]["summary"]["successful"] == 2
++    assert (tmp_path / "output/misc/a.log").exists()
++
++
++def test_step_start_history_failure_prevents_the_step(workspace, tmp_path, monkeypatch):
++    root, _, history = workspace
++    monkeypatch.setattr(Database, "save_run_step", Mock(side_effect=sqlite3.OperationalError("start denied")))
++    report = run_workflow(validate_workflow(document([document()["steps"][2]])),
++                          base_dir=root, history_path=history, apply=True)
++    assert not report["complete"] and report["steps"][0]["status"] == "not_run"
++    assert report["history"]["errors"][0]["code"] == "history_step_start_failed"
++    assert not (tmp_path / "output").exists()
++
++
++def test_interrupted_step_remains_running_in_history(workspace, monkeypatch):
++    root, _, history = workspace
++    monkeypatch.setattr("taskmaster.workflows.run_prepared", Mock(side_effect=KeyboardInterrupt()))
++    with pytest.raises(KeyboardInterrupt):
++        run_workflow(validate_workflow(document()), base_dir=root, history_path=history, apply=True)
++    run_id = Database.read_runs(str(history))[0]["run_id"]
++    stored = Database.read_runs(str(history), run_id=run_id)
++    assert stored["status"] == "running" and not stored["complete"]
++    assert stored["steps"][0]["status"] == "running"
++    assert stored["summary"]["running_steps"] == 1
++
++
++@pytest.mark.parametrize("policy,last_status", [("stop", "not_run"), ("continue", "success")])
++def test_partial_file_batch_is_reported_before_next_step_policy(workspace, tmp_path, policy, last_status):
++    root, _, history = workspace
++    existing = tmp_path / "output/misc/a.log"
++    existing.parent.mkdir(parents=True)
++    existing.write_bytes(b"preserve")
++    value = document([document()["steps"][2],
++        {"id": "after", "operation": "inspect", "parameters": {"source": ".", "includes": ["*.log"]}}], policy)
++    report = run_workflow(validate_workflow(value), base_dir=root, history_path=history, apply=True)
++    assert not report["complete"]
++    assert report["steps"][0]["report"]["summary"]["successful"] == 1
++    assert report["steps"][0]["report"]["summary"]["failed"] == 1
++    assert report["steps"][1]["status"] == last_status
++    assert existing.read_bytes() == b"preserve"
++    assert (tmp_path / "output/misc/b.log").read_bytes() == b"same log\n"
++
++
++def test_final_journal_failure_leaves_running_record_and_reports_file_success(workspace, tmp_path, monkeypatch):
++    root, _, history = workspace
++    monkeypatch.setattr(Database, "finish_run", Mock(side_effect=sqlite3.OperationalError("final history denied")))
++    report = run_workflow(validate_workflow(document()), base_dir=root, history_path=history, apply=True)
++    assert not report["complete"] and report["status"] == "completed_with_errors"
++    assert all(step["status"] == "success" for step in report["steps"])
++    stored = Database.read_runs(str(history), run_id=report["run_id"])
++    assert stored["status"] == "running" and not stored["complete"]
++    assert stored["steps"][2]["report"]["summary"]["successful"] == 2
++    assert (tmp_path / "output/misc/a.log").exists()
++
++
++def test_common_secret_diagnostics_are_redacted_from_history_and_logs(workspace, monkeypatch, caplog):
++    root, _, history = workspace
++    secret = "never-echo-this"
++    monkeypatch.setattr(Database, "log_file_operation", Mock(side_effect=OSError(f"api_key={secret} token={secret}")))
++    caplog.set_level(logging.INFO)
++    report = run_workflow(validate_workflow(document()), base_dir=root, history_path=history, apply=True)
++    assert secret not in json.dumps(report) and secret not in caplog.text
++    assert "[REDACTED]" in json.dumps(report)
++    assert secret.encode() not in history.read_bytes()
++
++
++def test_workflow_file_cannot_be_selected_as_an_artifact(workspace, tmp_path):
++    root, path, history = workspace
++    value = document([{"id": "unsafe", "operation": "organize", "parameters": {
++        "source": ".", "destination": "../output", "includes": ["workflow.json"], "action": "move"}}])
++    before = path.read_bytes()
++    report = run_workflow(validate_workflow(value), base_dir=root, config_path=path,
++                          history_path=history, apply=True, confirmed=True)
++    assert not report["complete"] and "configuration file" in report["steps"][0]["diagnostics"][0]["message"]
++    assert path.read_bytes() == before and not (tmp_path / "output").exists()
++
++
++def test_history_read_does_not_create_or_migrate_databases(tmp_path):
++    path = tmp_path / "history.sqlite"
++    assert Database.read_runs(str(path)) == [] and not path.exists()
++    with pytest.raises(ValueError, match="Run ID"):
++        Database.read_runs(str(path), run_id="")
++    with sqlite3.connect(path) as connection:
++        connection.execute("CREATE TABLE old_data (value TEXT)")
++        connection.execute("INSERT INTO old_data VALUES ('keep')")
++    before = path.read_bytes()
++    assert Database.read_runs(str(path)) == []
++    assert Database.read_runs(str(path), run_id="missing") is None
++    assert path.read_bytes() == before
++    with sqlite3.connect(path) as connection:
++        assert connection.execute("PRAGMA user_version").fetchone()[0] == 0
++
++
++def test_future_database_schema_is_rejected_without_changes(tmp_path):
++    path = tmp_path / "future.sqlite"
++    with sqlite3.connect(path) as connection:
++        connection.execute("PRAGMA user_version=99")
++    before = path.read_bytes()
++    with pytest.raises(ValueError, match="newer"):
++        Database(str(path))
++    assert path.read_bytes() == before
++    with pytest.raises(ValueError, match="newer"):
++        Database.read_runs(str(path))
++
++
++def test_version_zero_file_history_is_migrated_without_rewriting_old_outcomes(tmp_path):
++    path = tmp_path / "phase3.sqlite"
++    with sqlite3.connect(path) as connection:
++        connection.execute("""CREATE TABLE file_operations (
++            id TEXT PRIMARY KEY, source TEXT NOT NULL, destination TEXT, operation TEXT NOT NULL,
++            status TEXT, timestamp TEXT, size_bytes INTEGER, checksum TEXT, error TEXT,
++            filesystem_status TEXT, destination_created INTEGER, source_removed INTEGER,
++            history_status TEXT, history_error TEXT)""")
++        connection.execute("""INSERT INTO file_operations (id,source,operation,status,filesystem_status)
++            VALUES ('old-id','source','copy','success','copied')""")
++    db = Database(str(path))
++    old = db.get_file_operations()[0]
++    assert old["id"] == "old-id" and old["filesystem_status"] == "copied"
++    assert old["run_id"] is None and old["step_id"] is None
++    Database(str(path))
++    with sqlite3.connect(path) as connection:
++        assert connection.execute("PRAGMA user_version").fetchone()[0] == 1
++    assert db.get_stats()["file_operations"] == 1
++
++
++def test_direct_command_and_workflow_share_path_validation(tmp_path, monkeypatch, capsys):
++    monkeypatch.chdir(tmp_path)
++    bad = "https://user:never-echo-this@example.test"
++    assert main(["inspect", "--source", bad, "--format", "json"]) == 1
++    error = json.loads(capsys.readouterr().out)["error"]
++    with pytest.raises(PlanValidationError) as invalid:
++        validate_workflow(document([{"id": "x", "operation": "inspect", "parameters": {"source": bad}}]))
++    assert error in str(invalid.value) and "never-echo-this" not in error
++
++
++def test_human_workflow_report_shows_actionable_file_failure(workspace, tmp_path, capsys):
++    root, path, history = workspace
++    target = tmp_path / "output/misc/a.log"
++    target.parent.mkdir(parents=True)
++    target.write_text("keep")
++    assert main(["--database", str(history), "workflow", "run", str(path), "--apply"]) == 1
++    output = " ".join(capsys.readouterr().out.split())
++    assert "Destination already exists" in output and "a.log" in output
++
++
++def test_interactive_organizer_uses_tracked_captured_plan(workspace, tmp_path, monkeypatch):
++    root, _, history = workspace
++    answers = iter([str(root), str(tmp_path / "output"), "*.log", "type", "copy", "error"])
++    monkeypatch.setattr("taskmaster.cli.Prompt.ask", lambda *args, **kwargs: next(answers))
++    monkeypatch.setattr("taskmaster.cli.Confirm.ask", lambda *args, **kwargs: True)
++    cli = TaskMasterCLI(str(history))
++    try:
++        assert cli.organize_files_interactive() == 0
++        runs = Database.read_runs(str(history))
++        assert len(runs) == 1 and runs[0]["status"] == "success"
++        assert (tmp_path / "output/misc/a.log").exists()
++    finally:
++        cli.close()
++
++
++def test_home_paths_are_resolved_before_workflow_base_directory(workspace, tmp_path, monkeypatch):
++    root, _, _ = workspace
++    actual = Path.expanduser
++
++    def expand(path):
++        return root if path == Path("~/artifacts") else actual(path)
++
++    monkeypatch.setattr(Path, "expanduser", expand)
++    prepared = prepare_operation("inspect", {"source": "~/artifacts", "includes": ["*.log"]}, base_dir=tmp_path / "other")
++    assert run_prepared(prepared)["summary"]["file_count"] == 2
++
++
++def test_cli_validation_preview_apply_and_read_only_history_from_other_cwd(workspace, tmp_path, monkeypatch, capsys):
++    root, path, history = workspace
++    other = tmp_path / "elsewhere"
++    other.mkdir()
++    monkeypatch.chdir(other)
++    prefix = ["--database", str(history)]
++    for command in ("validate", "run"):
++        assert main([*prefix, "workflow", command, str(path), "--format", "json"]) == 0
++        assert json.loads(capsys.readouterr().out)["complete"]
++        assert not history.exists()
++    assert main([*prefix, "workflow", "run", str(path), "--apply", "--format", "json"]) == 0
++    report = json.loads(capsys.readouterr().out)
++    assert report["base_dir"] == str(root)
++    assert (tmp_path / "output/misc/a.log").exists()
++    before = history.read_bytes()
++    assert main([*prefix, "history", "list", "--format", "json"]) == 0
++    assert json.loads(capsys.readouterr().out)["runs"][0]["run_id"] == report["run_id"]
++    assert main([*prefix, "history", "show", report["run_id"], "--format", "json"]) == 0
++    assert json.loads(capsys.readouterr().out)["run"] == report
++    assert history.read_bytes() == before
++
++
++def test_direct_apply_exposes_run_id_and_preserves_same_captured_plan(workspace, tmp_path, monkeypatch, capsys):
++    root, _, history = workspace
++    monkeypatch.chdir(tmp_path)
++    args = ["--database", str(history), "organize", "--source", str(root), "--destination", "output",
++            "--include", "*.log", "--action", "copy", "--apply", "--format", "json"]
++    assert main(args) == 0
++    report = json.loads(capsys.readouterr().out)
++    assert str(uuid.UUID(report["run_id"])) == report["run_id"]
++    stored = Database.read_runs(str(history), run_id=report["run_id"])
++    assert stored["workflow"]["name"] == "direct-organize"
++    assert stored["steps"][0]["report"]["operations"] == report["operations"]
++
++
++def test_cli_invalid_config_never_echoes_unknown_secret_values(workspace, capsys):
++    _, path, history = workspace
++    value = document()
++    value["steps"][0]["parameters"]["password"] = "never-echo-this"
++    path.write_text(json.dumps(value), encoding="utf-8")
++    assert main(["--database", str(history), "workflow", "validate", str(path), "--format", "json"]) == 1
++    report = capsys.readouterr().out
++    assert not json.loads(report)["complete"] and "never-echo-this" not in report
++    assert not history.exists()
++
++
++def test_module_workflow_cli_json_is_one_document(workspace, tmp_path):
++    _, path, history = workspace
++    environment = {**os.environ, "PYTHONPATH": str(Path(__file__).resolve().parents[1])}
++    result = subprocess.run([sys.executable, "-B", "-m", "taskmaster", "--database", str(history),
++        "workflow", "run", str(path), "--apply", "--format", "json"], cwd=tmp_path,
++        env=environment, capture_output=True, text=True, timeout=30)
++    assert result.returncode == 0, result.stderr
++    assert json.loads(result.stdout)["complete"]

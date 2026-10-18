@@ -1,0 +1,11 @@
+{
+  "tests_passed": 221,
+  "tests_skipped": 1,
+  "installed_checks": 53,
+  "coverage_percent": 81.78913738019169,
+  "wheel_sha256": "cf057f6eaecdf35beebd8bf7e7151fe9b64181578773810e4dc5ed7f385d52df",
+  "dependencies_unchanged": true,
+  "installed_check_execution": "Windows host process-control access; the restricted-sandbox run timed out",
+  "hosted_ci_executed": false,
+  "release_published": false
+}

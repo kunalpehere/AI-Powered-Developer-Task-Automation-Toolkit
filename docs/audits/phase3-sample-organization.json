@@ -1,0 +1,111 @@
+{
+  "command": "organize",
+  "complete": true,
+  "destination_root": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\copy",
+  "mode": "preview",
+  "operations": [
+    {
+      "action": "move",
+      "checksum": "9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857",
+      "conflict_policy": "error",
+      "destination": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\copy\\misc\\logs\\app.log",
+      "destination_created": false,
+      "error": null,
+      "filesystem_status": "unchanged",
+      "history_error": null,
+      "history_status": "not_requested",
+      "skipped_reason": null,
+      "source": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\workspace\\logs\\app.log",
+      "source_removed": false,
+      "source_state": {
+        "changed_ns": 1792066278584015200,
+        "device": 11446573977672496805,
+        "inode": 5910974513199644,
+        "modified_ns": 1792066278586036800,
+        "sha256": "9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857",
+        "size": 4
+      },
+      "status": "dry_run",
+      "validation_error": null
+    },
+    {
+      "action": "move",
+      "checksum": "9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857",
+      "conflict_policy": "error",
+      "destination": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\copy\\misc\\logs\\nested\\app.log",
+      "destination_created": false,
+      "error": null,
+      "filesystem_status": "unchanged",
+      "history_error": null,
+      "history_status": "not_requested",
+      "skipped_reason": null,
+      "source": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\workspace\\logs\\nested\\app.log",
+      "source_removed": false,
+      "source_state": {
+        "changed_ns": 1792066278590101700,
+        "device": 11446573977672496805,
+        "inode": 3940649676225129,
+        "modified_ns": 1792066278592349400,
+        "sha256": "9b75290f6a6359a2a3471022cbba4b724e45105b313ae8f6c103a2f79e82a857",
+        "size": 4
+      },
+      "status": "dry_run",
+      "validation_error": null
+    },
+    {
+      "action": "move",
+      "checksum": "492d5ea496056f1a6a6592241032fab764c321596317930b4fa0e1e8bc3b7470",
+      "conflict_policy": "error",
+      "destination": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\copy\\data\\reports\\\u603b\u7ed3.csv",
+      "destination_created": false,
+      "error": null,
+      "filesystem_status": "unchanged",
+      "history_error": null,
+      "history_status": "not_requested",
+      "skipped_reason": null,
+      "source": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\workspace\\reports\\\u603b\u7ed3.csv",
+      "source_removed": false,
+      "source_state": {
+        "changed_ns": 1792066278595351800,
+        "device": 11446573977672496805,
+        "inode": 4222124652935788,
+        "modified_ns": 1792066278596352500,
+        "sha256": "492d5ea496056f1a6a6592241032fab764c321596317930b4fa0e1e8bc3b7470",
+        "size": 8
+      },
+      "status": "dry_run",
+      "validation_error": null
+    }
+  ],
+  "schema_version": 1,
+  "scope": {
+    "all_files": false,
+    "exclusions": [
+      ".git",
+      ".venv*",
+      "venv",
+      "__pycache__",
+      "node_modules",
+      ".pytest_cache",
+      ".mypy_cache",
+      ".ruff_cache",
+      ".tox",
+      ".nox"
+    ],
+    "includes": [
+      "logs/**/*.log",
+      "reports/**"
+    ]
+  },
+  "source_root": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\workspace",
+  "summary": {
+    "dry_run": 3,
+    "failed": 0,
+    "filesystem_changed": 0,
+    "history_failed": 0,
+    "skipped": 0,
+    "successful": 0,
+    "total_files": 3,
+    "total_size_mb": 0.0
+  }
+}

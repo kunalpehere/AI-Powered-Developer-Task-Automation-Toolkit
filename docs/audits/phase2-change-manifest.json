@@ -1,0 +1,78 @@
+{
+  "ATTRIBUTION.md": {
+    "before_sha256": "7b6f7803e2490ef878579a3218c5ef5695c312d4caf969e8cc10e03aa9d91c48",
+    "after_sha256": "17b626dc40b94ae4656fed8fb49886cf6cccaa7729843ed4415ea8976a942d1a"
+  },
+  "DEVELOPMENT_PLAN.md": {
+    "before_sha256": "3f2e32a54273ed78f4cd86596e5553b9799b9d350dfd15e31ddbc73b9f425f34",
+    "after_sha256": "66eed0648c27c4c488134d1eba294bba645d4ee9bfd049827ba0e94962e886a8"
+  },
+  "README.md": {
+    "before_sha256": "9cc1623e28208f8ba2788bf8b1fd3b75d1712f9e4c6f1feb476a8bb9d0135f21",
+    "after_sha256": "bf0663b9c986e5f028f90b32dee810f0f87cef9eed222da3d215d8e2b1061051"
+  },
+  "pyproject.toml": {
+    "before_sha256": "30811224e20d2dda87b79208264eeedbba501801827938218fc33df6d506406f",
+    "after_sha256": "30811224e20d2dda87b79208264eeedbba501801827938218fc33df6d506406f"
+  },
+  "taskmaster/__init__.py": {
+    "before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "after_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "taskmaster/__main__.py": {
+    "before_sha256": "de2c4dea22bd0000645688157ab3d58e347ff21dc6b0d36a22b53ca418822b9b",
+    "after_sha256": "de2c4dea22bd0000645688157ab3d58e347ff21dc6b0d36a22b53ca418822b9b"
+  },
+  "taskmaster/cli.py": {
+    "before_sha256": "09433278cb79dcf62bfdc83e9ed645f7ca53aa1fbc78c99f0a6480c3d7ea13a9",
+    "after_sha256": "91c190241a9f7eb46c6bc1d6f2cbc1134c0603b3762959256c53df052a8a7304"
+  },
+  "taskmaster/database.py": {
+    "before_sha256": "1f5e26b89384ce6a099c3fedd6cd85f1135d1141b5087e254c4f7cc65aa036ec",
+    "after_sha256": "dee314586c52afa77d22766c8b77850e6d072f64748c6bef0f55b5acfe210daf"
+  },
+  "taskmaster/demo.py": {
+    "before_sha256": "89975a84d808dfd8808b677a9ff2ae37863e74dd9aed802dedfff0cd2a93daea",
+    "after_sha256": "0c9a7e7e5e1805dcd49fc41acf8949b5545e5dba5cfbf087dbe886f5f42ad03c"
+  },
+  "taskmaster/errors.py": {
+    "before_sha256": null,
+    "after_sha256": "9505f51df19a82b11d219c8b6b96a9d0dcfb9d006615a337c8554513c3cc2967"
+  },
+  "taskmaster/execution.py": {
+    "before_sha256": null,
+    "after_sha256": "f0fb9bcb64553eaddcd9db632c37afccc2f4a31b8513eee02c0ba0a8e5a228a8"
+  },
+  "taskmaster/models.py": {
+    "before_sha256": "d958cb123708c2879a1dad26eae093b45b85900ef97c7c846202fb18a75179d1",
+    "after_sha256": "1a14d2b241924cb804c82416cd09ff809cd705c861daac1000c296dc1967c4b3"
+  },
+  "taskmaster/organizer.py": {
+    "before_sha256": "80de7bd4b7e0dd967c802cd9d504017c4e57a39fc8b1ddd66806b30ef93b1a68",
+    "after_sha256": "844b0ea245cf3a220591dda731706db6b0d659d6e8d24342038288aaad8db890"
+  },
+  "taskmaster/planning.py": {
+    "before_sha256": null,
+    "after_sha256": "d144596d6fc81e4d41a6b3dfd5920b2d22789e1282930e4580f22f04c58e4edc"
+  },
+  "taskmaster/plugins/__init__.py": {
+    "before_sha256": "6db0ee678f96f1e8846ebbbfa098afdffde73136d4d0f382b450b8eec2e6240d",
+    "after_sha256": "6db0ee678f96f1e8846ebbbfa098afdffde73136d4d0f382b450b8eec2e6240d"
+  },
+  "taskmaster/scheduler.py": {
+    "before_sha256": "4895b1bdf6340a5f1a1c5881e90b5065c4d28353da168ef76435acb205f80c10",
+    "after_sha256": "4895b1bdf6340a5f1a1c5881e90b5065c4d28353da168ef76435acb205f80c10"
+  },
+  "tests/conftest.py": {
+    "before_sha256": "3b2f6c392051b5b1dc5fc1b5963fdc44424f071a17c44fcb1c82583b4ca27507",
+    "after_sha256": "3b2f6c392051b5b1dc5fc1b5963fdc44424f071a17c44fcb1c82583b4ca27507"
+  },
+  "tests/test_baseline.py": {
+    "before_sha256": "c882c020db7d25d0576fc4a7bff170b8e919d45443fe425993b4f62718a28e1a",
+    "after_sha256": "c77476fa4c159008653153e3999684b5d8d4398196ade8ea1acdf6e0ad219702"
+  },
+  "tests/test_planning_execution.py": {
+    "before_sha256": null,
+    "after_sha256": "de01a7ad1825accf9935a2937e1dde71fa2177d10e065c24a379b09cccb2d475"
+  }
+}

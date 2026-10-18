@@ -1,0 +1,2584 @@
+--- phase1/ATTRIBUTION.md
++++ phase2/ATTRIBUTION.md
+@@ -13,13 +13,20 @@
+ 
+ | Component | Origin and Phase 1 treatment |
+ | --- | --- |
+-| Models, database, scheduler | Inherited, unchanged; known defects remain |
+-| Organizer | Adapted: source/action validation, complete hashing, conflict preservation, per-file error capture, worker cleanup |
+-| CLI and module entry point | Adapted: syntax, dispatch, error exits, lazy resources, safety restrictions, accurate warnings |
++| Models | Inherited task/rule types retained; Phase 2 adds immutable plan/source-state records and independent filesystem/history outcome fields |
++| Database | Inherited persistence retained; Phase 2 adds backward-compatible file-outcome columns; scheduling defects remain |
++| Scheduler | Inherited, unchanged; known defects remain |
++| Organizer | Adapted: source/action validation, complete hashing, read-only reporting, shared plan/preview/apply adapters, conflict preservation, worker cleanup |
++| Planning, execution, errors | Newly added in Phase 2 for root/template/state validation, confirmation, execution, and partial-failure reporting |
++| CLI and module entry point | Adapted: syntax, dispatch, error exits, lazy resources, default preview, explicit destination/apply/approval, safety restrictions, accurate warnings |
+ | Plugin classes and manager | Inherited code consolidated from `plugins.py` into `plugins/__init__.py`; discovery default adjusted for that location |
+ | Demo | Replaced with a disposable preview/report example |
+ | Nested packaging and duplicated docs | Replaced by root `pyproject.toml` and authoritative README; nested README redirects |
+-| Regression tests and Phase 1 records | Newly added for this implementation |
++| Regression tests and phase records | Newly added for this implementation |
++
++The pre-Phase-2 state is separately preserved in
++`docs/audits/phase2-reference.zip`. Phase 0/1 reports describe their historical
++snapshots; current behavior is documented in the root README and Phase 2 record.
+ 
+ The inherited project is not represented as wholly original work. Resolve the
+ upstream reuse terms and preserve required copyright/license notices before
+--- phase1/DEVELOPMENT_PLAN.md
++++ phase2/DEVELOPMENT_PLAN.md
+@@ -1,7 +1,7 @@
+ # Developer Task Automation Toolkit — Development Plan
+ 
+ Date: 15 October 2026  
+-Status: Phase 0 audit and Phase 1 baseline completed; later phases remain proposed and have not started.
++Status: Phases 0–2 completed; Phase 3 and later remain proposed and have not started.
+ 
+ ## 1. Purpose and engineering goals
+ 
+@@ -207,6 +207,8 @@
+ 
+ ### Phase 2 — Separate planning from filesystem execution
+ 
++**Status:** completed on 15 October 2026. See the [Phase 2 implementation record](docs/PHASE_2.md): immutable plans, read-only preview/reporting, scoped validation, confirmation, revalidation, and separate filesystem/history outcomes. Final regression run: 82 passed, 1 skipped because this Windows account cannot create file symlinks; actual junction tests passed. Phase 3 has not started.
++
+ **Objective:** make changes inspectable and testable before touching files.
+ 
+ **Existing files affected:** `models.py`, `organizer.py`, CLI integration, and persistence boundaries.
+@@ -383,6 +385,6 @@
+ 
+ ## 9. Recommended next action
+ 
+-Review the completed [Phase 1 baseline](docs/PHASE_1.md). The next implementation phase is **Phase 2: separate planning from filesystem execution**, after approval. Preview/history side effects, destination boundaries, and partial-failure semantics remain to be addressed there.
++Review the completed [Phase 2 contract](docs/PHASE_2.md). The next implementation phase is **Phase 3: deliver the developer-focused MVP**, after approval. Project inspection, duplicate candidate optimization, configurable exclusions, and selected-artifact workflows remain to be developed there.
+ 
+ Saving or updating this document does not authorize implementation of subsequent phases.
+--- phase1/README.md
++++ phase2/README.md
+@@ -1,15 +1,13 @@
+-# TaskMaster — Phase 1 baseline
++# TaskMaster — Phase 2
+ 
+-A Python CLI for file organization and full-content duplicate reporting. Phase 1
+-repairs the inherited prototype's startup, packaging, dispatch, and critical file
+-safety defects. Developer-project inspection and validated workflows arrive in
+-later phases; this is not a production release.
++A Python CLI with an explicit plan → preview → apply contract for file
++organization and full-content duplicate reporting. Developer-project inspection
++and JSON workflows remain later phases. This is a development baseline.
+ 
+-## Install and test
++## Install and verify
+ 
+-Python 3.12 or newer is required; this phase is validated on Python 3.12.4 on
+-Windows. Run these PowerShell commands from the repository root, where
+-`pyproject.toml` lives:
++Python 3.12+ is required; validation uses Python 3.12.4 on Windows. From the
++repository root (the directory containing `pyproject.toml`):
+ 
+ ```powershell
+ python -m venv .venv
+@@ -18,95 +16,163 @@
+ .\.venv\Scripts\python.exe -m taskmaster --help
+ .\.venv\Scripts\taskmaster.exe --help
+ .\.venv\Scripts\tm.exe --help
+-```
+-
+-On Linux/macOS the corresponding executables are `.venv/bin/python`,
+-`.venv/bin/taskmaster`, and `.venv/bin/tm`; those platforms are not yet validated.
+-Installing without `[dev]` installs only the runtime dependency, Rich. No API
+-keys, services, Pillow, or PDF packages are needed. Project metadata declares
+-supported dependency ranges; a full reproducible dependency lock is deferred.
+-
+-If a managed Windows host rejects its default temporary directory, set `TEMP`
+-and `TMP` to an existing writable directory before creating the environment or
+-installing. Do not add administrator privileges just to install this project.
+-
+-## Try the disposable demo
+-
+-```powershell
+ .\.venv\Scripts\python.exe -m taskmaster.demo --directory .
+ ```
+ 
+-The demo creates its own temporary child directory, previews copies, reports one
+-SHA-256 duplicate group, and removes its fixtures. It does not run the scheduler
+-or modify existing files. Run it as a module rather than as a script path.
++On Linux/macOS use `.venv/bin/python`, `.venv/bin/taskmaster`, and `.venv/bin/tm`.
++Those platforms are not yet validated. Rich is the only runtime dependency;
++`[dev]` adds pytest. No API keys, service, Pillow, or PDF package is required.
++Dependency ranges are declared, but a reproducible lock and vulnerability audit
++remain release work. On managed Windows hosts, TEMP/TMP may need to point to an
++existing writable directory for venv/pip operations.
+ 
+-## File commands
++## Preview and apply
+ 
+-Use a disposable folder containing only selected artifacts for now. Do not sort an
+-entire source tree: moving files by extension can break a project. The inherited
+-organizer still scans recursively, uses the first matching rule, and writes
+-outputs under `organized/` relative to the current working directory.
++Choose a folder containing only the artifacts you intend to organize. The current
++scanner is recursive and still applies its default type rule to unmatched files;
++do not point it at an entire source project. Source and destination roots must be
++separate: neither may contain the other.
+ 
+ ```powershell
+-.\.venv\Scripts\taskmaster.exe organize --source .\sample-artifacts --strategy type --dry-run
+-.\.venv\Scripts\taskmaster.exe organize --source .\sample-artifacts --strategy type
++# Default: inspect the plan without changing files, creating output directories,
++# creating a database, writing history, or updating an index.
++.\.venv\Scripts\taskmaster.exe organize --source .\sample-artifacts --destination .\organized
++
++# Apply the displayed plan. Moves require explicit approval.
++.\.venv\Scripts\taskmaster.exe organize --source .\sample-artifacts --destination .\organized --apply --yes
++
++# Copies preserve sources and do not require destructive-operation approval.
++.\.venv\Scripts\taskmaster.exe organize --source .\sample-artifacts --destination .\organized --action copy --apply
++
++# Explicit conflict policy: error (default) or skip; replacement is unsupported.
++.\.venv\Scripts\taskmaster.exe organize --source .\sample-artifacts --destination .\organized --conflict skip
++
+ .\.venv\Scripts\taskmaster.exe duplicates --dir .\sample-artifacts
+ ```
+ 
+-- `type` and `date` organization are available. Date means the current date,
+-  not a file's modification date. Size sorting returns an actionable error until
+-  its implementation in Phase 3.
+-- Duplicate reports hash every file completely using SHA-256 and list every
+-  member of each matching group. Legacy Python `fast_mode=True` also hashes full
+-  contents. Read failures abort the scan with an error instead of silently
+-  reporting an incomplete result. Size-based candidate optimization is deferred.
+-- Automatic duplicate deletion is disabled in both CLI and interactive modes.
+-  `duplicates --delete` exits with a usage error and deletes nothing.
+-- Existing destination files, directories, and dangling symlinks are rejected.
+-  Exclusive destination creation protects against a file appearing between the
+-  initial conflict check and creation. Copy, move, and rename preserve existing
+-  destinations; move/rename currently copy to a new file and then unlink source.
+-- Unknown rule actions and nonexistent/non-directory sources fail with useful
+-  messages. Per-file failures are shown and cause CLI exit code 1. Argument errors
+-  use exit code 2; successful commands use 0.
+-- `--help` and argument-validation errors do not create a database. Other commands
+-  create/use `taskmaster.db` in the current working directory.
++`--dry-run` explicitly selects the same preview mode. It cannot be combined with
++`--apply`. `--yes` requires `--apply`. When applying moves in an interactive
++terminal, omitting `--yes` prompts after displaying the plan. A noninteractive
++caller must supply `--yes`; refusal/absent approval changes no files or history.
++The interactive organization wizard also previews a captured plan and requires
++approval before applying it. An independently rerun CLI command builds a new plan;
++the Python API below retains an exact plan between preview and apply. Plans are
++not yet saved/loaded from disk.
+ 
+-## Limits carried into later phases
++Strategies are `type` (default) and `date` (current date, not modification date).
++Size sorting returns an actionable error until Phase 3. `--template` overrides
++the strategy template, for example `logs/{year}/{month}/{filename}`. Supported
++placeholders are `{filename}`, `{name}` (stem), `{ext}`, `{type}`, `{mime}`,
++`{date}`, `{year}`, `{month}`, and `{day}`. Unknown placeholders, attribute/index
++lookups, conversions, format specifications, traversal, and nonportable destination
++components are rejected. `{filename}` preserves extensionless names. Templates
++are relative to the destination root; the Python API also accepts absolute paths
++strictly inside that root.
+ 
+-Preview preserves source files but still writes history, and duplicate scans
+-still update the SQLite index. Preview/apply separation belongs to Phase 2.
+-Destination-root boundaries, parent symlinks/junctions, concurrent source changes,
+-rollback, and atomic filesystem-plus-history guarantees are not established.
+-A failed copy or metadata update may leave a partial/new destination; a failed
+-source unlink can leave both files. A history/index failure after a file change
+-can still report failure after the change happened. Review results before retrying.
++Duplicate reporting hashes complete files with SHA-256, including legacy Python
++`fast_mode=True` calls. It is read-only by default. Read errors fail the scan
++rather than silently return a complete-looking report. Automatic duplicate
++removal remains disabled: `duplicates --delete` exits 2 and deletes nothing.
++Size-group optimization and project exclusions belong to Phase 3.
+ 
+-The inherited `task add`, `task list`, `task start`, and interactive menu remain
+-available for experimentation. **Scheduler persistence/restoration, due times,
+-retries, dependencies, timeouts, and shutdown are unreliable or unverified.** A
+-saved task record does not include its command, so a later `task start` cannot
+-restore it. Task-add dispatch is fixed; that does not make scheduling reliable.
+-Interactive Python expression evaluation is disabled. Python callers may supply
+-callables directly; shell tasks raise on nonzero subprocess exit status.
++## Python planning API
+ 
+-The plugin import collision is resolved: `from taskmaster.plugins import
+-PluginManager` works. Explicit registration is tested; dynamic discovery and
+-image/PDF execution remain deferred and unverified. Discovery imports arbitrary
+-Python, so do not load untrusted plugins. Optional image/PDF dependencies and old
+-installation extras are not part of this baseline.
++```python
++from pathlib import Path
++from taskmaster.models import FileRule
++from taskmaster.organizer import FileOrganizer
+ 
+-## Project status and provenance
++organizer = FileOrganizer()  # No database initialized.
++try:
++    organizer.add_rule(FileRule("logs", "*.log", "logs/{filename}", action="move"))
++    plan = organizer.plan_directory(Path("sample-artifacts"), Path("organized"))
++    preview = organizer.preview(plan)
++    for item in preview:
++        print(item.source, item.destination, item.status, item.error)
++    # Call only after the caller has explicitly approved these operations.
++    results = organizer.apply(plan, confirmed=True)
++finally:
++    organizer.close()
++```
+ 
+-See [development plan](DEVELOPMENT_PLAN.md),
+-[Phase 0 evidence](docs/audits/PHASE_0_AUDIT.md), and
+-[Phase 1 implementation record](docs/PHASE_1.md).
+-The original 13-file source/README snapshot and pre-change plan are preserved in
+-[the baseline archive](docs/audits/phase1-reference.zip). Phase 0 results remain
+-historical evidence; its defect collector is not the current regression suite.
++Plans and their operations/source fingerprints are frozen dataclasses. They
++capture absolute roots, source identity and metadata, full SHA-256, final
++paths/actions, conflicts, skips, and validation failures. Invalid entries are
++reported alongside valid ones; each item is attempted once, with no automatic
++retry or rollback. Rules/conditions are evaluated during planning; trusted Python
++conditions must be read-only. Changing rules or adding files afterward does not
++change an existing plan.
+ 
+-This work derives from the supplied TaskMaster snapshot. Its upstream URL,
+-revision, copyright holder, and actual license notices remain unresolved. The
+-original README said MIT, but no LICENSE was supplied. No new licensing claim
+-is made; resolve provenance and retain required notices before distributing
+-inherited code. See [component attribution](ATTRIBUTION.md).
++The retained `organize_file` and `organize_directory` adapters now require
++`destination_root=...`; destructive execution requires `confirmed=True`.
++`dry_run=True` uses the same preview contract. Rename/delete actions are available
++only through explicit Python rules and require approval; automatic duplicate
++deletion is unavailable. Every plan, including a delete plan, requires separate
++source/destination roots. Legacy unplanned empty-directory cleanup and scheduled
++file organization are explicitly disabled rather than bypassing this contract.
++
++## Results, history, and guarantees
++
++Apply revalidates roots, paths, identity/size/timestamps, and full content before
++changes. Copying uses exclusive destination creation and verifies contents before
++removing a moved source. Existing destination files/directories are preserved;
++conflicts never grant overwrite permission. Repeated destinations or sources
++within a plan are rejected. Filesystem/home roots, overlapping roots, symlinks,
++junctions, and reparse-point components are rejected. On Windows, actual junction
++checks were validated outside the sandbox; real file-symlink tests may skip when
++the required privilege is absent.
++
++The CLI records apply attempts in `taskmaster.db` in its working directory. The
++Python API records history only when supplied a Database or history callback.
++Preview and duplicate reports leave even existing history/index data unchanged.
++Explicit legacy indexing is possible only with `record_index=True` and an
++explicit Database; it is separate from read-only reporting. Organization no
++longer updates the duplicate index as a hidden post-file step.
++
++Each result separates `filesystem_status`, `destination_created`, `source_removed`,
++`history_status`, and `history_error` from the overall `status` and file error.
++A successful file change followed by a history failure is `completed_with_errors`,
++not a claim that the file was unchanged. A write/metadata failure can leave a new
++partial file; a failed source unlink can leave a complete destination and source.
++Results report these facts, and the batch continues. Inspect those paths before
++retrying. New partial files and newly created parent directories are not rolled
++back. Existing history databases receive additive outcome columns without losing
++old rows; historical outcomes that were never captured remain `unknown`.
++
++Success/preview uses exit 0; per-file or history failures use 1; invalid CLI
++arguments use 2. Skip is a reported nonfailure. Summary success counts include
++completed file changes with history failures; a separate history-failure count
++and exit 1 expose the persistence problem.
++
++Path/identity checks are practical safeguards, not an OS security sandbox. Another
++process can still change a path between checking and opening/unlinking it. Do not
++apply plans in actively modified or untrusted trees. Reading files may update OS
++access times; preview makes no intentional content, directory, or persistence
++writes. Move/rename use copy-plus-unlink and do not guarantee atomicity or full
++ACL/alternate-stream preservation. Filesystem and SQLite transactions are not a
++single atomic unit, and no exactly-once/crash-recovery guarantee is made.
++
++## Deferred features and provenance
++
++Experimental task add/list/start and the menu remain available. Scheduler command
++restoration, due times, retries, dependencies, timeouts, failure logs, and shutdown
++remain unreliable/unverified. Registration is tested; reliable scheduling is not.
++Interactive Python evaluation remains disabled. Shell tasks raise on nonzero exit.
++
++`from taskmaster.plugins import PluginManager` works; explicit registration is
++tested. Dynamic discovery and image/PDF processing are deferred; imported plugins
++execute Python and must be trusted. JSON workflows, structured run history,
++project inspection, release CI, dependency audit, and upstream license verification
++are not part of Phase 2.
++
++See the [development plan](DEVELOPMENT_PLAN.md), [Phase 2 record](docs/PHASE_2.md),
++[Phase 1 record](docs/PHASE_1.md), and [Phase 0 audit](docs/audits/PHASE_0_AUDIT.md).
++The pre-Phase-2 source/tests/docs are preserved in
++[phase2-reference.zip](docs/audits/phase2-reference.zip); the original supplied
++snapshot remains in [phase1-reference.zip](docs/audits/phase1-reference.zip).
++
++This derives from the supplied TaskMaster snapshot. Its upstream URL/revision,
++copyright holder, and actual license notices remain unresolved. The original
++README said MIT but no LICENSE was supplied. No new author/license claim is made;
++resolve provenance before distributing inherited code. See
++[attribution](ATTRIBUTION.md).
+--- phase1/taskmaster/cli.py
++++ phase2/taskmaster/cli.py
+@@ -5,6 +5,7 @@
+ import asyncio
+ import argparse
+ import sqlite3
++import sys
+ from datetime import datetime, timedelta
+ from pathlib import Path
+ from functools import cached_property
+@@ -25,6 +26,7 @@
+ from .database import Database
+ from .scheduler import TaskScheduler
+ from .organizer import FileOrganizer
++from .errors import ConfirmationRequired
+ 
+ console = Console()
+ 
+@@ -32,7 +34,7 @@
+     """Main CLI interface for TaskMaster."""
+ 
+     def __init__(self, db_path: str = "taskmaster.db"):
+-        self.db_path = db_path
++        self.db_path = str(Path(db_path).absolute()) if db_path != ":memory:" else db_path
+ 
+     @cached_property
+     def db(self):
+@@ -44,7 +46,8 @@
+ 
+     @cached_property
+     def organizer(self):
+-        return FileOrganizer(self.db)
++        return FileOrganizer(history_recorder=lambda operation: self.db.log_file_operation(operation),
++                             history_path=Path(self.db_path))
+ 
+     def close(self):
+         if "organizer" in self.__dict__:
+@@ -228,7 +231,7 @@
+         console.print("\n[bold]Command Type:[/bold]")
+         console.print("1. Shell command")
+         console.print("2. Python function (disabled; use Python API)")
+-        console.print("3. File organization")
++        console.print("3. File organization (unavailable; use organize preview/apply)")
+ 
+         cmd_choice = Prompt.ask("Choose type", choices=["1","2","3"], default="1")
+ 
+@@ -242,20 +245,8 @@
+         elif cmd_choice == "2":
+             raise ValueError("Interactive Python expressions are disabled. Use a shell command or the Python API.")
+ 
+-        else:  # File organization
+-            source_dir = Prompt.ask("Source directory")
+-            dest_template = Prompt.ask("Destination template", default="organized/{type}/{name}.{ext}")
+-
+-            def command():
+-                rule = FileRule(
+-                    name="auto_organize",
+-                    source_pattern="*",
+-                    destination_template=dest_template,
+-                    action="move"
+-                )
+-                self.organizer.add_rule(rule)
+-                results = self.organizer.organize_directory(Path(source_dir))
+-                return self.organizer.generate_report(results)
++        else:
++            raise ValueError("Scheduled file organization is unavailable until scheduler approval and recovery are designed. Use organize to preview and apply a plan.")
+ 
+         # Create task
+         task = Task(
+@@ -272,91 +263,45 @@
+ 
+         return task_id
+ 
++    def show_plan(self, plan):
++        console.print(f"Plan: {len(plan.operations)} operations | {plan.source_root} -> {plan.destination_root}", markup=False)
++        for operation in plan.operations:
++            reason = operation.validation_error or operation.skipped_reason
++            detail = f" | {reason}" if reason else ""
++            target = operation.destination or ("(delete)" if operation.action == "delete" else "(invalid destination)")
++            console.print(f"{operation.action} {operation.source} -> {target}"
++                          f" | conflict={operation.conflict_policy}{detail}", markup=False)
++
++    def show_results(self, results):
++        for result in results:
++            console.print(f"{result.status}: {result.source} | files={result.filesystem_status}"
++                          f" | history={result.history_status}"
++                          f"{(' | ' + result.error) if result.error else ''}"
++                          f"{(' | History error: ' + result.history_error) if result.history_error else ''}", markup=False)
++        report = self.organizer.generate_report(results)
++        console.print(f"Successful: {report['successful']}; failed: {report['failed']}; "
++                      f"skipped: {report['skipped']}; history failures: {report['history_failed']}")
++        if report["dry_run"]:
++            console.print(f"Previewed {report['dry_run']} files; no file or history changes applied.")
++        return 1 if report["failed"] or report["history_failed"] else 0
++
+     def organize_files_interactive(self):
+-        """Interactive file organization wizard."""
+-        console.print("\n[bold cyan]File Organization Wizard[/bold cyan]\n")
+-
+-        source_dir = Prompt.ask("Source directory", default=str(Path.home() / "Downloads"))
+-        source_path = Path(source_dir)
+-
+-        if not source_path.exists():
+-            console.print(f"[red]Directory not found: {source_dir}[/red]")
+-            return
+-
+-        # Show preview
+-        files = self.organizer.scan_directory(source_path)
+-        console.print(f"\nFound [bold]{len(files)}[/bold] files")
+-
+-        # Organization strategy
+-        console.print("\n[bold]Organization Strategy:[/bold]")
+-        console.print("1. By file type (images, documents, etc.)")
+-        console.print("2. By date (YYYY/MM)")
+-        console.print("3. By size (unavailable until Phase 3)")
+-        console.print("4. Custom rules")
+-
+-        strategy = Prompt.ask("Choose strategy", choices=["1","2","3","4"], default="1")
+-
+-        if strategy == "3":
+-            raise ValueError("Size organization is unavailable until Phase 3. Use type or date.")
+-
+-        templates = {
+-            "1": "organized/{type}/{name}.{ext}",
+-            "2": "organized/{year}/{month}/{name}.{ext}",
+-            "3": "organized/{size_category}/{name}.{ext}",
+-        }
+-
+-        if strategy == "4":
+-            template = Prompt.ask("Enter template", default="organized/{type}/{name}.{ext}")
+-        else:
+-            template = templates[strategy]
+-        # Dry run option
+-        dry_run = Confirm.ask("Perform dry run first?", default=True)
+-
++        source = Path(Prompt.ask("Source directory"))
++        destination = Path(Prompt.ask("Destination root (separate from the source)"))
++        strategy = Prompt.ask("Strategy", choices=["type", "date", "custom"], default="type")
++        templates = {"type": "{type}/{filename}", "date": "{year}/{month}/{filename}"}
++        template = (Prompt.ask("Destination template relative to destination root")
++                    if strategy == "custom" else templates[strategy])
++        action = Prompt.ask("Action", choices=["copy", "move"], default="move")
++        conflict = Prompt.ask("Existing destination", choices=["error", "skip"], default="error")
+         self.organizer.rules.clear()
+-        self.organizer.dry_run = dry_run
+-        if dry_run:
+-            console.print("\n[yellow]--- DRY RUN MODE ---[/yellow]")
+-
+-        # Add default rule
+-        rule = FileRule(
+-            name="interactive_organize",
+-            source_pattern="*",
+-            destination_template=template,
+-            action="move"
+-        )
+-        self.organizer.add_rule(rule)
+-
+-        # Execute
+-        with Progress(
+-            SpinnerColumn(),
+-            TextColumn("[progress.description]{task.description}"),
+-            BarColumn(),
+-            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+-            TimeElapsedColumn(),
+-            console=console
+-        ) as progress:
+-            task_progress = progress.add_task("[cyan]Organizing files...", total=len(files))
+-
+-            results = self.organizer.organize_directory(source_path)
+-
+-            for i, _ in enumerate(results):
+-                progress.update(task_progress, advance=1)
+-
+-        # Report
+-        report = self.organizer.generate_report(results)
+-
+-        console.print("\n[bold green]Organization Complete![/bold green]")
+-        console.print(f"Total files: {report['total_files']}")
+-        console.print(f"Successful: {report['successful']}")
+-        console.print(f"Failed: {report['failed']}")
+-        console.print(f"Total size: {report['total_size_mb']} MB")
+-
+-        if dry_run and Confirm.ask("Apply changes for real?", default=False):
+-            self.organizer.dry_run = False
+-            console.print("\n[yellow]Applying changes...[/yellow]")
+-            results = self.organizer.organize_directory(source_path)
+-            report = self.organizer.generate_report(results)
+-            console.print(f"[green]Done! {report['successful']} files organized.[/green]")
++        self.organizer.add_rule(FileRule("interactive", "*", template, action=action))
++        plan = self.organizer.plan_directory(source, destination, conflict_policy=conflict)
++        self.show_plan(plan)
++        self.show_results(self.organizer.preview(plan))
++        if Confirm.ask("Apply this displayed plan? Source files will be removed for moves.", default=False):
++            return self.show_results(self.organizer.apply(plan, confirmed=True))
++        return 0
+ 
+     def find_duplicates_interactive(self):
+         """Interactive duplicate file finder."""
+@@ -471,7 +416,7 @@
+   %(prog)s --interactive              Launch interactive mode
+   %(prog)s task add --name "Backup" --command "rsync -a ~/docs /backup" --schedule "2024-01-01 00:00"
+   %(prog)s task list
+-  %(prog)s organize --source ./sample-artifacts --strategy type --dry-run
++  %(prog)s organize --source ./sample-artifacts --destination ./organized --dry-run
+   %(prog)s duplicates --dir ./sample-artifacts
+             """
+         )
+@@ -499,8 +444,15 @@
+         # Organize commands
+         org_parser = subparsers.add_parser("organize", help="Organize files")
+         org_parser.add_argument("--source", required=True)
++        org_parser.add_argument("--destination", required=True, help="Explicit destination root outside source")
++        org_parser.add_argument("--action", choices=["copy", "move"], default="move")
++        org_parser.add_argument("--conflict", choices=["error", "skip"], default="error")
++        org_parser.add_argument("--template", help="Validated template relative to destination root")
++        org_parser.add_argument("--yes", action="store_true", help="Explicitly approve destructive application")
+         org_parser.add_argument("--strategy", choices=["type","date","size"], default="type")
+-        org_parser.add_argument("--dry-run", action="store_true")
++        execution_mode = org_parser.add_mutually_exclusive_group()
++        execution_mode.add_argument("--dry-run", action="store_true", help="Preview only (the default)")
++        execution_mode.add_argument("--apply", action="store_true", help="Apply the displayed plan")
+ 
+         # Duplicate commands
+         dup_parser = subparsers.add_parser("duplicates", help="Find duplicates")
+@@ -511,6 +463,8 @@
+         parsed = parser.parse_args(args)
+         if parsed.subcommand == "duplicates" and parsed.delete:
+             parser.error("Duplicate deletion is disabled; omit --delete to report full SHA-256 matches.")
++        if parsed.subcommand == "organize" and parsed.yes and not parsed.apply:
++            parser.error("--yes requires --apply; the default is preview only")
+         if parsed.subcommand == "organize" and parsed.strategy == "size":
+             parser.error("Size organization is unavailable until Phase 3; use type or date.")
+ 
+@@ -553,35 +507,24 @@
+                     console.print("[red]Stopped.[/red]")
+ 
+         elif parsed.subcommand == "organize":
+-            self.organizer.dry_run = parsed.dry_run
+-            source = Path(parsed.source)
+-
+-            templates = {
+-                "type": "organized/{type}/{name}.{ext}",
+-                "date": "organized/{year}/{month}/{name}.{ext}",
+-                "size": "organized/{size_category}/{name}.{ext}",
+-            }
+-
+-            rule = FileRule(
+-                name="cli_organize",
+-                source_pattern="*",
+-                destination_template=templates[parsed.strategy],
+-                action="move"
+-            )
++            templates = {"type": "{type}/{filename}", "date": "{year}/{month}/{filename}"}
+             self.organizer.rules.clear()
+-            self.organizer.add_rule(rule)
+-
+-            results = self.organizer.organize_directory(source)
+-            report = self.organizer.generate_report(results)
+-
+-            console.print(f"[green]Organized {report['successful']} files[/green]")
+-            if report['failed'] > 0:
+-                for op in results:
+-                    if op.status == "failed":
+-                        console.print(f"Failed: {op.source}: {op.error}", markup=False)
+-                return 1
+-            if report["dry_run"]:
+-                console.print(f"Previewed {report['dry_run']} files; no file changes applied.")
++            self.organizer.add_rule(FileRule("cli_organize", "*", parsed.template if parsed.template is not None else templates[parsed.strategy],
++                                             action=parsed.action))
++            plan = self.organizer.plan_directory(Path(parsed.source), Path(parsed.destination),
++                                                 conflict_policy=parsed.conflict)
++            self.show_plan(plan)
++            if not parsed.apply:
++                return self.show_results(self.organizer.preview(plan))
++            confirmed = parsed.yes
++            if plan.requires_confirmation and not confirmed:
++                if not sys.stdin.isatty():
++                    raise ConfirmationRequired("Confirmation required; inspect preview, then use --apply --yes")
++                confirmed = Confirm.ask("Apply this displayed plan and remove moved source files?", default=False)
++                if not confirmed:
++                    console.print("Plan not applied; no files or history changed.")
++                    return 0
++            return self.show_results(self.organizer.apply(plan, confirmed=confirmed))
+ 
+         elif parsed.subcommand == "duplicates":
+             dir_path = Path(parsed.dir)
+--- phase1/taskmaster/database.py
++++ phase2/taskmaster/database.py
+@@ -91,6 +91,17 @@
+             conn.execute("CREATE INDEX IF NOT EXISTS idx_tasks_next_run ON tasks(next_run)")
+             conn.execute("CREATE INDEX IF NOT EXISTS idx_file_checksum ON file_index(checksum)")
+             conn.execute("CREATE INDEX IF NOT EXISTS idx_file_ops_timestamp ON file_operations(timestamp)")
++            # Additive compatibility for existing Phase 1 history databases.
++            columns = {row["name"] for row in conn.execute("PRAGMA table_info(file_operations)")}
++            for name, definition in {
++                "filesystem_status": "TEXT DEFAULT 'unknown'",
++                "destination_created": "INTEGER DEFAULT 0",
++                "source_removed": "INTEGER DEFAULT 0",
++                "history_status": "TEXT DEFAULT 'unknown'",
++                "history_error": "TEXT",
++            }.items():
++                if name not in columns:
++                    conn.execute(f"ALTER TABLE file_operations ADD COLUMN {name} {definition}")
+ 
+     # Task operations
+     def save_task(self, task: Task) -> None:
+@@ -179,12 +190,14 @@
+         with self._connection() as conn:
+             conn.execute("""
+                 INSERT INTO file_operations 
+-                (id, source, destination, operation, status, timestamp, size_bytes, checksum, error)
+-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
++                (id, source, destination, operation, status, timestamp, size_bytes, checksum, error,
++                 filesystem_status, destination_created, source_removed, history_status, history_error)
++                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             """, (
+                 op.id, str(op.source), str(op.destination) if op.destination else None,
+                 op.operation, op.status, op.timestamp.isoformat(),
+-                op.size_bytes, op.checksum, op.error
++                op.size_bytes, op.checksum, op.error, op.filesystem_status,
++                op.destination_created, op.source_removed, op.history_status, op.history_error
+             ))
+ 
+     def get_file_operations(self, limit: int = 100) -> List[Dict[str, Any]]:
+--- phase1/taskmaster/demo.py
++++ phase2/taskmaster/demo.py
+@@ -1,4 +1,4 @@
+-"""Disposable Phase 1 demo: python -m taskmaster.demo --directory ./demo-work.
++"""Disposable planning demo: python -m taskmaster.demo --directory ./demo-work.
+ 
+ Only a newly created temporary child of the selected existing directory is used.
+ The demo previews copies and reports duplicates; it never runs the scheduler.
+@@ -7,7 +7,6 @@
+ from pathlib import Path
+ from tempfile import TemporaryDirectory
+ 
+-from .database import Database
+ from .models import FileRule
+ from .organizer import FileOrganizer
+ 
+@@ -28,13 +27,14 @@
+         source.mkdir()
+         (source / "first.log").write_text("sample log\n", encoding="utf-8")
+         (source / "second.log").write_text("sample log\n", encoding="utf-8")
+-        organizer = FileOrganizer(Database(str(base / "demo.sqlite")), dry_run=True)
++        organizer = FileOrganizer()
+         try:
+-            rule = FileRule("preview", "*.log", str(base / "output/{name}.{ext}"), action="copy")
++            rule = FileRule("preview", "*.log", "{filename}", action="copy")
+             organizer.add_rule(rule)
+-            print(organizer.generate_report(organizer.organize_directory(source)))
++            plan = organizer.plan_directory(source, base / "output")
++            print(organizer.generate_report(organizer.preview(plan)))
+             print(f"Full SHA-256 duplicate groups: {len(organizer.find_duplicates(source))}")
+-            print("Preview and duplicate scans write disposable database records only.")
++            print("Preview and duplicate report created no output files or database.")
+         finally:
+             organizer.close()
+     print("Demo complete; disposable fixtures removed.")
+--- phase1/taskmaster/errors.py
++++ phase2/taskmaster/errors.py
+@@ -0,0 +1,9 @@
++"""Errors shared by planning, validation, execution, and the CLI."""
++
++
++class PlanValidationError(ValueError):
++    """An input or file state does not satisfy the execution contract."""
++
++
++class ConfirmationRequired(PlanValidationError):
++    """The caller must explicitly approve destructive planned operations."""
+--- phase1/taskmaster/execution.py
++++ phase2/taskmaster/execution.py
+@@ -0,0 +1,122 @@
++"""Execute a previously inspected plan; persistence is an independent boundary."""
++import hashlib
++import os
++import shutil
++from typing import Callable
++
++from .errors import ConfirmationRequired, PlanValidationError
++from .models import FileOperation, OperationPlan, PlannedOperation
++from .planning import source_state, stat_identity, validate_operation, validate_roots
++
++
++def preview_plan(plan: OperationPlan) -> list[FileOperation]:
++    """Render captured intentions without file reads, file writes, or history."""
++    results = []
++    for operation in plan.operations:
++        result = FileOperation(source=operation.source, destination=operation.destination,
++                               operation=operation.action,
++                               size_bytes=operation.source_state.size if operation.source_state else 0)
++        if operation.validation_error:
++            result.status, result.error = "failed", operation.validation_error
++        elif operation.skipped_reason:
++            result.status, result.error = "skipped", operation.skipped_reason
++        else:
++            result.status = "dry_run"
++            result.checksum = operation.source_state.sha256 if operation.source_state else None
++        results.append(result)
++    return results
++
++
++def revalidate_source(plan: OperationPlan, operation: PlannedOperation) -> None:
++    roots = validate_roots(plan.source_root, plan.destination_root)
++    if roots != (plan.source_root, plan.destination_root):
++        raise PlanValidationError("Plan roots must be absolute normalized paths")
++    validate_operation(plan, operation)
++    if operation.source_state is None or source_state(operation.source) != operation.source_state:
++        raise PlanValidationError(f"Source changed since planning; create a new plan: {operation.source}")
++
++
++def _apply_file(plan: OperationPlan, operation: PlannedOperation, result: FileOperation) -> None:
++    revalidate_source(plan, operation)
++    destination = operation.destination
++    if destination is not None and destination.exists():
++        if operation.conflict_policy == "skip":
++            result.status, result.error = "skipped", f"Destination already exists: {destination}"
++            return
++        raise FileExistsError(f"Destination already exists; leaving it unchanged: {destination}")
++    if operation.action == "delete":
++        operation.source.unlink()
++        result.source_removed = True
++        result.filesystem_status = "deleted"
++    else:
++        destination.parent.mkdir(parents=True, exist_ok=True)
++        # Recheck newly created parents and file state before opening either file.
++        revalidate_source(plan, operation)
++        expected = operation.source_state
++        digest = hashlib.sha256()
++        with operation.source.open("rb") as reader:
++            if stat_identity(os.fstat(reader.fileno()))[:4] != (expected.device, expected.inode,
++                    expected.size, expected.modified_ns):
++                raise PlanValidationError(f"Source changed while being opened: {operation.source}")
++            try:
++                writer = destination.open("xb")
++            except FileExistsError:
++                if operation.conflict_policy != "skip":
++                    raise
++                result.status, result.error = "skipped", f"Destination already exists: {destination}"
++                return
++            result.destination_created = True
++            result.filesystem_status = "partial"
++            with writer:
++                while chunk := reader.read(1024 * 1024):
++                    digest.update(chunk)
++                    writer.write(chunk)
++        if digest.hexdigest() != expected.sha256:
++            raise PlanValidationError("Source content changed during copy; inspect the partial destination")
++        revalidate_source(plan, operation)
++        shutil.copystat(operation.source, destination)
++        if source_state(destination).sha256 != expected.sha256:
++            raise PlanValidationError("Destination verification failed; source was retained")
++        result.filesystem_status = "copied"
++        result.checksum = expected.sha256
++        if operation.action in {"move", "rename"}:
++            revalidate_source(plan, operation)
++            operation.source.unlink()
++            result.source_removed = True
++            result.filesystem_status = "moved" if operation.action == "move" else "renamed"
++    result.status = "success"
++    result.checksum = operation.source_state.sha256
++
++
++def execute_plan(plan: OperationPlan, *, confirmed: bool = False,
++                 history_recorder: Callable[[FileOperation], None] | None = None) -> list[FileOperation]:
++    """Apply each item once, continuing on per-file failures. No automatic retries.
++
++    A confirmation failure happens before *any* mutation or history recording.
++    New partial files are retained on failure for inspection; no unsafe rollback
++    deletion or replacement of existing destinations is attempted.
++    """
++    validate_roots(plan.source_root, plan.destination_root)
++    if not isinstance(confirmed, bool):
++        raise PlanValidationError("confirmed must be an explicit boolean")
++    if plan.requires_confirmation and not confirmed:
++        raise ConfirmationRequired("Confirmation required for move, rename, or delete operations")
++    results = preview_plan(plan)
++    for operation, result in zip(plan.operations, results):
++        if result.status == "dry_run":
++            # A preview checksum describes the planned source, not necessarily
++            # the contents of a partially written destination after failure.
++            result.checksum = None
++            try:
++                _apply_file(plan, operation, result)
++            except Exception as error:
++                result.status, result.error = "failed", str(error)
++        if history_recorder is not None:
++            try:
++                result.history_status = "recorded"
++                history_recorder(result)
++            except Exception as error:
++                result.history_status, result.history_error = "failed", str(error)
++                if result.status == "success":
++                    result.status = "completed_with_errors"
++    return results
+--- phase1/taskmaster/models.py
++++ phase2/taskmaster/models.py
+@@ -138,3 +138,44 @@
+     size_bytes: int = 0
+     checksum: Optional[str] = None
+     error: Optional[str] = None
++    filesystem_status: str = "unchanged"
++    destination_created: bool = False
++    source_removed: bool = False
++    history_status: str = "not_requested"
++    history_error: Optional[str] = None
++
++
++@dataclass(frozen=True)
++class SourceState:
++    """Identity, metadata, and full-content fingerprint captured during planning."""
++    device: int
++    inode: int
++    size: int
++    modified_ns: int
++    changed_ns: int
++    sha256: str
++
++
++@dataclass(frozen=True)
++class PlannedOperation:
++    source: Path
++    destination: Optional[Path]
++    action: str
++    source_state: Optional[SourceState]
++    conflict_policy: str = "error"
++    validation_error: Optional[str] = None
++    skipped_reason: Optional[str] = None
++
++
++@dataclass(frozen=True)
++class OperationPlan:
++    source_root: Path
++    destination_root: Path
++    operations: tuple[PlannedOperation, ...]
++    created_at: datetime = field(default_factory=datetime.now)
++
++    @property
++    def requires_confirmation(self) -> bool:
++        return any(op.action in {"move", "rename", "delete"}
++                   and not op.validation_error and not op.skipped_reason
++                   for op in self.operations)
+--- phase1/taskmaster/organizer.py
++++ phase2/taskmaster/organizer.py
+@@ -1,278 +1,196 @@
+-"""
+-TaskMaster - Advanced File Organizer
+-Smart file organization with duplicate detection, content analysis, and rules engine.
+-"""
+-import os
+-import hashlib
+-import shutil
+-import mimetypes
+-from pathlib import Path
+-from datetime import datetime
+-from typing import List, Dict, Optional, Callable, Set, Tuple
+-from concurrent.futures import ThreadPoolExecutor
+-import asyncio
+-
+-from .models import FileRule, FileOperation
+-from .database import Database
+-
+-class FileOrganizer:
+-    """Advanced file organizer with rule-based processing and duplicate detection."""
+-
+-    # File type categories
+-    CATEGORIES = {
+-        "images": {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".ico"},
+-        "videos": {".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm"},
+-        "audio": {".mp3", ".wav", ".flac", ".aac", ".ogg", ".m4a", ".wma"},
+-        "documents": {".pdf", ".doc", ".docx", ".txt", ".rtf", ".odt", ".xls", ".xlsx", ".ppt", ".pptx"},
+-        "code": {".py", ".js", ".html", ".css", ".java", ".cpp", ".c", ".h", ".go", ".rs", ".ts"},
+-        "archives": {".zip", ".rar", ".7z", ".tar", ".gz", ".bz2"},
+-        "data": {".json", ".xml", ".csv", ".yaml", ".yml", ".sql", ".db"},
+-        "executables": {".exe", ".msi", ".dmg", ".pkg", ".deb", ".rpm", ".appimage"},
+-    }
+-
+-    def __init__(self, db: Database, dry_run: bool = False):
+-        self.db = db
+-        self.dry_run = dry_run
+-        self.rules: List[FileRule] = []
+-        self._executor = ThreadPoolExecutor(max_workers=8)
+-
+-    def add_rule(self, rule: FileRule) -> None:
+-        """Add an organization rule."""
+-        self._validate_action(rule.action)
+-        self.rules.append(rule)
+-        self.rules.sort(key=lambda r: r.priority, reverse=True)
+-
+-    def get_file_category(self, path: Path) -> str:
+-        """Determine file category based on extension."""
+-        ext = path.suffix.lower()
+-        for category, extensions in self.CATEGORIES.items():
+-            if ext in extensions:
+-                return category
+-        return "misc"
+-
+-    @staticmethod
+-    def _validate_action(action: str) -> None:
+-        if action not in {"move", "copy", "rename", "delete"}:
+-            raise ValueError(f"Unsupported action: {action!r}. Use move, copy, rename, or delete.")
+-
+-    def close(self) -> None:
+-        """Release the duplicate scan worker pool."""
+-        self._executor.shutdown(wait=True)
+-
+-    def calculate_checksum(self, path: Path, algorithm: str = "sha256", 
+-                          chunk_size: int = 8192) -> str:
+-        """Calculate file checksum for duplicate detection."""
+-        hash_obj = hashlib.new(algorithm)
+-        with open(path, "rb") as f:
+-            while chunk := f.read(chunk_size):
+-                hash_obj.update(chunk)
+-        return hash_obj.hexdigest()
+-
+-    def get_file_info(self, path: Path) -> Dict[str, any]:
+-        """Get comprehensive file information."""
+-        stat = path.stat()
+-        return {
+-            "path": path,
+-            "name": path.name,
+-            "stem": path.stem,
+-            "extension": path.suffix.lower(),
+-            "size": stat.st_size,
+-            "modified": datetime.fromtimestamp(stat.st_mtime),
+-            "created": datetime.fromtimestamp(stat.st_ctime),
+-            "category": self.get_file_category(path),
+-            "mime_type": mimetypes.guess_type(str(path))[0] or "unknown",
+-        }
+-
+-    def scan_directory(self, directory: Path, recursive: bool = True,
+-                      pattern: str = "*") -> List[Path]:
+-        """Scan directory for files matching pattern."""
+-        files = []
+-        directory = Path(directory)
+-        if not directory.exists():
+-            raise FileNotFoundError(f"Source directory does not exist: {directory}")
+-        if not directory.is_dir():
+-            raise NotADirectoryError(f"Source must be a directory: {directory}")
+-
+-        if recursive:
+-            for path in directory.rglob(pattern):
+-                if path.is_file():
+-                    files.append(path)
+-        else:
+-            for path in directory.glob(pattern):
+-                if path.is_file():
+-                    files.append(path)
+-
+-        return sorted(files)
+-
+-    def find_duplicates(self, directory: Path, recursive: bool = True,
+-                       fast_mode: bool = False) -> Dict[str, List[Path]]:
+-        """Report full SHA-256 matches; legacy fast_mode also verifies full content.
+-
+-        Scan/read errors propagate instead of producing a misleading complete report.
+-        Automatic duplicate deletion is unavailable in the Phase 1 CLI.
+-        """
+-        files = self.scan_directory(directory, recursive)
+-        checksum_map: Dict[str, List[Path]] = {}
+-
+-        def process_file(path: Path) -> Optional[Tuple[str, Path]]:
+-            return (self.calculate_checksum(path), path)
+-
+-        # Process in parallel
+-        futures = [self._executor.submit(process_file, f) for f in files]
+-        for future in futures:
+-            result = future.result()
+-            if result:
+-                checksum, path = result
+-                if checksum not in checksum_map:
+-                    checksum_map[checksum] = []
+-                checksum_map[checksum].append(path)
+-
+-        # Filter to only duplicates
+-        duplicates = {k: v for k, v in checksum_map.items() if len(v) > 1}
+-
+-        # Index in database
+-        for checksum, paths in duplicates.items():
+-            for path in paths:
+-                self.db.index_file(path, checksum, path.stat().st_size)
+-
+-        return duplicates
+-
+-    def apply_template(self, template: str, file_info: Dict[str, any]) -> Path:
+-        """Apply destination template with variable substitution."""
+-        now = datetime.now()
+-
+-        replacements = {
+-            "{name}": file_info["stem"],
+-            "{ext}": file_info["extension"].lstrip("."),
+-            "{date}": now.strftime("%Y-%m-%d"),
+-            "{year}": now.strftime("%Y"),
+-            "{month}": now.strftime("%m"),
+-            "{day}": now.strftime("%d"),
+-            "{type}": file_info["category"],
+-            "{mime}": file_info["mime_type"].replace("/", "_"),
+-        }
+-
+-        result = template
+-        for key, value in replacements.items():
+-            result = result.replace(key, value)
+-
+-        return Path(result)
+-
+-    def organize_file(self, source: Path, rule: FileRule) -> FileOperation:
+-        """Organize a single file according to a rule."""
+-        source = Path(source)
+-        op = FileOperation(source=source, operation=rule.action)
+-        try:
+-            self._validate_action(rule.action)
+-            if source.is_symlink() or not source.is_file():
+-                raise ValueError(f"Source must be a regular, non-symlink file: {source}")
+-            file_info = self.get_file_info(source)
+-            destination = self.apply_template(rule.destination_template, file_info)
+-            op.destination = destination
+-            op.size_bytes = file_info["size"]
+-            if rule.action != "delete" and (destination.exists() or destination.is_symlink()):
+-                raise FileExistsError(f"Destination already exists; leaving it unchanged: {destination}")
+-            if rule.condition and not rule.condition(source):
+-                op.status = "skipped"
+-                op.error = "Condition not met"
+-            elif self.dry_run:
+-                op.status = "dry_run"
+-                print(f"[DRY RUN] Would {rule.action} {source} -> {destination}")
+-            else:
+-                if rule.action == "delete":
+-                    source.unlink()
+-                else:
+-                    destination.parent.mkdir(parents=True, exist_ok=True)
+-                    # Exclusive creation also rejects a destination created after
+-                    # the check above. Never let copy/move/rename replace a file.
+-                    with source.open("rb") as reader, destination.open("xb") as writer:
+-                        shutil.copyfileobj(reader, writer)
+-                    shutil.copystat(source, destination)
+-                    if rule.action in {"move", "rename"}:
+-                        source.unlink()
+-
+-                op.status = "success"
+-                op.checksum = self.calculate_checksum(destination) if rule.action != "delete" else None
+-
+-                # Index the new file
+-                if rule.action != "delete":
+-                    self.db.index_file(destination, op.checksum or "", file_info["size"])
+-
+-        except Exception as e:
+-            op.status = "failed"
+-            op.error = str(e)
+-
+-        self.db.log_file_operation(op)
+-        return op
+-
+-    def organize_directory(self, source_dir: Path, 
+-                          recursive: bool = True) -> List[FileOperation]:
+-        """Organize all files in a directory according to rules."""
+-        files = self.scan_directory(source_dir, recursive)
+-        results = []
+-
+-        for file_path in files:
+-            # Find matching rule
+-            matched = False
+-            for rule in self.rules:
+-                if not rule.enabled:
+-                    continue
+-
+-                # Check if file matches rule pattern
+-                import fnmatch
+-                if fnmatch.fnmatch(file_path.name, rule.source_pattern):
+-                    op = self.organize_file(file_path, rule)
+-                    results.append(op)
+-                    matched = True
+-                    break
+-
+-            if not matched:
+-                # Default: organize by type
+-                default_rule = FileRule(
+-                    name="default_type_sort",
+-                    source_pattern="*",
+-                    destination_template=f"organized/{{type}}/{{name}}.{{ext}}",
+-                    action="move"
+-                )
+-                op = self.organize_file(file_path, default_rule)
+-                results.append(op)
+-
+-        return results
+-
+-    def clean_empty_directories(self, directory: Path, 
+-                                recursive: bool = True) -> List[Path]:
+-        """Remove empty directories."""
+-        removed = []
+-        directory = Path(directory)
+-
+-        if recursive:
+-            # Process from deepest to shallowest
+-            for path in sorted(directory.rglob("*"), key=lambda p: len(p.parts), reverse=True):
+-                if path.is_dir() and not any(path.iterdir()):
+-                    try:
+-                        path.rmdir()
+-                        removed.append(path)
+-                    except Exception:
+-                        pass
+-
+-        return removed
+-
+-    def generate_report(self, operations: List[FileOperation]) -> Dict[str, any]:
+-        """Generate summary report of operations."""
+-        total = len(operations)
+-        successful = sum(1 for op in operations if op.status == "success")
+-        failed = sum(1 for op in operations if op.status == "failed")
+-        skipped = sum(1 for op in operations if op.status == "skipped")
+-        dry_run = sum(1 for op in operations if op.status == "dry_run")
+-
+-        total_size = sum(op.size_bytes for op in operations if op.status in ("success", "dry_run"))
+-
+-        return {
+-            "total_files": total,
+-            "successful": successful,
+-            "failed": failed,
+-            "skipped": skipped,
+-            "dry_run": dry_run,
+-            "total_size_mb": round(total_size / (1024 * 1024), 2),
+-            "timestamp": datetime.now().isoformat(),
+-        }
++"""
++TaskMaster - Advanced File Organizer
++Smart file organization with duplicate detection, content analysis, and rules engine.
++"""
++import hashlib
++import mimetypes
++from pathlib import Path
++from datetime import datetime
++from typing import List, Dict, Optional, Tuple, Any
++from concurrent.futures import ThreadPoolExecutor
++
++from .models import FileRule, FileOperation, OperationPlan
++from .database import Database
++from .errors import PlanValidationError
++from .execution import execute_plan, preview_plan
++from .planning import absolute_path, build_plan, expand_template, scan_files, validate_action, validate_template
++
++class FileOrganizer:
++    """Advanced file organizer with rule-based processing and duplicate detection."""
++
++    # File type categories
++    CATEGORIES = {
++        "images": {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".ico"},
++        "videos": {".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm"},
++        "audio": {".mp3", ".wav", ".flac", ".aac", ".ogg", ".m4a", ".wma"},
++        "documents": {".pdf", ".doc", ".docx", ".txt", ".rtf", ".odt", ".xls", ".xlsx", ".ppt", ".pptx"},
++        "code": {".py", ".js", ".html", ".css", ".java", ".cpp", ".c", ".h", ".go", ".rs", ".ts"},
++        "archives": {".zip", ".rar", ".7z", ".tar", ".gz", ".bz2"},
++        "data": {".json", ".xml", ".csv", ".yaml", ".yml", ".sql", ".db"},
++        "executables": {".exe", ".msi", ".dmg", ".pkg", ".deb", ".rpm", ".appimage"},
++    }
++
++    def __init__(self, db: Database | None = None, dry_run: bool = False, *, history_recorder=None,
++                 history_path: Path | None = None):
++        self.db = db
++        self.history_recorder = history_recorder or (db.log_file_operation if db is not None else None)
++        known_path = history_path if history_path is not None else (db.db_path if db is not None else None)
++        self.history_path = absolute_path(known_path) if known_path is not None and str(known_path) != ":memory:" else None
++        self.dry_run = dry_run
++        self.rules: List[FileRule] = []
++        self._executor = ThreadPoolExecutor(max_workers=8)
++
++    def add_rule(self, rule: FileRule) -> None:
++        """Add an organization rule."""
++        self._validate_action(rule.action)
++        if rule.action != "delete":
++            validate_template(rule.destination_template)
++        self.rules.append(rule)
++        self.rules.sort(key=lambda r: r.priority, reverse=True)
++
++    def get_file_category(self, path: Path) -> str:
++        """Determine file category based on extension."""
++        ext = path.suffix.lower()
++        for category, extensions in self.CATEGORIES.items():
++            if ext in extensions:
++                return category
++        return "misc"
++
++    @staticmethod
++    def _validate_action(action: str) -> None:
++        validate_action(action)
++
++    def close(self) -> None:
++        """Release the duplicate scan worker pool."""
++        self._executor.shutdown(wait=True)
++
++    def calculate_checksum(self, path: Path, algorithm: str = "sha256", 
++                          chunk_size: int = 8192) -> str:
++        """Calculate file checksum for duplicate detection."""
++        hash_obj = hashlib.new(algorithm)
++        with open(path, "rb") as f:
++            while chunk := f.read(chunk_size):
++                hash_obj.update(chunk)
++        return hash_obj.hexdigest()
++
++    def get_file_info(self, path: Path) -> Dict[str, Any]:
++        """Get comprehensive file information."""
++        stat = path.stat()
++        return {
++            "path": path,
++            "name": path.name,
++            "stem": path.stem,
++            "extension": path.suffix.lower(),
++            "size": stat.st_size,
++            "modified": datetime.fromtimestamp(stat.st_mtime),
++            "created": datetime.fromtimestamp(stat.st_ctime),
++            "category": self.get_file_category(path),
++            "mime_type": mimetypes.guess_type(str(path))[0] or "unknown",
++        }
++
++    def scan_directory(self, directory: Path, recursive: bool = True,
++                      pattern: str = "*") -> List[Path]:
++        """Scan directory for files matching pattern."""
++        return scan_files(directory, recursive, pattern)
++
++    def find_duplicates(self, directory: Path, recursive: bool = True,
++                       fast_mode: bool = False, *, record_index: bool = False) -> Dict[str, List[Path]]:
++        """Report full SHA-256 matches; legacy fast_mode also verifies full content.
++
++        Scan/read errors propagate instead of producing a misleading complete report.
++        Automatic duplicate deletion remains unavailable.
++        """
++        files = self.scan_directory(directory, recursive)
++        checksum_map: Dict[str, List[Path]] = {}
++
++        def process_file(path: Path) -> Optional[Tuple[str, Path]]:
++            return (self.calculate_checksum(path), path)
++
++        # Process in parallel
++        futures = [self._executor.submit(process_file, f) for f in files]
++        for future in futures:
++            result = future.result()
++            if result:
++                checksum, path = result
++                if checksum not in checksum_map:
++                    checksum_map[checksum] = []
++                checksum_map[checksum].append(path)
++
++        # Filter to only duplicates
++        duplicates = {k: v for k, v in checksum_map.items() if len(v) > 1}
++
++        # Read-only by default; legacy indexing must be requested explicitly.
++        if record_index:
++            if self.db is None:
++                raise PlanValidationError("record_index=True requires an explicit Database")
++            for checksum, paths in duplicates.items():
++                for path in paths:
++                    self.db.index_file(path, checksum, path.stat().st_size)
++
++        return duplicates
++
++    def apply_template(self, template: str, file_info: dict) -> Path:
++        return expand_template(template, file_info)
++
++    def plan_directory(self, source_root: Path, destination_root: Path, *,
++                       recursive: bool = True, conflict_policy: str = "error") -> OperationPlan:
++        self._check_history_location(source_root, destination_root)
++        return build_plan(source_root, destination_root, self.rules,
++                          file_info=self.get_file_info, recursive=recursive,
++                          conflict_policy=conflict_policy)
++
++    def preview(self, plan: OperationPlan) -> List[FileOperation]:
++        return preview_plan(plan)
++
++    def apply(self, plan: OperationPlan, *, confirmed: bool = False) -> List[FileOperation]:
++        self._check_history_location(plan.source_root, plan.destination_root)
++        return execute_plan(plan, confirmed=confirmed, history_recorder=self.history_recorder)
++
++    def _check_history_location(self, source_root: Path, destination_root: Path) -> None:
++        if self.history_path is not None and any(self.history_path.is_relative_to(absolute_path(root))
++                                                 for root in (source_root, destination_root)):
++            raise PlanValidationError("History database must be outside source and destination roots")
++
++    def organize_file(self, source: Path, rule: FileRule, *, destination_root: Path,
++                      source_root: Path | None = None, confirmed: bool = False,
++                      conflict_policy: str = "error") -> FileOperation:
++        """Compatibility adapter: explicit roots and approval now use the shared contract."""
++        source = Path(source)
++        self._check_history_location(source_root or source.absolute().parent, destination_root)
++        plan = build_plan(source_root or source.absolute().parent, destination_root, [rule],
++                          files=[source], file_info=self.get_file_info,
++                          conflict_policy=conflict_policy)
++        return (self.preview(plan) if self.dry_run else self.apply(plan, confirmed=confirmed))[0]
++
++    def organize_directory(self, source_dir: Path, *, destination_root: Path,
++                           recursive: bool = True, confirmed: bool = False,
++                           conflict_policy: str = "error") -> List[FileOperation]:
++        """Compatibility adapter; new callers should retain the plan for preview/apply."""
++        plan = self.plan_directory(source_dir, destination_root, recursive=recursive,
++                                   conflict_policy=conflict_policy)
++        return self.preview(plan) if self.dry_run else self.apply(plan, confirmed=confirmed)
++
++    def clean_empty_directories(self, directory: Path, recursive: bool = True):
++        raise PlanValidationError("Unplanned directory cleanup is disabled; this phase plans regular files only")
++
++    def generate_report(self, operations: List[FileOperation]) -> Dict[str, Any]:
++        """Generate summary report of operations."""
++        total = len(operations)
++        successful = sum(1 for op in operations if op.status in ("success", "completed_with_errors"))
++        failed = sum(1 for op in operations if op.status == "failed")
++        skipped = sum(1 for op in operations if op.status == "skipped")
++        dry_run = sum(1 for op in operations if op.status == "dry_run")
++
++        total_size = sum(op.size_bytes for op in operations if op.status in ("success", "completed_with_errors", "dry_run"))
++
++        return {
++            "total_files": total,
++            "history_failed": sum(op.history_status == "failed" for op in operations),
++            "filesystem_changed": sum(op.destination_created or op.source_removed for op in operations),
++            "successful": successful,
++            "failed": failed,
++            "skipped": skipped,
++            "dry_run": dry_run,
++            "total_size_mb": round(total_size / (1024 * 1024), 2),
++            "timestamp": datetime.now().isoformat(),
++        }
+--- phase1/taskmaster/planning.py
++++ phase2/taskmaster/planning.py
+@@ -0,0 +1,227 @@
++"""Read-only scanning, template validation, and immutable operation planning."""
++from dataclasses import replace
++from collections import Counter
++from datetime import datetime
++import fnmatch
++import hashlib
++import os
++from pathlib import Path, PureWindowsPath
++import stat
++from string import Formatter
++from typing import Callable, Iterable
++
++from .errors import PlanValidationError
++from .models import FileRule, OperationPlan, PlannedOperation, SourceState
++
++ACTIONS = {"copy", "move", "rename", "delete"}
++CONFLICT_POLICIES = {"error", "skip"}
++FIELDS = {"name", "filename", "ext", "type", "mime", "date", "year", "month", "day"}
++
++
++def absolute_path(path: Path) -> Path:
++    return Path(os.path.abspath(Path(path).expanduser()))
++
++
++def reject_links(path: Path) -> None:
++    """Check every existing component, including Windows reparse points."""
++    for part in (path, *path.parents):
++        try:
++            info = part.lstat()
++        except FileNotFoundError:
++            continue
++        if stat.S_ISLNK(info.st_mode) or getattr(info, "st_file_attributes", 0) & 0x400:
++            raise PlanValidationError(f"Symlinks, junctions, and reparse points are not allowed: {part}")
++
++
++def validate_roots(source_root: Path, destination_root: Path) -> tuple[Path, Path]:
++    source, destination = absolute_path(source_root), absolute_path(destination_root)
++    reject_links(source)
++    reject_links(destination)
++    if not source.exists():
++        raise FileNotFoundError(f"Source directory does not exist: {source}")
++    if not source.is_dir():
++        raise NotADirectoryError(f"Source must be a directory: {source}")
++    if destination.exists() and not destination.is_dir():
++        raise PlanValidationError(f"Destination root must be a directory: {destination}")
++    if source == Path(source.anchor) or destination == Path(destination.anchor):
++        raise PlanValidationError("A filesystem root cannot be an organization root")
++    if source == Path.home() or destination == Path.home():
++        raise PlanValidationError("Select a specific folder rather than the entire home directory")
++    if source.is_relative_to(destination) or destination.is_relative_to(source):
++        raise PlanValidationError("Source and destination roots must not overlap")
++    # Missing parents may be created only if existing ancestors are directories.
++    for parent in destination.parents:
++        if parent.exists() and not parent.is_dir():
++            raise PlanValidationError(f"Destination parent is not a directory: {parent}")
++    return source, destination
++
++
++def validate_action(action: str, conflict_policy: str = "error") -> None:
++    if not isinstance(action, str) or action not in ACTIONS:
++        raise PlanValidationError(f"Unsupported action: {action!r}. Use copy, move, rename, or delete.")
++    if not isinstance(conflict_policy, str) or conflict_policy not in CONFLICT_POLICIES:
++        raise PlanValidationError(f"Unsupported conflict policy: {conflict_policy!r}. Use error or skip.")
++
++
++def scan_files(directory: Path, recursive: bool = True, pattern: str = "*") -> list[Path]:
++    directory = absolute_path(directory)
++    reject_links(directory)
++    if not directory.exists():
++        raise FileNotFoundError(f"Source directory does not exist: {directory}")
++    if not directory.is_dir():
++        raise NotADirectoryError(f"Source must be a directory: {directory}")
++    paths = []
++
++    def scan_error(error):
++        raise error
++
++    for current, directories, files in os.walk(directory, followlinks=False, onerror=scan_error):
++        for name in directories:
++            reject_links(Path(current) / name)
++        for name in files:
++            path = Path(current) / name
++            reject_links(path)
++            if fnmatch.fnmatch(name, pattern):
++                paths.append(path)
++        if not recursive:
++            break
++    return sorted(paths)
++
++
++def stat_identity(info: os.stat_result) -> tuple[int, int, int, int, int]:
++    return info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns
++
++
++def source_state(path: Path) -> SourceState:
++    reject_links(path)
++    before = path.stat()
++    if not stat.S_ISREG(before.st_mode):
++        raise PlanValidationError(f"Source must be a regular file: {path}")
++    digest = hashlib.sha256()
++    with path.open("rb") as reader:
++        # Python 3.12 on Windows exposes different ctime semantics for path stat
++        # and fstat. Compare handle identity/size/mtime; compare path ctime only
++        # with other path stats, and always verify full contents.
++        if stat_identity(os.fstat(reader.fileno()))[:4] != stat_identity(before)[:4]:
++            raise PlanValidationError(f"Source changed while being opened: {path}")
++        while chunk := reader.read(1024 * 1024):
++            digest.update(chunk)
++    reject_links(path)
++    if stat_identity(path.stat()) != stat_identity(before):
++        raise PlanValidationError(f"Source changed while being inspected: {path}")
++    return SourceState(*stat_identity(before), digest.hexdigest())
++
++
++def validate_template(template: str) -> None:
++    if not isinstance(template, str) or not template.strip():
++        raise PlanValidationError("Destination template must be a nonempty string")
++    try:
++        for _, field, spec, conversion in Formatter().parse(template):
++            if field is not None and (field not in FIELDS or spec or conversion):
++                raise PlanValidationError(f"Unsupported template placeholder: {{{field}}}")
++    except ValueError as error:
++        raise PlanValidationError(f"Invalid destination template: {error}") from error
++
++
++def expand_template(template: str, info: dict, now: datetime | None = None) -> Path:
++    validate_template(template)
++    now = now or datetime.now()
++    values = {"name": info["stem"], "filename": info["name"],
++              "ext": info["extension"].lstrip("."), "type": info["category"],
++              "mime": info["mime_type"].replace("/", "_"),
++              "date": now.strftime("%Y-%m-%d"), "year": now.strftime("%Y"),
++              "month": now.strftime("%m"), "day": now.strftime("%d")}
++    return Path(template.format_map(values))
++
++
++def destination_path(rendered: Path, root: Path) -> Path:
++    # Check both separator styles even when a plan is prepared on Linux.
++    windows = PureWindowsPath(str(rendered))
++    if ".." in windows.parts or ".." in rendered.parts:
++        raise PlanValidationError("Destination traversal (..) is not allowed")
++    if windows.drive and not rendered.is_absolute():
++        raise PlanValidationError("Drive-relative or foreign absolute destination is not allowed")
++    # Windows absolute-path normalization may strip trailing dots/spaces. Reject
++    # those aliases before normalization, rather than silently changing a plan.
++    for component in rendered.parts:
++        if component == rendered.anchor:
++            continue
++        if (PureWindowsPath(component).is_reserved() or component.endswith((".", " "))
++                or any(char in component for char in '<>:"|?*\\')):
++            raise PlanValidationError(f"Destination contains an unsupported path component: {component!r}")
++    destination = absolute_path(rendered if rendered.is_absolute() else root / rendered)
++    if destination == root or not destination.is_relative_to(root):
++        raise PlanValidationError(f"Destination is outside its root: {destination}")
++    for component in destination.relative_to(root).parts:
++        if (PureWindowsPath(component).is_reserved() or component.endswith((".", " "))
++                or any(char in component for char in '<>:"|?*\\')):
++            raise PlanValidationError(f"Destination contains an unsupported path component: {component!r}")
++    reject_links(destination)
++    for parent in destination.parents:
++        if parent.exists() and not parent.is_dir():
++            raise PlanValidationError(f"Destination parent is not a directory: {parent}")
++        if parent == root:
++            break
++    return destination
++
++
++def validate_operation(plan: OperationPlan, operation: PlannedOperation) -> None:
++    validate_action(operation.action, operation.conflict_policy)
++    source = operation.source
++    if not source.is_absolute() or source != absolute_path(source) or not source.is_relative_to(plan.source_root):
++        raise PlanValidationError(f"Source is outside its root: {source}")
++    reject_links(source)
++    if operation.action == "delete":
++        if operation.destination is not None:
++            raise PlanValidationError("A delete operation must not have a destination")
++    elif operation.destination is None:
++        raise PlanValidationError("This action requires a destination")
++    else:
++        destination_path(operation.destination, plan.destination_root)
++
++
++def build_plan(source_root: Path, destination_root: Path, rules: Iterable[FileRule], *,
++               file_info: Callable[[Path], dict], files: Iterable[Path] | None = None,
++               recursive: bool = True, conflict_policy: str = "error") -> OperationPlan:
++    source, destination = validate_roots(source_root, destination_root)
++    validate_action("copy", conflict_policy)
++    rules = sorted((rule for rule in rules if rule.enabled), key=lambda r: r.priority, reverse=True)
++    for rule in rules:
++        validate_action(rule.action, conflict_policy)
++        if rule.condition is not None and not callable(rule.condition):
++            raise PlanValidationError("Rule condition must be callable or None")
++        if not isinstance(rule.source_pattern, str) or not rule.source_pattern:
++            raise PlanValidationError("Rule source_pattern must be a nonempty string")
++        if rule.action != "delete":
++            validate_template(rule.destination_template)
++    paths = scan_files(source, recursive) if files is None else sorted(absolute_path(p) for p in files)
++    now = datetime.now()
++    operations = []
++    for path in paths:
++        rule = next((r for r in rules if fnmatch.fnmatch(path.name, r.source_pattern)), None)
++        rule = rule or FileRule("default_type_sort", "*", "{type}/{filename}")
++        state, target, error, skipped = None, None, None, None
++        try:
++            if not path.is_relative_to(source):
++                raise PlanValidationError(f"Source is outside its root: {path}")
++            state = source_state(path)
++            if rule.action != "delete":
++                target = destination_path(expand_template(rule.destination_template, file_info(path), now), destination)
++            if rule.condition and not rule.condition(path):
++                skipped = "Condition not met"
++            elif target is not None and target.exists():
++                if conflict_policy == "skip":
++                    skipped = f"Destination already exists: {target}"
++                else:
++                    raise FileExistsError(f"Destination already exists; leaving it unchanged: {target}")
++        except (OSError, ValueError) as failure:
++            error = str(failure)
++        operations.append(PlannedOperation(path, target, rule.action, state, conflict_policy, error, skipped))
++    # A plan must not let two inputs contend for a target or execute a source twice.
++    source_counts = Counter(op.source for op in operations)
++    destination_counts = Counter(op.destination for op in operations if op.destination is not None)
++    for index, operation in enumerate(operations):
++        if source_counts[operation.source] > 1 or (operation.destination is not None
++                and destination_counts[operation.destination] > 1):
++            operations[index] = replace(operation, validation_error="Multiple operations share a source or destination")
++    return OperationPlan(source, destination, tuple(operations), now)
+--- phase1/tests/test_baseline.py
++++ phase2/tests/test_baseline.py
+@@ -1,226 +1,235 @@
+-import hashlib
+-import subprocess
+-import sys
+-from pathlib import Path
+-from unittest.mock import Mock
+-
+-import pytest
+-
+-from taskmaster.cli import TaskMasterCLI, main
+-from taskmaster.models import FileRule
+-from taskmaster.plugins import ImageProcessorPlugin, PluginManager
+-
+-
+-@pytest.mark.parametrize("fast_mode", [True, False])
+-def test_matching_prefix_does_not_make_duplicates(organizer, tmp_path, fast_mode):
+-    source = tmp_path / "files"
+-    source.mkdir()
+-    (source / "a.bin").write_bytes(b"x" * 1024 + b"A")
+-    (source / "b.bin").write_bytes(b"x" * 1024 + b"B")
+-    assert organizer.find_duplicates(source, fast_mode=fast_mode) == {}
+-    assert organizer.db.get_stats()["indexed_files"] == 0
+-
+-
+-def test_duplicates_use_full_sha256_and_include_every_member(organizer, tmp_path):
+-    source = tmp_path / "files"
+-    source.mkdir()
+-    paths = [source / name for name in ("a.log", "b.log", "c.log")]
+-    for path in paths:
+-        path.write_bytes(b"same\n")
+-    assert organizer.find_duplicates(source) == {hashlib.sha256(b"same\n").hexdigest(): paths}
+-
+-
+-@pytest.mark.parametrize("action", ["copy", "move", "rename"])
+-@pytest.mark.parametrize("dry_run", [True, False])
+-def test_existing_destination_is_preserved(organizer, tmp_path, action, dry_run):
+-    source, target = tmp_path / "source.txt", tmp_path / "target.txt"
+-    source.write_text("new")
+-    target.write_text("original")
+-    organizer.dry_run = dry_run
+-    result = organizer.organize_file(source, FileRule("collision", "*", str(target), action=action))
+-    assert result.status == "failed"
+-    assert "already exists" in result.error
+-    assert source.read_text() == "new"
+-    assert target.read_text() == "original"
+-
+-
+-def test_destination_created_during_copy_is_preserved(organizer, tmp_path, monkeypatch):
+-    source, target = tmp_path / "source.txt", tmp_path / "target.txt"
+-    source.write_text("source")
+-    original_open = Path.open
+-
+-    def raced_open(path, mode="r", *args, **kwargs):
+-        if path == target and mode == "xb":
+-            with original_open(target, "w") as writer:
+-                writer.write("concurrent")
+-        return original_open(path, mode, *args, **kwargs)
+-
+-    monkeypatch.setattr(Path, "open", raced_open)
+-    result = organizer.organize_file(source, FileRule("race", "*", str(target), action="move"))
+-    assert result.status == "failed"
+-    assert source.read_text() == "source"
+-    assert target.read_text() == "concurrent"
+-
+-
+-def test_destination_directory_is_not_treated_as_a_move_target(organizer, tmp_path):
+-    source, target = tmp_path / "source.txt", tmp_path / "target"
+-    source.write_text("keep")
+-    target.mkdir()
+-    result = organizer.organize_file(source, FileRule("directory", "*", str(target)))
+-    assert result.status == "failed"
+-    assert source.read_text() == "keep"
+-    assert not list(target.iterdir())
+-
+-
+-def test_interactive_duplicate_report_never_offers_deletion(organizer, tmp_path, monkeypatch):
+-    source = tmp_path / "files"
+-    source.mkdir()
+-    for name in ("a.txt", "b.txt"):
+-        (source / name).write_text("same")
+-    cli = TaskMasterCLI()
+-    cli.organizer = organizer
+-    monkeypatch.setattr("taskmaster.cli.Prompt.ask", lambda *args, **kwargs: str(source))
+-    confirm = Mock(side_effect=AssertionError("Deletion confirmation must not be requested"))
+-    monkeypatch.setattr("taskmaster.cli.Confirm.ask", confirm)
+-    cli.find_duplicates_interactive()
+-    confirm.assert_not_called()
+-    assert len(list(source.iterdir())) == 2
+-
+-
+-@pytest.mark.parametrize("action", ["copy", "move", "rename"])
+-def test_basic_file_operation(organizer, tmp_path, action):
+-    source, target = tmp_path / "source.log", tmp_path / "out/result.log"
+-    source.write_bytes(b"log contents")
+-    result = organizer.organize_file(source, FileRule("basic", "*", str(target), action=action))
+-    assert result.status == "success"
+-    assert target.read_bytes() == b"log contents"
+-    assert source.exists() == (action == "copy")
+-
+-
+-def test_invalid_action_has_no_file_side_effects(organizer, tmp_path):
+-    source = tmp_path / "source.txt"
+-    source.write_text("keep")
+-    target = tmp_path / "absent/result.txt"
+-    rule = FileRule("invalid", "*", str(target), action="bogus")
+-    with pytest.raises(ValueError, match="Unsupported action"):
+-        organizer.add_rule(rule)
+-    result = organizer.organize_file(source, rule)
+-    assert result.status == "failed"
+-    assert "Unsupported action" in result.error
+-    assert source.read_text() == "keep"
+-    assert not target.parent.exists()
+-
+-
+-@pytest.mark.parametrize("kind", ["missing", "file"])
+-def test_invalid_scan_source(organizer, tmp_path, kind):
+-    source = tmp_path / kind
+-    if kind == "file":
+-        source.write_text("not a directory")
+-    with pytest.raises((FileNotFoundError, NotADirectoryError), match="Source"):
+-        organizer.scan_directory(source)
+-
+-
+-def test_metadata_failure_is_reported_per_file(organizer, tmp_path, monkeypatch):
+-    source = tmp_path / "source.txt"
+-    source.write_text("keep")
+-    monkeypatch.setattr(organizer, "get_file_info", Mock(side_effect=PermissionError("denied")))
+-    result = organizer.organize_file(source, FileRule("metadata", "*", str(tmp_path / "out.txt")))
+-    assert result.status == "failed"
+-    assert "denied" in result.error
+-    assert source.read_text() == "keep"
+-
+-
+-def test_hash_failure_is_not_silently_ignored(organizer, tmp_path, monkeypatch):
+-    source = tmp_path / "files"
+-    source.mkdir()
+-    (source / "one.log").write_text("log")
+-    monkeypatch.setattr(organizer, "calculate_checksum", Mock(side_effect=PermissionError("denied")))
+-    with pytest.raises(PermissionError, match="denied"):
+-        organizer.find_duplicates(source)
+-
+-
+-def test_task_add_dispatch_preserves_shell_text(tmp_path, monkeypatch):
+-    monkeypatch.chdir(tmp_path)
+-    cli = TaskMasterCLI()
+-    try:
+-        assert cli.run_cli(["task", "add", "--name", "probe", "--command", "echo correct",
+-                            "--schedule", "2026-10-15 12:00"]) == 0
+-        task = next(iter(cli.scheduler.tasks.values()))
+-        with pytest.MonkeyPatch.context() as patch:
+-            run = Mock(return_value=Mock(stdout="correct"))
+-            patch.setattr(subprocess, "run", run)
+-            assert task.command() == "correct"
+-            run.assert_called_once_with("echo correct", shell=True, capture_output=True, text=True, check=True)
+-    finally:
+-        cli.close()
+-
+-
+-def test_cli_errors_and_deletion_guard_preserve_files(tmp_path, monkeypatch, capsys):
+-    monkeypatch.chdir(tmp_path)
+-    for command in ("organize", "duplicates"):
+-        option = "--source" if command == "organize" else "--dir"
+-        assert main([command, option, "missing"]) == 1
+-        assert "Source directory does not exist" in capsys.readouterr().out
+-    source = tmp_path / "files"
+-    source.mkdir()
+-    for name in ("a.log", "b.log"):
+-        (source / name).write_text("same")
+-    with pytest.raises(SystemExit) as error:
+-        main(["duplicates", "--dir", str(source), "--delete"])
+-    assert error.value.code == 2
+-    assert len(list(source.iterdir())) == 2
+-
+-
+-def test_cli_collision_returns_failure(tmp_path, monkeypatch, capsys):
+-    monkeypatch.chdir(tmp_path)
+-    source = tmp_path / "files"
+-    source.mkdir()
+-    (source / "one.txt").write_text("source")
+-    target = tmp_path / "organized/documents/one.txt"
+-    target.parent.mkdir(parents=True)
+-    target.write_text("existing")
+-    assert main(["organize", "--source", str(source)]) == 1
+-    assert "Destination already exists" in capsys.readouterr().out
+-    assert target.read_text() == "existing"
+-    assert (source / "one.txt").read_text() == "source"
+-
+-
+-def test_cli_preview_preserves_source(tmp_path, monkeypatch, capsys):
+-    monkeypatch.chdir(tmp_path)
+-    source = tmp_path / "files"
+-    source.mkdir()
+-    (source / "one.log").write_text("source")
+-    assert main(["organize", "--source", str(source), "--dry-run"]) == 0
+-    assert (source / "one.log").read_text() == "source"
+-    assert not (tmp_path / "organized").exists()
+-    assert "Previewed 1 files" in capsys.readouterr().out
+-
+-
+-@pytest.mark.parametrize("args", [["--help"], ["organize", "--source", ".", "--strategy", "size"],
+-    ["task"], ["task", "add", "--name", "x", "--command", "echo x", "--schedule", "bad"]])
+-def test_parse_only_paths_do_not_create_database(tmp_path, monkeypatch, args):
+-    monkeypatch.chdir(tmp_path)
+-    with pytest.raises(SystemExit) as error:
+-        main(args)
+-    assert error.value.code == (0 if args == ["--help"] else 2)
+-    assert not (tmp_path / "taskmaster.db").exists()
+-
+-
+-def test_plugin_import_and_explicit_registration(tmp_path):
+-    manager = PluginManager(tmp_path)
+-    plugin = ImageProcessorPlugin()
+-    manager.register_file_plugin(plugin)
+-    assert manager.get_file_plugin_for_extension(".png") is plugin
+-    assert manager.list_plugins()["file_plugins"] == ["image_processor"]
+-
+-
+-def test_module_help_and_demo_in_disposable_directory(tmp_path):
+-    root = Path(__file__).resolve().parents[1]
+-    help_result = subprocess.run([sys.executable, "-B", "-m", "taskmaster", "--help"],
+-                                 cwd=root, capture_output=True, text=True, timeout=20)
+-    assert help_result.returncode == 0, help_result.stderr
+-    demo = subprocess.run([sys.executable, "-B", "-m", "taskmaster.demo", "--directory", str(tmp_path)],
+-                          cwd=root, capture_output=True, text=True, timeout=20)
+-    assert demo.returncode == 0, demo.stderr
+-    assert "Full SHA-256 duplicate groups: 1" in demo.stdout
+-    assert not list(tmp_path.iterdir())
++import hashlib
++import subprocess
++import sys
++from pathlib import Path
++from unittest.mock import Mock
++
++import pytest
++
++from taskmaster.cli import TaskMasterCLI, main
++from taskmaster.models import FileRule
++from taskmaster.plugins import ImageProcessorPlugin, PluginManager
++
++
++@pytest.mark.parametrize("fast_mode", [True, False])
++def test_matching_prefix_does_not_make_duplicates(organizer, tmp_path, fast_mode):
++    source = tmp_path / "files"
++    source.mkdir()
++    (source / "a.bin").write_bytes(b"x" * 1024 + b"A")
++    (source / "b.bin").write_bytes(b"x" * 1024 + b"B")
++    assert organizer.find_duplicates(source, fast_mode=fast_mode) == {}
++    assert organizer.db.get_stats()["indexed_files"] == 0
++
++
++def test_duplicates_use_full_sha256_and_include_every_member(organizer, tmp_path):
++    source = tmp_path / "files"
++    source.mkdir()
++    paths = [source / name for name in ("a.log", "b.log", "c.log")]
++    for path in paths:
++        path.write_bytes(b"same\n")
++    assert organizer.find_duplicates(source) == {hashlib.sha256(b"same\n").hexdigest(): paths}
++
++
++@pytest.mark.parametrize("action", ["copy", "move", "rename"])
++@pytest.mark.parametrize("dry_run", [True, False])
++def test_existing_destination_is_preserved(organizer, tmp_path, action, dry_run):
++    source, target = tmp_path / "input/source.txt", tmp_path / "output/target.txt"
++    source.parent.mkdir(exist_ok=True)
++    target.parent.mkdir(parents=True, exist_ok=True)
++    source.write_text("new")
++    target.write_text("original")
++    organizer.dry_run = dry_run
++    result = organizer.organize_file(source, FileRule("collision", "*", str(target), action=action), destination_root=tmp_path / "output", confirmed=True)
++    assert result.status == "failed"
++    assert "already exists" in result.error
++    assert source.read_text() == "new"
++    assert target.read_text() == "original"
++
++
++def test_destination_created_during_copy_is_preserved(organizer, tmp_path, monkeypatch):
++    source, target = tmp_path / "input/source.txt", tmp_path / "output/target.txt"
++    source.parent.mkdir(exist_ok=True)
++    target.parent.mkdir(parents=True, exist_ok=True)
++    source.write_text("source")
++    original_open = Path.open
++
++    def raced_open(path, mode="r", *args, **kwargs):
++        if path == target and mode == "xb":
++            with original_open(target, "w") as writer:
++                writer.write("concurrent")
++        return original_open(path, mode, *args, **kwargs)
++
++    monkeypatch.setattr(Path, "open", raced_open)
++    result = organizer.organize_file(source, FileRule("race", "*", str(target), action="move"), destination_root=tmp_path / "output", confirmed=True)
++    assert result.status == "failed"
++    assert source.read_text() == "source"
++    assert target.read_text() == "concurrent"
++
++
++def test_destination_directory_is_not_treated_as_a_move_target(organizer, tmp_path):
++    source, target = tmp_path / "input/source.txt", tmp_path / "output/target"
++    source.parent.mkdir(exist_ok=True)
++    target.parent.mkdir(parents=True, exist_ok=True)
++    source.write_text("keep")
++    target.mkdir()
++    result = organizer.organize_file(source, FileRule("directory", "*", str(target)), destination_root=tmp_path / "output", confirmed=True)
++    assert result.status == "failed"
++    assert source.read_text() == "keep"
++    assert not list(target.iterdir())
++
++
++def test_interactive_duplicate_report_never_offers_deletion(organizer, tmp_path, monkeypatch):
++    source = tmp_path / "files"
++    source.mkdir()
++    for name in ("a.txt", "b.txt"):
++        (source / name).write_text("same")
++    cli = TaskMasterCLI()
++    cli.organizer = organizer
++    monkeypatch.setattr("taskmaster.cli.Prompt.ask", lambda *args, **kwargs: str(source))
++    confirm = Mock(side_effect=AssertionError("Deletion confirmation must not be requested"))
++    monkeypatch.setattr("taskmaster.cli.Confirm.ask", confirm)
++    cli.find_duplicates_interactive()
++    confirm.assert_not_called()
++    assert len(list(source.iterdir())) == 2
++
++
++@pytest.mark.parametrize("action", ["copy", "move", "rename"])
++def test_basic_file_operation(organizer, tmp_path, action):
++    source, target = tmp_path / "input/source.log", tmp_path / "output/result.log"
++    source.parent.mkdir(exist_ok=True)
++    target.parent.mkdir(parents=True, exist_ok=True)
++    source.write_bytes(b"log contents")
++    result = organizer.organize_file(source, FileRule("basic", "*", str(target), action=action), destination_root=tmp_path / "output", confirmed=True)
++    assert result.status == "success"
++    assert target.read_bytes() == b"log contents"
++    assert source.exists() == (action == "copy")
++
++
++def test_invalid_action_has_no_file_side_effects(organizer, tmp_path):
++    source = tmp_path / "input/source.txt"
++    source.parent.mkdir(exist_ok=True)
++    source.write_text("keep")
++    target = tmp_path / "output/absent/result.txt"
++    rule = FileRule("invalid", "*", str(target), action="bogus")
++    with pytest.raises(ValueError, match="Unsupported action"):
++        organizer.add_rule(rule)
++    with pytest.raises(ValueError, match="Unsupported action"):
++        organizer.organize_file(source, rule, destination_root=tmp_path / "output", confirmed=True)
++    assert source.read_text() == "keep"
++    assert not target.parent.exists()
++
++
++@pytest.mark.parametrize("kind", ["missing", "file"])
++def test_invalid_scan_source(organizer, tmp_path, kind):
++    source = tmp_path / kind
++    if kind == "file":
++        source.write_text("not a directory")
++    with pytest.raises((FileNotFoundError, NotADirectoryError), match="Source"):
++        organizer.scan_directory(source)
++
++
++def test_metadata_failure_is_reported_per_file(organizer, tmp_path, monkeypatch):
++    source = tmp_path / "input/source.txt"
++    source.parent.mkdir(exist_ok=True)
++    source.write_text("keep")
++    monkeypatch.setattr(organizer, "get_file_info", Mock(side_effect=PermissionError("denied")))
++    result = organizer.organize_file(source, FileRule("metadata", "*", "out.txt"), destination_root=tmp_path / "output", confirmed=True)
++    assert result.status == "failed"
++    assert "denied" in result.error
++    assert source.read_text() == "keep"
++
++
++def test_hash_failure_is_not_silently_ignored(organizer, tmp_path, monkeypatch):
++    source = tmp_path / "files"
++    source.mkdir()
++    (source / "one.log").write_text("log")
++    monkeypatch.setattr(organizer, "calculate_checksum", Mock(side_effect=PermissionError("denied")))
++    with pytest.raises(PermissionError, match="denied"):
++        organizer.find_duplicates(source)
++
++
++def test_task_add_dispatch_preserves_shell_text(tmp_path, monkeypatch):
++    monkeypatch.chdir(tmp_path)
++    cli = TaskMasterCLI()
++    try:
++        assert cli.run_cli(["task", "add", "--name", "probe", "--command", "echo correct",
++                            "--schedule", "2026-10-15 12:00"]) == 0
++        task = next(iter(cli.scheduler.tasks.values()))
++        with pytest.MonkeyPatch.context() as patch:
++            run = Mock(return_value=Mock(stdout="correct"))
++            patch.setattr(subprocess, "run", run)
++            assert task.command() == "correct"
++            run.assert_called_once_with("echo correct", shell=True, capture_output=True, text=True, check=True)
++    finally:
++        cli.close()
++
++
++def test_cli_errors_and_deletion_guard_preserve_files(tmp_path, monkeypatch, capsys):
++    monkeypatch.chdir(tmp_path)
++    for command in ("organize", "duplicates"):
++        option = "--source" if command == "organize" else "--dir"
++        assert main([command, option, "missing"] + (["--destination", "output"] if command == "organize" else [])) == 1
++        assert "Source directory does not exist" in capsys.readouterr().out
++    source = tmp_path / "files"
++    source.mkdir()
++    for name in ("a.log", "b.log"):
++        (source / name).write_text("same")
++    with pytest.raises(SystemExit) as error:
++        main(["duplicates", "--dir", str(source), "--delete"])
++    assert error.value.code == 2
++    assert len(list(source.iterdir())) == 2
++
++
++def test_cli_collision_returns_failure(tmp_path, monkeypatch, capsys):
++    monkeypatch.chdir(tmp_path)
++    source = tmp_path / "files"
++    source.mkdir()
++    (source / "one.txt").write_text("source")
++    target = tmp_path / "organized/documents/one.txt"
++    target.parent.mkdir(parents=True)
++    target.write_text("existing")
++    assert main(["organize", "--source", str(source), "--destination", "organized", "--apply", "--yes"]) == 1
++    assert "Destination already exists" in capsys.readouterr().out
++    assert target.read_text() == "existing"
++    assert (source / "one.txt").read_text() == "source"
++
++
++def test_cli_preview_preserves_source(tmp_path, monkeypatch, capsys):
++    monkeypatch.chdir(tmp_path)
++    source = tmp_path / "files"
++    source.mkdir()
++    (source / "one.log").write_text("source")
++    assert main(["organize", "--source", str(source), "--destination", "organized", "--dry-run"]) == 0
++    assert (source / "one.log").read_text() == "source"
++    assert not (tmp_path / "organized").exists()
++    assert "Previewed 1 files" in capsys.readouterr().out
++
++
++@pytest.mark.parametrize("args", [["--help"], ["organize", "--source", ".", "--strategy", "size"],
++    ["task"], ["task", "add", "--name", "x", "--command", "echo x", "--schedule", "bad"]])
++def test_parse_only_paths_do_not_create_database(tmp_path, monkeypatch, args):
++    monkeypatch.chdir(tmp_path)
++    with pytest.raises(SystemExit) as error:
++        main(args)
++    assert error.value.code == (0 if args == ["--help"] else 2)
++    assert not (tmp_path / "taskmaster.db").exists()
++
++
++def test_plugin_import_and_explicit_registration(tmp_path):
++    manager = PluginManager(tmp_path)
++    plugin = ImageProcessorPlugin()
++    manager.register_file_plugin(plugin)
++    assert manager.get_file_plugin_for_extension(".png") is plugin
++    assert manager.list_plugins()["file_plugins"] == ["image_processor"]
++
++
++def test_module_help_and_demo_in_disposable_directory(tmp_path):
++    root = Path(__file__).resolve().parents[1]
++    help_result = subprocess.run([sys.executable, "-B", "-m", "taskmaster", "--help"],
++                                 cwd=root, capture_output=True, text=True, timeout=20)
++    assert help_result.returncode == 0, help_result.stderr
++    demo = subprocess.run([sys.executable, "-B", "-m", "taskmaster.demo", "--directory", str(tmp_path)],
++                          cwd=root, capture_output=True, text=True, timeout=20)
++    assert demo.returncode == 0, demo.stderr
++    assert "Full SHA-256 duplicate groups: 1" in demo.stdout
++    assert not list(tmp_path.iterdir())
+--- phase1/tests/test_planning_execution.py
++++ phase2/tests/test_planning_execution.py
+@@ -0,0 +1,548 @@
++from dataclasses import FrozenInstanceError, replace
++import hashlib
++import os
++from pathlib import Path
++import sqlite3
++import subprocess
++from unittest.mock import Mock
++from types import SimpleNamespace
++
++import pytest
++
++from taskmaster.cli import main
++from taskmaster.database import Database
++from taskmaster.errors import ConfirmationRequired, PlanValidationError
++from taskmaster.execution import execute_plan
++from taskmaster.models import FileRule
++from taskmaster.organizer import FileOrganizer
++
++
++@pytest.fixture
++def workspace(tmp_path):
++    source, destination = tmp_path / "input", tmp_path / "output"
++    source.mkdir()
++    (source / "first.log").write_bytes(b"first log\n")
++    organizer = FileOrganizer()
++    organizer.add_rule(FileRule("logs", "*.log", "{filename}", action="copy"))
++    try:
++        yield organizer, source, destination
++    finally:
++        organizer.close()
++
++
++def contents(root):
++    return {str(path.relative_to(root)): path.read_bytes() for path in root.rglob("*") if path.is_file()}
++
++
++def test_plan_and_preview_are_read_only_and_immutable(workspace, tmp_path):
++    organizer, source, destination = workspace
++    before = contents(tmp_path)
++    plan = organizer.plan_directory(source, destination)
++    assert plan.source_root == source
++    assert plan.destination_root == destination
++    operation = plan.operations[0]
++    assert operation.source_state.sha256 == hashlib.sha256(b"first log\n").hexdigest()
++    assert operation.destination == destination / "first.log"
++    with pytest.raises(FrozenInstanceError):
++        operation.action = "delete"
++    results = organizer.preview(plan)
++    assert results[0].status == "dry_run"
++    assert results[0].history_status == "not_requested"
++    assert contents(tmp_path) == before
++    assert not destination.exists()
++
++
++def test_preview_and_duplicate_report_leave_existing_database_unchanged(workspace, tmp_path):
++    _, source, destination = workspace
++    db = Database(str(tmp_path / "history.sqlite"))
++    organizer = FileOrganizer(db)
++    organizer.add_rule(FileRule("logs", "*", "{filename}", action="copy"))
++    (source / "second.log").write_bytes(b"first log\n")
++    before = contents(tmp_path)
++    try:
++        organizer.preview(organizer.plan_directory(source, destination))
++        assert len(organizer.find_duplicates(source)) == 1
++        assert contents(tmp_path) == before
++        assert db.get_stats()["file_operations"] == 0
++        assert db.get_stats()["indexed_files"] == 0
++        organizer.find_duplicates(source, record_index=True)
++        assert db.get_stats()["indexed_files"] == 2
++    finally:
++        organizer.close()
++
++
++@pytest.mark.parametrize("action", ["move", "rename", "delete"])
++def test_destructive_actions_require_confirmation_before_any_mutation(workspace, tmp_path, action):
++    organizer, source, destination = workspace
++    organizer.rules = [FileRule("logs", "*", "{filename}", action=action)]
++    recorder = Mock()
++    plan = organizer.plan_directory(source, destination)
++    before = contents(tmp_path)
++    with pytest.raises(ConfirmationRequired):
++        execute_plan(plan, history_recorder=recorder)
++    assert contents(tmp_path) == before
++    assert not destination.exists()
++    recorder.assert_not_called()
++    result = execute_plan(plan, confirmed=True)[0]
++    assert result.status == "success"
++    assert result.source_removed
++    assert not (source / "first.log").exists()
++    assert result.filesystem_status == {"move": "moved", "rename": "renamed", "delete": "deleted"}[action]
++    assert result.destination_created == (action != "delete")
++
++
++def test_mixed_copy_and_move_confirmation_is_batch_wide(workspace):
++    organizer, source, destination = workspace
++    (source / "other.txt").write_text("other")
++    organizer.rules.append(FileRule("other", "*.txt", "{filename}", action="move"))
++    plan = organizer.plan_directory(source, destination)
++    with pytest.raises(ConfirmationRequired):
++        organizer.apply(plan)
++    assert not destination.exists()
++    assert len(list(source.iterdir())) == 2
++
++
++@pytest.mark.parametrize("template", ["{unknown}", "{name.upper}", "{name[0]}", "{name!r}",
++    "{name:>20}", "{", ""])
++def test_invalid_templates_fail_before_planning(workspace, template):
++    organizer, source, destination = workspace
++    organizer.rules = [FileRule("bad", "*", template)]
++    with pytest.raises(PlanValidationError, match="template|placeholder"):
++        organizer.plan_directory(source, destination)
++    assert not destination.exists()
++
++
++@pytest.mark.parametrize("template", ["../escape.log", "sub/../../escape.log", r"sub\..\escape.log",
++    "C:escape.log", "NUL.txt", "stream:secret", "trailing."])
++def test_destination_traversal_and_nonportable_components_are_rejected(workspace, template):
++    organizer, source, destination = workspace
++    organizer.rules = [FileRule("bad", "*", template, action="copy")]
++    result = organizer.preview(organizer.plan_directory(source, destination))[0]
++    assert result.status == "failed"
++    assert not destination.exists()
++
++
++def test_absolute_destination_outside_root_is_rejected(workspace, tmp_path):
++    organizer, source, destination = workspace
++    organizer.rules = [FileRule("escape", "*", str(tmp_path / "escape.log"), action="copy")]
++    result = organizer.apply(organizer.plan_directory(source, destination))[0]
++    assert result.status == "failed"
++    assert "outside" in result.error
++    assert not (tmp_path / "escape.log").exists()
++
++
++@pytest.mark.parametrize("relationship", ["equal", "inside_source", "source_inside_destination"])
++def test_overlapping_roots_are_rejected(workspace, tmp_path, relationship):
++    organizer, source, destination = workspace
++    root = {"equal": source, "inside_source": source / "output", "source_inside_destination": tmp_path}[relationship]
++    with pytest.raises(PlanValidationError, match="overlap"):
++        organizer.plan_directory(source, root)
++
++
++def test_two_files_cannot_share_one_planned_destination(workspace):
++    organizer, source, destination = workspace
++    (source / "second.log").write_text("second")
++    organizer.rules = [FileRule("collision", "*", "same.log", action="copy")]
++    plan = organizer.plan_directory(source, destination)
++    results = organizer.apply(plan)
++    assert [r.status for r in results] == ["failed", "failed"]
++    assert all("Multiple operations" in r.error for r in results)
++    assert not destination.exists()
++
++
++def test_same_size_content_change_with_restored_mtime_is_detected(workspace):
++    organizer, source, destination = workspace
++    plan = organizer.plan_directory(source, destination)
++    path = source / "first.log"
++    before = path.stat()
++    path.write_bytes(b"other log\n")
++    os.utime(path, ns=(before.st_atime_ns, before.st_mtime_ns))
++    result = organizer.apply(plan)[0]
++    assert result.status == "failed"
++    assert "changed since planning" in result.error
++    assert not destination.exists()
++    assert path.read_bytes() == b"other log\n"
++
++
++def test_missing_source_does_not_hide_success_of_other_items(workspace):
++    organizer, source, destination = workspace
++    (source / "second.log").write_text("second")
++    plan = organizer.plan_directory(source, destination)
++    (source / "first.log").unlink()
++    results = organizer.apply(plan)
++    assert [r.status for r in results] == ["failed", "success"]
++    assert results[0].filesystem_status == "unchanged"
++    assert results[1].filesystem_status == "copied"
++    assert (destination / "second.log").read_text() == "second"
++    assert organizer.generate_report(results)["failed"] == 1
++
++
++@pytest.mark.parametrize("policy,status", [("error", "failed"), ("skip", "skipped")])
++def test_destination_appearing_after_plan_obeys_conflict_policy(workspace, policy, status):
++    organizer, source, destination = workspace
++    plan = organizer.plan_directory(source, destination, conflict_policy=policy)
++    destination.mkdir()
++    (destination / "first.log").write_text("existing")
++    result = organizer.apply(plan)[0]
++    assert result.status == status
++    assert result.filesystem_status == "unchanged"
++    assert (destination / "first.log").read_text() == "existing"
++    assert (source / "first.log").exists()
++
++
++def test_existing_destination_skip_is_visible_in_plan(workspace):
++    organizer, source, destination = workspace
++    destination.mkdir()
++    (destination / "first.log").write_text("existing")
++    plan = organizer.plan_directory(source, destination, conflict_policy="skip")
++    assert plan.operations[0].skipped_reason
++    assert organizer.preview(plan)[0].status == "skipped"
++    assert organizer.apply(plan)[0].status == "skipped"
++
++
++def test_condition_skip_and_new_files_do_not_change_a_captured_plan(workspace):
++    organizer, source, destination = workspace
++    organizer.rules = [FileRule("condition", "*", "{filename}", condition=lambda _: False)]
++    plan = organizer.plan_directory(source, destination)
++    (source / "new.log").write_text("new")
++    assert not plan.requires_confirmation
++    results = organizer.apply(plan)
++    assert len(results) == 1 and results[0].status == "skipped"
++    assert not destination.exists()
++    assert len(list(source.iterdir())) == 2
++
++
++def test_history_failure_does_not_erase_successful_file_change(workspace):
++    organizer, source, destination = workspace
++    plan = organizer.plan_directory(source, destination)
++    recorder = Mock(side_effect=sqlite3.OperationalError("history disk full"))
++    result = execute_plan(plan, history_recorder=recorder)[0]
++    assert result.status == "completed_with_errors"
++    assert result.filesystem_status == "copied"
++    assert result.destination_created and not result.source_removed
++    assert result.error is None
++    assert result.history_status == "failed" and result.history_error == "history disk full"
++    assert (destination / "first.log").read_bytes() == b"first log\n"
++    report = organizer.generate_report([result])
++    assert report["successful"] == 1 and report["history_failed"] == 1
++
++
++def test_file_failure_and_history_failure_are_both_retained(workspace):
++    organizer, source, destination = workspace
++    plan = organizer.plan_directory(source, destination)
++    (source / "first.log").unlink()
++    result = execute_plan(plan, history_recorder=Mock(side_effect=OSError("history denied")))[0]
++    assert result.status == "failed" and result.error
++    assert result.history_error == "history denied"
++    assert result.filesystem_status == "unchanged"
++
++
++def test_unlink_failure_reports_completed_copy_and_preserved_source(workspace, monkeypatch):
++    organizer, source, destination = workspace
++    organizer.rules[0].action = "move"
++    plan = organizer.plan_directory(source, destination)
++    real_unlink = Path.unlink
++
++    def denied_unlink(path, *args, **kwargs):
++        if path == source / "first.log":
++            raise PermissionError("source unlink denied")
++        return real_unlink(path, *args, **kwargs)
++
++    monkeypatch.setattr(Path, "unlink", denied_unlink)
++    result = organizer.apply(plan, confirmed=True)[0]
++    assert result.status == "failed"
++    assert result.filesystem_status == "copied"
++    assert result.destination_created and not result.source_removed
++    assert "unlink denied" in result.error
++    assert (source / "first.log").exists() and (destination / "first.log").exists()
++
++
++def test_partial_write_failure_preserves_source_and_reports_new_file(workspace, monkeypatch):
++    organizer, source, destination = workspace
++    plan = organizer.plan_directory(source, destination)
++    real_open = Path.open
++
++    class BrokenWriter:
++        def __init__(self, file):
++            self.file = file
++        def __enter__(self):
++            return self
++        def __exit__(self, *args):
++            self.file.close()
++        def write(self, data):
++            self.file.write(data[:3])
++            raise OSError("simulated write failure")
++
++    def broken_open(path, mode="r", *args, **kwargs):
++        file = real_open(path, mode, *args, **kwargs)
++        return BrokenWriter(file) if path == destination / "first.log" and mode == "xb" else file
++
++    monkeypatch.setattr(Path, "open", broken_open)
++    result = organizer.apply(plan)[0]
++    assert result.status == "failed" and "write failure" in result.error
++    assert result.filesystem_status == "partial" and result.destination_created
++    assert result.checksum is None
++    assert not result.source_removed
++    assert (destination / "first.log").read_bytes() == b"fir"
++    assert (source / "first.log").read_bytes() == b"first log\n"
++
++
++def test_forged_source_escape_is_rejected_at_execution(workspace, tmp_path):
++    organizer, source, destination = workspace
++    plan = organizer.plan_directory(source, destination)
++    outside = tmp_path / "outside.log"
++    outside.write_text("keep")
++    forged = replace(plan.operations[0], source=source / ".." / "outside.log")
++    result = organizer.apply(replace(plan, operations=(forged,)))[0]
++    assert result.status == "failed" and "outside" in result.error
++    assert outside.read_text() == "keep"
++    assert not destination.exists()
++
++
++def test_cli_preview_and_duplicate_report_create_no_database(tmp_path, monkeypatch):
++    monkeypatch.chdir(tmp_path)
++    source = tmp_path / "input"
++    source.mkdir()
++    (source / "a.log").write_text("same")
++    (source / "b.log").write_text("same")
++    before = contents(tmp_path)
++    assert main(["organize", "--source", "input", "--destination", "output"]) == 0
++    assert main(["duplicates", "--dir", "input"]) == 0
++    assert contents(tmp_path) == before
++    assert not (tmp_path / "taskmaster.db").exists()
++    assert not (tmp_path / "output").exists()
++
++
++def test_cli_noninteractive_move_requires_explicit_approval(workspace, tmp_path, monkeypatch, capsys):
++    _, source, destination = workspace
++    monkeypatch.chdir(tmp_path)
++    monkeypatch.setattr("sys.stdin.isatty", lambda: False)
++    assert main(["organize", "--source", str(source), "--destination", str(destination), "--apply"]) == 1
++    assert "Confirmation required" in capsys.readouterr().out
++    assert not destination.exists() and not (tmp_path / "taskmaster.db").exists()
++
++
++def test_cli_reuses_displayed_plan_after_confirmation(workspace, tmp_path, monkeypatch, capsys):
++    _, source, destination = workspace
++    monkeypatch.chdir(tmp_path)
++    monkeypatch.setattr("sys.stdin.isatty", lambda: True)
++
++    def approve(*args, **kwargs):
++        (source / "first.log").write_text("changed after preview")
++        return True
++
++    monkeypatch.setattr("taskmaster.cli.Confirm.ask", approve)
++    assert main(["organize", "--source", str(source), "--destination", str(destination), "--apply"]) == 1
++    assert "changed since planning" in " ".join(capsys.readouterr().out.split())
++    assert not destination.exists()
++
++
++def test_cli_history_failure_returns_nonzero_with_file_success(workspace, tmp_path, monkeypatch, capsys):
++    _, source, destination = workspace
++    monkeypatch.chdir(tmp_path)
++    monkeypatch.setattr(Database, "log_file_operation", Mock(side_effect=sqlite3.OperationalError("history full")))
++    assert main(["organize", "--source", str(source), "--destination", str(destination),
++                 "--action", "copy", "--apply"]) == 1
++    output = capsys.readouterr().out
++    assert "completed_with_errors" in output and "history full" in output
++    assert (destination / "misc/first.log").exists()
++
++
++def test_existing_phase1_database_is_upgraded_without_losing_history(tmp_path):
++    path = tmp_path / "old.sqlite"
++    with sqlite3.connect(path) as connection:
++        connection.execute("CREATE TABLE file_operations (id TEXT PRIMARY KEY, source TEXT NOT NULL, "
++            "destination TEXT, operation TEXT NOT NULL, status TEXT, timestamp TEXT, size_bytes INTEGER, "
++            "checksum TEXT, error TEXT)")
++        connection.execute("INSERT INTO file_operations (id,source,operation,status) VALUES ('old','x','copy','success')")
++    db = Database(str(path))
++    old = db.get_file_operations()[0]
++    assert old["id"] == "old" and old["filesystem_status"] == "unknown"
++    # Initialization is idempotent, including additive columns.
++    Database(str(path))
++    assert db.get_stats()["file_operations"] == 1
++
++
++def test_new_history_records_filesystem_outcome(workspace, tmp_path):
++    organizer, source, destination = workspace
++    db = Database(str(tmp_path / "history.sqlite"))
++    plan = organizer.plan_directory(source, destination)
++    result = execute_plan(plan, history_recorder=db.log_file_operation)[0]
++    record = db.get_file_operations()[0]
++    assert result.history_status == record["history_status"] == "recorded"
++    assert record["filesystem_status"] == "copied"
++    assert record["destination_created"] == 1 and record["source_removed"] == 0
++
++
++def make_directory_link(link, target):
++    if os.name == "nt":
++        result = subprocess.run(["cmd", "/c", "mklink", "/J", str(link), str(target)],
++                                capture_output=True, text=True, timeout=10)
++        if result.returncode:
++            pytest.skip(f"Junction creation unavailable: {result.stderr}")
++    else:
++        link.symlink_to(target, target_is_directory=True)
++
++
++def remove_directory_link(link):
++    if os.name == "nt":
++        os.rmdir(link)  # Removes only the junction entry, never recurses into target.
++    else:
++        link.unlink()
++
++
++def test_source_directory_link_is_rejected(workspace, tmp_path):
++    organizer, source, destination = workspace
++    outside = tmp_path / "outside"
++    outside.mkdir()
++    (outside / "keep.log").write_text("keep")
++    link = source / "linked"
++    make_directory_link(link, outside)
++    try:
++        with pytest.raises(PlanValidationError, match="junctions"):
++            organizer.plan_directory(source, destination)
++        assert (outside / "keep.log").read_text() == "keep"
++    finally:
++        remove_directory_link(link)
++
++
++def test_destination_parent_link_introduced_after_plan_is_rejected(workspace, tmp_path):
++    organizer, source, destination = workspace
++    organizer.rules[0].destination_template = "nested/{filename}"
++    plan = organizer.plan_directory(source, destination)
++    outside = tmp_path / "outside"
++    outside.mkdir()
++    destination.mkdir()
++    link = destination / "nested"
++    make_directory_link(link, outside)
++    try:
++        result = organizer.apply(plan)[0]
++        assert result.status == "failed" and "junctions" in result.error
++        assert not list(outside.iterdir())
++        assert (source / "first.log").exists()
++    finally:
++        remove_directory_link(link)
++
++
++def test_file_symlink_is_rejected_when_platform_allows_it(workspace):
++    organizer, source, destination = workspace
++    link = source / "linked.log"
++    try:
++        link.symlink_to(source / "first.log")
++    except OSError as error:
++        pytest.skip(f"File symlink creation unavailable: {error}")
++    try:
++        with pytest.raises(PlanValidationError, match="Symlinks"):
++            organizer.plan_directory(source, destination)
++    finally:
++        link.unlink()
++
++
++def test_unplanned_cleanup_cannot_bypass_preview(workspace):
++    organizer, source, _ = workspace
++    empty = source / "empty"
++    empty.mkdir()
++    organizer.dry_run = True
++    with pytest.raises(PlanValidationError, match="Unplanned"):
++        organizer.clean_empty_directories(source)
++    assert empty.exists()
++
++
++def test_source_reparse_point_introduced_after_plan_is_rejected(workspace, monkeypatch):
++    organizer, source, destination = workspace
++    plan = organizer.plan_directory(source, destination)
++    real_lstat = Path.lstat
++
++    def reparse_lstat(path, *args, **kwargs):
++        info = real_lstat(path, *args, **kwargs)
++        if path == source / "first.log":
++            return SimpleNamespace(st_mode=info.st_mode, st_file_attributes=0x400)
++        return info
++
++    monkeypatch.setattr(Path, "lstat", reparse_lstat)
++    result = organizer.apply(plan)[0]
++    assert result.status == "failed" and "reparse points" in result.error
++    assert not destination.exists()
++
++
++def test_apply_read_denial_is_reported_without_destination(workspace, monkeypatch):
++    organizer, source, destination = workspace
++    plan = organizer.plan_directory(source, destination)
++    real_open = Path.open
++
++    def denied_open(path, mode="r", *args, **kwargs):
++        if path == source / "first.log" and mode == "rb":
++            raise PermissionError("source read denied")
++        return real_open(path, mode, *args, **kwargs)
++
++    monkeypatch.setattr(Path, "open", denied_open)
++    result = organizer.apply(plan)[0]
++    assert result.status == "failed" and "source read denied" in result.error
++    assert not result.destination_created and not destination.exists()
++
++
++def test_source_mutation_during_copy_prevents_source_removal(workspace, monkeypatch):
++    organizer, source, destination = workspace
++    organizer.rules[0].action = "move"
++    plan = organizer.plan_directory(source, destination)
++    real_open = Path.open
++
++    class MutatingWriter:
++        def __init__(self, writer):
++            self.writer = writer
++        def __enter__(self):
++            return self
++        def __exit__(self, *args):
++            self.writer.close()
++        def write(self, data):
++            result = self.writer.write(data)
++            (source / "first.log").write_bytes(b"changed after read")
++            return result
++
++    def mutating_open(path, mode="r", *args, **kwargs):
++        file = real_open(path, mode, *args, **kwargs)
++        return MutatingWriter(file) if path == destination / "first.log" and mode == "xb" else file
++
++    monkeypatch.setattr(Path, "open", mutating_open)
++    result = organizer.apply(plan, confirmed=True)[0]
++    assert result.status == "failed" and "changed" in result.error
++    assert result.destination_created and not result.source_removed
++    assert (source / "first.log").read_bytes() == b"changed after read"
++
++
++def test_interactive_decline_leaves_files_and_history_unchanged(workspace, tmp_path, monkeypatch):
++    _, source, destination = workspace
++    monkeypatch.chdir(tmp_path)
++    monkeypatch.setattr("sys.stdin.isatty", lambda: True)
++    monkeypatch.setattr("taskmaster.cli.Confirm.ask", lambda *args, **kwargs: False)
++    before = contents(tmp_path)
++    assert main(["organize", "--source", str(source), "--destination", str(destination), "--apply"]) == 0
++    assert contents(tmp_path) == before
++    assert not destination.exists()
++
++
++def test_invalid_conflict_policy_is_actionable(workspace):
++    organizer, source, destination = workspace
++    with pytest.raises(PlanValidationError, match="conflict policy"):
++        organizer.plan_directory(source, destination, conflict_policy="overwrite")
++
++
++def test_confirmation_cannot_be_a_truthy_string(workspace):
++    organizer, source, destination = workspace
++    organizer.rules[0].action = "move"
++    plan = organizer.plan_directory(source, destination)
++    with pytest.raises(PlanValidationError, match="boolean"):
++        organizer.apply(plan, confirmed="false")
++    assert not destination.exists()
++
++
++def test_history_file_cannot_be_selected_for_organization(workspace):
++    _, source, destination = workspace
++    db = Database(str(source / "history.sqlite"))
++    organizer = FileOrganizer(db)
++    try:
++        with pytest.raises(PlanValidationError, match="History database must be outside"):
++            organizer.plan_directory(source, destination)
++        assert db.get_stats()["file_operations"] == 0
++    finally:
++        organizer.close()

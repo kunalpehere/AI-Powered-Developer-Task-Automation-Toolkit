@@ -1,0 +1,275 @@
+{
+  "base_dir": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase4-outside\\verified-kto_7v45\\examples\\workflows",
+  "command": "workflow",
+  "complete": true,
+  "config_path": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase4-outside\\verified-kto_7v45\\examples\\workflows\\review-artifacts.json",
+  "diagnostics": [],
+  "finished_at": "2026-10-15T12:53:34.351830+00:00",
+  "history": {
+    "errors": [],
+    "status": "recorded"
+  },
+  "mode": "apply",
+  "on_failure": "stop",
+  "run_id": "50ff3bef-ad86-4a79-ac89-5ba5cb7ba001",
+  "schema_version": 1,
+  "started_at": "2026-10-15T12:53:32.691776+00:00",
+  "status": "success",
+  "steps": [
+    {
+      "diagnostics": [],
+      "finished_at": "2026-10-15T12:53:32.842767+00:00",
+      "id": "inspect",
+      "operation": "inspect",
+      "report": {
+        "command": "inspect",
+        "complete": true,
+        "errors": [],
+        "extensions": [
+          {
+            "extension": ".csv",
+            "file_count": 1,
+            "size_bytes": 29
+          },
+          {
+            "extension": ".log",
+            "file_count": 2,
+            "size_bytes": 50
+          },
+          {
+            "extension": ".py",
+            "file_count": 1,
+            "size_bytes": 107
+          }
+        ],
+        "largest_files": [
+          {
+            "path": "src/app.py",
+            "size_bytes": 107
+          },
+          {
+            "path": "reports/summary.csv",
+            "size_bytes": 29
+          },
+          {
+            "path": "logs/app.log",
+            "size_bytes": 25
+          },
+          {
+            "path": "logs/archive/app.log",
+            "size_bytes": 25
+          }
+        ],
+        "root": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase4-outside\\verified-kto_7v45\\examples\\fixtures\\workspace",
+        "schema_version": 1,
+        "scope": {
+          "exclusions": [
+            ".git",
+            ".venv*",
+            "venv",
+            "__pycache__",
+            "node_modules",
+            ".pytest_cache",
+            ".mypy_cache",
+            ".ruff_cache",
+            ".tox",
+            ".nox"
+          ],
+          "includes": []
+        },
+        "summary": {
+          "directories_visited": 5,
+          "error_count": 0,
+          "excluded_entries": 0,
+          "file_count": 4,
+          "size_bytes": 186
+        }
+      },
+      "started_at": "2026-10-15T12:53:32.740767+00:00",
+      "status": "success"
+    },
+    {
+      "diagnostics": [],
+      "finished_at": "2026-10-15T12:53:32.987467+00:00",
+      "id": "duplicates",
+      "operation": "duplicates",
+      "report": {
+        "algorithm": "sha256",
+        "command": "duplicates",
+        "complete": true,
+        "errors": [],
+        "groups": [
+          {
+            "paths": [
+              "logs/app.log",
+              "logs/archive/app.log"
+            ],
+            "sha256": "51feb86a4458b449c9e2e21f1494e2bfb4265ce99dd5c2fd11abccc198ff046c",
+            "size_bytes": 25
+          }
+        ],
+        "root": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase4-outside\\verified-kto_7v45\\examples\\fixtures\\workspace",
+        "schema_version": 1,
+        "scope": {
+          "exclusions": [
+            ".git",
+            ".venv*",
+            "venv",
+            "__pycache__",
+            "node_modules",
+            ".pytest_cache",
+            ".mypy_cache",
+            ".ruff_cache",
+            ".tox",
+            ".nox"
+          ],
+          "includes": [
+            "*.log"
+          ]
+        },
+        "summary": {
+          "candidate_files": 2,
+          "duplicate_groups": 1,
+          "error_count": 0,
+          "excluded_entries": 0,
+          "file_count": 2,
+          "hashed_files": 2,
+          "redundant_bytes": 25
+        }
+      },
+      "started_at": "2026-10-15T12:53:32.860769+00:00",
+      "status": "success"
+    },
+    {
+      "diagnostics": [],
+      "finished_at": "2026-10-15T12:53:34.333260+00:00",
+      "id": "copy_artifacts",
+      "operation": "organize",
+      "report": {
+        "command": "organize",
+        "complete": true,
+        "destination_root": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase4-outside\\verified-kto_7v45\\examples\\fixtures\\organized",
+        "mode": "apply",
+        "operations": [
+          {
+            "action": "copy",
+            "checksum": "51feb86a4458b449c9e2e21f1494e2bfb4265ce99dd5c2fd11abccc198ff046c",
+            "conflict_policy": "skip",
+            "destination": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase4-outside\\verified-kto_7v45\\examples\\fixtures\\organized\\misc\\logs\\app.log",
+            "destination_created": true,
+            "error": null,
+            "filesystem_status": "copied",
+            "history_error": null,
+            "history_status": "recorded",
+            "skipped_reason": null,
+            "source": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase4-outside\\verified-kto_7v45\\examples\\fixtures\\workspace\\logs\\app.log",
+            "source_removed": false,
+            "source_state": {
+              "changed_ns": 1792068790426384000,
+              "device": 11446573977672496805,
+              "inode": 3377699722805315,
+              "modified_ns": 1792067891335809500,
+              "sha256": "51feb86a4458b449c9e2e21f1494e2bfb4265ce99dd5c2fd11abccc198ff046c",
+              "size": 25
+            },
+            "status": "success",
+            "validation_error": null
+          },
+          {
+            "action": "copy",
+            "checksum": "51feb86a4458b449c9e2e21f1494e2bfb4265ce99dd5c2fd11abccc198ff046c",
+            "conflict_policy": "skip",
+            "destination": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase4-outside\\verified-kto_7v45\\examples\\fixtures\\organized\\misc\\logs\\archive\\app.log",
+            "destination_created": true,
+            "error": null,
+            "filesystem_status": "copied",
+            "history_error": null,
+            "history_status": "recorded",
+            "skipped_reason": null,
+            "source": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase4-outside\\verified-kto_7v45\\examples\\fixtures\\workspace\\logs\\archive\\app.log",
+            "source_removed": false,
+            "source_state": {
+              "changed_ns": 1792068790435546500,
+              "device": 11446573977672496805,
+              "inode": 3096224746094661,
+              "modified_ns": 1792067893829667100,
+              "sha256": "51feb86a4458b449c9e2e21f1494e2bfb4265ce99dd5c2fd11abccc198ff046c",
+              "size": 25
+            },
+            "status": "success",
+            "validation_error": null
+          },
+          {
+            "action": "copy",
+            "checksum": "cc7a868245a55869117009b7f26a9b1566a56ad157d49afb3f40014a4ae4273c",
+            "conflict_policy": "skip",
+            "destination": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase4-outside\\verified-kto_7v45\\examples\\fixtures\\organized\\data\\reports\\summary.csv",
+            "destination_created": true,
+            "error": null,
+            "filesystem_status": "copied",
+            "history_error": null,
+            "history_status": "recorded",
+            "skipped_reason": null,
+            "source": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase4-outside\\verified-kto_7v45\\examples\\fixtures\\workspace\\reports\\summary.csv",
+            "source_removed": false,
+            "source_state": {
+              "changed_ns": 1792068790448554300,
+              "device": 11446573977672496805,
+              "inode": 3377699722805319,
+              "modified_ns": 1792067896279631000,
+              "sha256": "cc7a868245a55869117009b7f26a9b1566a56ad157d49afb3f40014a4ae4273c",
+              "size": 29
+            },
+            "status": "success",
+            "validation_error": null
+          }
+        ],
+        "schema_version": 1,
+        "scope": {
+          "all_files": false,
+          "exclusions": [
+            ".git",
+            ".venv*",
+            "venv",
+            "__pycache__",
+            "node_modules",
+            ".pytest_cache",
+            ".mypy_cache",
+            ".ruff_cache",
+            ".tox",
+            ".nox"
+          ],
+          "includes": [
+            "logs/**/*.log",
+            "reports/*.csv"
+          ]
+        },
+        "source_root": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase4-outside\\verified-kto_7v45\\examples\\fixtures\\workspace",
+        "summary": {
+          "dry_run": 0,
+          "failed": 0,
+          "filesystem_changed": 3,
+          "history_failed": 0,
+          "skipped": 0,
+          "successful": 3,
+          "total_files": 3,
+          "total_size_mb": 0.0
+        }
+      },
+      "started_at": "2026-10-15T12:53:33.002467+00:00",
+      "status": "success"
+    }
+  ],
+  "summary": {
+    "failed_steps": 0,
+    "history_failures": 0,
+    "not_run_steps": 0,
+    "running_steps": 0,
+    "successful_steps": 3
+  },
+  "workflow": {
+    "config_sha256": "2f9929f8a061d55954ae3a649673cf43f2de7f605c295b001c7926081f220db4",
+    "name": "Review and copy development artifacts",
+    "version": 1
+  }
+}

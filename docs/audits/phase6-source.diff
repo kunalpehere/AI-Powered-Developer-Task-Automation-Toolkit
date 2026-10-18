@@ -1,0 +1,2184 @@
+--- before/.gitignore
++++ after/.gitignore
+@@ -8,6 +8,8 @@
+ dist/
+ taskmaster.db
+ .test-tmp/
++.test-phase6/
++*.scheduler.lock
+ .test-links/
+ .venv-phase2/
+ .venv-phase3/
+--- before/ATTRIBUTION.md
++++ after/ATTRIBUTION.md
+@@ -11,11 +11,11 @@
+ archive must remain available as provenance evidence until a verified upstream
+ history and notices can be established. No Git history was created in this phase.
+ 
+-| Component | Origin and treatment through Phase 5 |
++| Component | Origin and treatment through Phase 6 |
+ | --- | --- |
+ | Models | Inherited task/rule types retained; Phase 2 adds immutable plan/source-state records and independent filesystem/history outcome fields; Phase 4 adds run/step links and full UUID file-operation IDs |
+ | Database | Inherited persistence retained; Phase 2 adds backward-compatible file-outcome columns; Phase 4 adds transactional versioned initialization, runs/steps, file associations and read-only run queries; scheduling defects remain |
+-| Scheduler | Inherited; Phase 4 removes import-time root logging configuration only; known scheduling defects remain |
++| Scheduler | Inherited prototype preserved in references; replaced in Phase 6 by single-owner durable named scheduling, atomic claims, retry/dependency state and explicit crash recovery |
+ | Organizer | Adapted: source/action validation, scoped plan/preview/apply adapters, read-only size-first duplicate reporting, conflict preservation; implicit unmatched-file movement removed |
+ | Planning, execution, errors | Newly added in Phase 2 for root/template/state validation, confirmation, execution, and partial-failure reporting |
+ | Scanning, inspection, duplicates, reporting | Newly added in Phase 3 for explicit selections/exclusions, project summaries, sequential full hashing of size candidates, readable/JSON output |
+@@ -27,13 +27,17 @@
+ | Regression tests and phase records | Newly added for this implementation |
+ | Workflow example and fixtures | Newly added in Phase 4 to demonstrate inspection, duplicate reporting and copying disposable log/CSV artifacts |
+ | CI, dependency baselines, release verification and design guides | Newly added in Phase 5; application changes are limited to unused-import removal identified by Ruff |
++| Schedule model, process containment and worker | Newly added in Phase 6 for validated serializable task snapshots, UTC recurrence, Windows Job Objects/POSIX process groups and isolated execution |
++| Schedule/attempt tables and CLI controls | Newly added in Phase 6 with schema-2 additive migration; legacy callable-only rows remain preserved and nonexecutable |
+ 
+ The pre-Phase-2 state is separately preserved in
+ `docs/audits/phase2-reference.zip`; the pre-Phase-3 source/tests/root docs are in
+ `docs/audits/phase3-reference.zip`; the pre-Phase-4 snapshot is in
+ `docs/audits/phase4-reference.zip`; the pre-Phase-5 code/tests/examples/root docs
+ are in `docs/audits/phase5-reference.zip`. Earlier reports describe their historical
+-snapshots; current behavior is documented in the root README and Phase 5 record.
++snapshots; current behavior is documented in the root README and Phase 6 record.
++The pre-Phase-6 source/scripts and original Phase 5 guides/examples are preserved
++in `docs/audits/phase6-reference.zip`.
+ 
+ Phase 5 removed unused imports from inherited/adapted modules, including the
+ scheduler and plugin package, without repairing or extending their behavior.
+--- before/DEVELOPMENT_PLAN.md
++++ after/DEVELOPMENT_PLAN.md
+@@ -1,7 +1,7 @@
+ # Developer Task Automation Toolkit — Development Plan
+ 
+ Date: 15 October 2026  
+-Status: Phases 0–4 completed; Phase 5 local implementation completed, with hosted CI and upstream provenance acceptance pending. Optional Phase 6 has not started.
++Status: Phases 0–6 implemented locally. Hosted CI and upstream provenance acceptance remain pending release gates.
+ 
+ ## 1. Purpose and engineering goals
+ 
+@@ -322,6 +322,8 @@
+ 
+ ### Optional Phase 6 — Scheduling only when justified
+ 
++**Status:** implemented locally on 15 October 2026 for the user's selected project-review workflows. See [Phase 6](docs/PHASE_6.md): persisted named workflow snapshots, UTC recurrence/next-run scheduling, explicit retry budgets, dependency/cycle checks, one owner/worker, isolated subprocess attempts, timeout/cancel/shutdown tree cleanup, and interrupted-run review. Legacy rows are preserved without inventing lost callables. Hosted Linux/newer-Python results remain pending.
++
+ **Entry condition:** a useful recurring developer workflow exists that cannot be adequately served by invoking the CLI through an existing scheduler.
+ 
+ **Affected files:** `scheduler.py`, task models, database persistence, workflow integration, and scheduler tests.
+@@ -391,6 +393,6 @@
+ 
+ ## 9. Recommended next action
+ 
+-Review the [Phase 5 implementation and evidence](docs/PHASE_5.md). Before publishing, connect a repository and obtain actual passing hosted matrix results, identify the exact upstream source/revision and preserve its actual license/copyright notices. No optional Phase 6 scheduling work is authorized by these release checks; it requires its documented use case and separate approval.
++Review the [Phase 6 implementation and evidence](docs/PHASE_6.md). Before publishing, connect a repository and obtain actual passing hosted matrix results, identify the exact upstream source/revision and preserve its actual license/copyright notices. No further implementation phase is authorized by this document alone.
+ 
+ Saving or updating this document does not authorize implementation of subsequent phases.
+--- before/README.md
++++ after/README.md
+@@ -4,6 +4,7 @@
+ organize explicitly selected artifacts through plan → preview → apply → report.
+ Validated JSON workflows and structured run history compose these MVP operations.
+ Phase 5 adds pinned setup, CI, coverage, dependency audits and package checks.
++Phase 6 adds durable scheduling for saved project-review workflows.
+ This is a development candidate; hosted CI and upstream reuse terms remain
+ release gates.
+ 
+@@ -302,7 +303,7 @@
+ missing or older database. A missing history file lists no runs; an unknown run
+ ID returns exit 1. `history list --limit N` accepts 1–1000, default 20. Writable
+ initialization transactionally upgrades unversioned Phase 1–3 files to SQLite
+-`user_version=1`, retaining existing rows/outcomes and adding runs, steps, and
++`user_version=2`, retaining existing rows/outcomes and adding runs, steps, and
+ nullable run/step links on file history. New file-operation IDs are full UUIDs;
+ old IDs are retained. Newer unsupported schemas are rejected without downgrade.
+ 
+@@ -312,7 +313,7 @@
+ userinfo are redacted in diagnostic text; credentials are not supported workflow
+ parameters. Standard-library logging adds run/step context without configuring
+ logging at import time. Run history is separate from legacy scheduler records;
+-serializable named workflows do not repair scheduled-command restoration.
++Phase 6 stores restorable schedules and attempt reports in separate tables.
+ 
+ ## Reports, history, and safety limits
+ 
+@@ -360,23 +361,100 @@
+ and overlapping roots are rejected. Real Windows junction tests pass; a real
+ file-symlink test skips when account privileges prevent creating its fixture.
+ 
++## Durable project-review scheduling
++
++The recurring use case is a saved project review with dependency ordering,
++persisted attempts and restart behavior. A single independent CLI command can
++still be invoked through an OS scheduler; this runner provides the integrated
++state and history needed for dependent reviews. It runs in the foreground until
++stopped; no background service is installed automatically.
++
++```powershell
++.\.venv\Scripts\tm.exe task add --name "Project review" --workflow .\examples\workflows\scheduled-project-review.json --schedule "2026-10-16T09:00:00+05:30" --recurrence hourly --max-retries 2 --timeout 60 --format json
++.\.venv\Scripts\tm.exe task list --format json
++.\.venv\Scripts\tm.exe task run-due --format json
++.\.venv\Scripts\tm.exe task start
++.\.venv\Scripts\tm.exe task attempts --format json
++.\.venv\Scripts\tm.exe task pause <task-id>
++.\.venv\Scripts\tm.exe task resume <task-id>
++.\.venv\Scripts\tm.exe task cancel <task-id>
++```
++
++`task add` stores an immutable JSON copy of the validated workflow and its base
++directory; editing/deleting the original file does not change the schedule.
++Default workflow mode is read-only preview. File-changing workflows require
++`--apply --yes` at registration and cannot have automatic retries. Known journal,
++lock and workflow configuration paths remain protected from organization.
++Direct `--operation inspect|duplicates --source PATH` is also supported.
++Explicit `--command "..."` schedules a trusted shell command, stored verbatim;
++this is separate from the closed JSON workflow registry. Commands, names and
++paths are public database metadata, so do not store credentials in them.
++
++Times require ISO timestamps with offsets and normalize to UTC. Legacy
++`YYYY-MM-DD HH:MM` is interpreted as **UTC**, including interactive registration.
++Daily/weekly cadence uses elapsed UTC time, not local DST wall time. Monthly
++schedules retain the original day and clamp to the month's end, then restore the
++anchor day in later months. `minutely`/`custom` use positive `--interval-minutes`.
++Missed occurrences are coalesced into one run, followed by the next future tick.
++The scheduler queries `next_run`, so retries and future due times survive restart.
++
++`--max-retries N` means **N additional attempts**, default zero. Read-only failures
++use exponential `--retry-delay` seconds (default 1, capped at 300). Subprocess
++retries require `--retry-safe`, an explicit statement that repeated side effects
++are acceptable. Exhaustion leaves the schedule failed. Success resets the current
++occurrence's attempt budget, retaining lifetime counters and the last ten errors.
++There is no exactly-once or automatic rollback guarantee.
++
++`--depends-on TASK_ID` is repeatable and requires existing tasks. A dependency
++must have succeeded at or after the dependent occurrence's scheduled time.
++Missing/self/cyclic graphs are rejected. Waiting tasks become `BLOCKED` without
++consuming attempts and are reconsidered while the runner is active.
++
++Only one scheduler owns a database, using a held OS lock. Claims and attempt
++starts commit together before launching work. One worker prevents overlapping
++scheduled attempts in that database; separate databases and unrelated direct
++commands are not coordinated. Database symlink/hard-link aliases are rejected.
++Timeouts use a monotonic clock and terminate the process tree before recording
++failure. Windows uses a kill-on-close Job Object; POSIX uses a process group.
++The worker waits for its payload until containment is established. Subprocess
++output keeps only a 4 KiB tail per stream; workflow output is limited to 4 MiB.
++Timeout/cancel latency includes process cleanup and any SQLite lock waits.
++
++Pause/cancel requests on running jobs are asynchronous: inspect `task attempts`
++for the completed cancellation. Ctrl+C stops dispatch, terminates the active
++tree, and pauses that job. Partial copies/moves may remain and need inspection.
++An unexpected owner exit/final-journal failure leaves an interrupted attempt.
++Restart marks it `INTERRUPTED` and blocks all dispatch until reviewed:
++
++```powershell
++# Only after checking actual outputs and that no old child process remains:
++.\.venv\Scripts\tm.exe task recover <task-id> --acknowledge
++# Recovery leaves it paused; explicitly choose whether to run again:
++.\.venv\Scripts\tm.exe task resume <task-id>
++```
++
++On POSIX, children can survive an abrupt owner crash until explicitly terminated;
++the recovery gate prevents automatic overlap/replay. This runner is not a sandbox
++for hostile commands. Legacy callable-only task rows are preserved and listed as
++`legacy_tasks`; their commands cannot be reconstructed and are never executed.
++See [Phase 6 design and evidence](docs/PHASE_6.md).
++
+ ## Deferred work and provenance
+ 
+-Experimental task add/list/start and the menu remain. Reliable scheduler command
+-restoration, due times, retries, dependencies, timeouts, error logs, and shutdown
+-remain unverified or defective. Scheduled file organization, interactive Python
+-evaluation, automatic duplicate deletion, and unplanned empty-directory cleanup
+-remain unavailable. Plugin imports/explicit registration work; dynamic discovery
++Interactive Python evaluation, automatic duplicate deletion, and unplanned
++empty-directory cleanup remain unavailable. The legacy callable Task model is
++retained for compatibility with old records, not durable dispatch.
++Plugin imports/explicit registration work; dynamic discovery
+ and image/PDF processing are deferred. Plugins execute trusted Python.
+ 
+ Phase 4 workflows are separate from JSON output reports. Phase 5 provides local
+ release checks and CI configuration. Hosted matrix results and verified upstream
+ license/copyright notices remain required before publishing. No publish job or
+-release credential is configured. Optional Phase 6 scheduling has not started.
++release credential is configured. Phase 6 scheduling is implemented locally.
+ See [development plan](DEVELOPMENT_PLAN.md), [Phase 5 record](docs/PHASE_5.md), [Phase 4 record](docs/PHASE_4.md), [Phase 3 record](docs/PHASE_3.md),
+ [Phase 2 record](docs/PHASE_2.md), and [original audit](docs/audits/PHASE_0_AUDIT.md).
+-The pre-Phase-5 code/tests/docs are preserved in
+-[phase5-reference.zip](docs/audits/phase5-reference.zip); earlier archives/evidence
++The pre-Phase-6 code/tests/scripts are preserved in
++[phase6-reference.zip](docs/audits/phase6-reference.zip); earlier archives/evidence
+ remain historical.
+ 
+ This derives from the supplied TaskMaster snapshot. Its upstream URL/revision,
+--- before/docs/DESIGN.md
++++ after/docs/DESIGN.md
+@@ -1,8 +1,8 @@
+ # Design and interview notes
+ 
+ TaskMaster inspects projects, verifies duplicate content, and organizes selected
+-development artifacts. The scheduler and dynamic plugin prototype are inherited
+-experiments; neither is part of the supported file workflow engine.
++development artifacts. Phase 6 replaces the inherited scheduler engine with
++durable named schedules and isolated attempts. Dynamic plugins remain experimental.
+ 
+ ## Control flow
+ 
+@@ -37,6 +37,13 @@
+ `running` can survive a crash. No automatic resume, rollback or exactly-once
+ guarantee is implied. The journal itself is excluded from selected inputs.
+ 
++The schedule layer persists validated snapshots, UTC cadence and dependency
++state in schema 2. An OS owner lock plus atomic attempt claims prevents duplicate
++dispatch, and one worker prevents overlap within the same database. Attempts run
++in contained child processes so timeout/cancellation can terminate actual work.
++Interrupted attempts require review and explicit recovery rather than replay.
++See [Phase 6](PHASE_6.md) for retry, recurrence, crash and shutdown semantics.
++
+ Inspection uses metadata. Duplicate reporting groups by size, hashes only
+ candidate groups with full SHA-256 in bounded reads, and rechecks state. Empty
+ files work. Logical redundant bytes do not measure actual space reclaimed.
+@@ -60,7 +67,8 @@
+ and plugin ideas/code. Phases 1–4 repaired startup, replaced unsafe file flows,
+ added scanning/inspection/duplicates and implemented named JSON workflows/history.
+ Phase 5 adds reproducible setup, CI, coverage, audits, packaging verification and
+-these notes; unused imports are removed without repairing scheduler behavior.
++these notes. Phase 6 replaces scheduler behavior and adds serializable schedule
++models, attempt persistence and contained process execution.
+ See [ATTRIBUTION.md](../ATTRIBUTION.md) for the component record and unresolved
+ upstream terms. Do not describe this as wholly original work.
+ 
+--- before/docs/FEATURE_EVIDENCE.md
++++ after/docs/FEATURE_EVIDENCE.md
+@@ -1,7 +1,7 @@
+ # Supported behavior and evidence
+ 
+-Claims here concern file workflows. Experimental scheduling and dynamic plugins
+-remain explicitly excluded from supported behavior. Test functions and parametrized
++Claims here concern file workflows and Phase 6 durable project-review scheduling.
++Dynamic plugins remain experimental. Test functions and parametrized
+ cases are in the linked files; installed checks exercise the built wheel as well.
+ 
+ | Advertised behavior | Regression evidence | Installed evidence |
+@@ -18,13 +18,14 @@
+ | UUID run history, legacy migration, journal failure truthfulness | [Workflow tests](../tests/test_workflows.py): start/file/step/final journal failures, interrupted running states, version migration, read-only queries | Run list/show, direct association, file links, unknown/legacy history |
+ | Useful JSON/text, error exits and diagnostic redaction | [MVP tests](../tests/test_mvp.py): Unicode/CP1252 pipes and JSON errors; [workflow tests](../tests/test_workflows.py): redaction in reports/logs/database | Text/JSON, invalid JSON without source echo, exit 1/2 cases |
+ | Safe demo and clean packaging | [Baseline tests](../tests/test_baseline.py): module help/disposable demo | Existing sentinel preserved, no database, fixtures removed, both entry points/import origin checked |
++| Durable scheduling, retries, dependencies, cancellation and recovery | [Scheduler tests](../tests/test_scheduler.py): due times, restart, cadence, retry budget, blocking/cycles, atomic owner claims, crash review, real process-tree timeout/shutdown, journal failure | Saved review dispatched without original config, attempts, pause/resume/cancel, invalid dependency |
+ 
+ Installed evidence is generated by [verify_install.py](../scripts/verify_install.py)
+-and saved in [Phase 5 results](audits/phase5-install-results.json). The
+-[phase record](PHASE_5.md) gives exact counts and limitations. Distribution and
++and saved in [Phase 6 results](audits/phase6-install-results.json). The
++[phase record](PHASE_6.md) gives scope and limitations. Distribution and
+ configuration checks live in [check_dist.py](../scripts/check_dist.py) and
+ [check_project.py](../scripts/check_project.py).
+ 
+ Read tests alongside [design notes](DESIGN.md). These checks do not establish
+-hostile-tree isolation, crash recovery, performance guarantees, full ACL fidelity,
+-scheduler correctness, or results on platforms that have not actually run.
++hostile-tree isolation, automatic crash replay, performance guarantees, full ACL
++fidelity, distributed scheduling, or results on platforms that have not actually run.
+--- /dev/null
++++ after/docs/PHASE_6.md
+@@ -0,0 +1,118 @@
++# Phase 6 — Durable project-review scheduling
++
++Date: 15 October 2026 (Asia/Calcutta)
++
++Status: local implementation complete. Hosted platform CI and upstream provenance
++verification remain the existing release gates. Nothing has been published.
++
++## Use case and scope
++
++The user selected recurring project-review workflows. A saved review can contain
++inspection, duplicate reporting and artifact-plan previews, depend on another
++review, and retain its attempt/retry state through process restarts. An existing
++OS scheduler remains suitable for an independent CLI invocation; this runner
++adds portable dependency ordering and integrated attempts/history without OS-specific
++job configuration. A foreground owner process must be running for dispatch.
++
++The previous callable/thread-pool scheduler could not restore commands, queried
++the original schedule rather than retry due time, could queue duplicate work,
++and could not terminate a timed-out Python thread. It has been replaced with
++serializable tasks and isolated worker processes. No scheduling dependency was
++added: SQLite, asyncio, POSIX process groups and Windows Job Objects cover the
++small single-worker design. Third-party scheduler libraries would not eliminate
++the need to define crash/side-effect policies or terminate actual work.
++
++## Model, persistence and dispatch
++
++`schedules.py` contains `ScheduledTask`, validated named operation parameters,
++timezone normalization and recurrence arithmetic. `scheduler.py` owns registration,
++graph validation, dispatch, retries and recovery. `scheduled_worker.py` executes
++the saved snapshot; `processes.py` contains output limits and tree cleanup.
++
++SQLite schema 2 adds `scheduled_tasks` and `scheduled_attempts` in the same
++versioned initialization transaction. Earlier task, run, step, file and index
++records are preserved. Legacy callable-only task rows remain visible separately
++but are never guessed into executable commands. Attempts have full UUID IDs,
++occurrence/attempt numbers, start/finish times, PID and structured reports.
++
++The owner holds an OS advisory lock for the entire scheduler session. Atomic
++claims commit running state and an attempt before any child starts. One worker
++prevents concurrent scheduled attempts in a database. Symlink/hard-link database
++aliases are refused. Other databases, manually launched commands and arbitrary
++external writers are outside that coordination boundary.
++
++The worker waits on stdin until its parent has assigned process containment and
++recorded its PID, then receives the immutable task snapshot. Windows uses a
++kill-on-close Job Object; POSIX uses a separate process group. Timeout/cancellation
++terminates the tree before the final attempt transaction. Standard-output/error
++tails for commands are bounded to 4 KiB each; named-workflow output has a 4 MiB
++limit. Excessive workflow output produces a failure with advice to inspect
++workflow history, rather than pretending the underlying file changes rolled back.
++
++## Defined behavior
++
++| Concern | Policy |
++| --- | --- |
++| Timezones | Require explicit offsets in the API; normalize to UTC. Legacy CLI minute strings explicitly mean UTC |
++| Cadence | Anchor to original scheduled time; run one coalesced overdue occurrence, skip missed ticks and choose the next future boundary |
++| Monthly dates | Clamp to month's end while retaining the original day anchor for later months |
++| Retries | `max_retries` means additional attempts; default zero. Exponential delay starts at retry-delay seconds, capped at 300 |
++| Counters | Lifetime run/failure counts persist; occurrence attempt budget resets on success; retain last ten diagnostic errors |
++| Side effects | File-changing workflows require saved approval and prohibit automatic retries. Shell retries require explicit retry-safe acknowledgement |
++| Dependencies | Existing distinct IDs, no self/cycles; require a successful prerequisite at/after the dependent occurrence's scheduled time |
++| Blocked work | Visible `BLOCKED` state, no consumed attempt, rechecked by the active runner |
++| Pause/cancel | Pending work stops immediately; running requests are polled and terminate the tree. Inspect the final attempt to confirm cancellation |
++| Shutdown | Stop dispatch, terminate active work, leave its job paused. Completed files may remain |
++| Unclean restart | Convert durable running work to interrupted; block every dispatch until review/acknowledgement, then leave recovered tasks paused |
++| Failed finish journal | Preserve running state for recovery; do not replay automatically |
++
++Names, paths and explicit shell commands are public metadata. Common credential
++assignments in diagnostics/output are redacted; this is not a universal secret
++detector. Callables, dynamic plugin tasks and shell commands inside JSON workflow
++configuration are not supported. Explicit `task add --command` remains a trusted
++shell-execution feature with no credential isolation.
++
++## Verification and evidence
++
++The regression suite includes 26 new scheduling cases covering future/retry due
++times, restoration, exact retry budgets, missed ticks, month boundaries, UTC
++offsets, dependency blocking/cycles, same-/cross-process owner exclusion, atomic
++claims, interrupted review, pause/cancel, final-journal failures, legacy rows,
++snapshot restoration, bounded/redacted output and approval/retry guards.
++
++Real Windows timeout checks launch a descendant that writes a ready marker,
++terminate its tree, then verify that its delayed file write never occurs.
++Shutdown and cancellation tests terminate active work before checking persisted
++states. Existing workflow/file safety regressions remain, with the legacy command
++registration test updated to assert serialized command text instead of a closure.
++Schema-upgrade assertions now expect version 2 without rewriting prior outcomes.
++
++Reports are saved as [JUnit](audits/phase6-test-results.xml),
++[coverage JSON](audits/phase6-coverage.json), and
++[installed checks](audits/phase6-install-results.json). The portable installation
++verifier also registers a recurring review, deletes its config fixture, dispatches
++it in another process, reads attempt history, exercises controls and rejects an
++unknown dependency. All fixtures are disposable; no real recurring service or
++user command was installed or left running.
++
++Before/after evidence: [reference snapshot](audits/phase6-reference.zip),
++[source diff](audits/phase6-source.diff), [hash manifest](audits/phase6-change-manifest.json),
++and [verification summary](audits/phase6-verification.json). The reference archive
++includes pre-change code and the hash-verified Phase 5 source archive's original
++guides/examples, preserved before the Phase 6 build.
++
++## Limits
++
++The runner is a single local owner, not distributed scheduling or an OS sandbox.
++On POSIX, children can survive abrupt owner death. Recovery requires the operator
++to inspect partial results and ensure old processes are stopped before acknowledging.
++Windows Job Objects also do not promise containment of hostile commands that
++deliberately exploit OS mechanisms. SQLite waits and cleanup add to timeout latency;
++no realtime deadline is promised. Filesystem and journal changes remain separate,
++so cancellation/crash can leave partial copies or completed moves.
++
++Exactly-once side effects, automatic rollback/resume, arbitrary Python callback
++restoration, cross-database overlap prevention and named local-time/DST calendars
++are not claimed. CI is configured for Windows/Linux and Python 3.12–3.14; only
++Windows/Python 3.12.4 was available locally. Prior release/provenance checks remain
++pending and historical phase records describe their earlier snapshots.
+--- before/docs/PLATFORMS.md
++++ after/docs/PLATFORMS.md
+@@ -27,6 +27,11 @@
+   installed-package checks. The verifier creates/removes only its own temporary
+   directory. Coverage data for subprocesses uses the configured project paths.
+ 
++- Phase 6 timeout/cancellation tests exercise real Windows Job Object cleanup of
++  nested descendants. POSIX uses process-group termination; that branch awaits
++  hosted Linux results. Abrupt POSIX owner death can leave children alive, so
++  interrupted schedules block dispatch pending explicit operator review.
++
+ The current `requires-python` is a lower bound, not a claim that future Python
+ versions or macOS have passed. A release needs actual green matrix results and
+ the separate provenance gate in [RELEASE.md](RELEASE.md).
+--- before/docs/RELEASE.md
++++ after/docs/RELEASE.md
+@@ -40,8 +40,8 @@
+ `--wheelhouse PATH` uses cached runtime wheels without network.
+ 
+ Coverage includes branches and subprocess CLI tests. Reports include inherited
+-experimental modules, so a total percentage must not be read as validation of
+-scheduler guarantees or plugins. Read missing branches and the behavior tests;
++plugin/menu paths and platform-specific process code, so a total percentage alone
++does not validate scheduling or plugin guarantees. Read missing branches and behavior tests;
+ do not add assertion-free calls merely to raise a percentage. Coverage is reported
+ without an arbitrary global threshold in this initial baseline.
+ 
+@@ -71,5 +71,5 @@
+ 
+ Unresolved upstream permission and absent hosted CI evidence remain release
+ gates. They do not prevent local development/testing; they prevent describing
+-this candidate as a verified distributable portfolio release. Optional Phase 6
+-scheduling is not required for these checks and has not started.
++this candidate as a verified distributable portfolio release. Phase 6 scheduling
++is locally implemented and included in the regression and installed checks.
+--- /dev/null
++++ after/docs/audits/capture_phase6_evidence.py
+@@ -0,0 +1,49 @@
++"""Capture the Phase 6 review diff and verify final test/install evidence."""
++import difflib
++import hashlib
++import json
++from pathlib import Path
++import xml.etree.ElementTree as ET
++from zipfile import ZipFile
++
++ROOT = Path(__file__).resolve().parents[2]
++OUT = ROOT / 'docs/audits'
++with ZipFile(OUT / 'phase6-reference.zip') as archive:
++    before = {name: archive.read(name) for name in archive.namelist() if not name.endswith('/')}
++paths = set(before)
++for folder in ('taskmaster', 'tests', 'scripts', 'examples', 'requirements', '.github'):
++    paths.update(p.relative_to(ROOT).as_posix() for p in (ROOT / folder).rglob('*')
++                 if p.is_file() and '__pycache__' not in p.parts and p.suffix != '.pyc' and 'organized' not in p.parts)
++paths.update(['docs/PHASE_6.md', 'docs/audits/capture_phase6_evidence.py'])
++sha = lambda data: hashlib.sha256(data).hexdigest() if data is not None else None
++manifest, diff = {}, []
++for name in sorted(paths):
++    path = ROOT / name
++    old, new = before.get(name), path.read_bytes() if path.is_file() else None
++    manifest[name] = {'before_sha256': sha(old), 'after_sha256': sha(new)}
++    if old != new:
++        diff.extend(difflib.unified_diff([v + '\n' for v in (old or b'').decode('utf-8-sig').splitlines()],
++                    [v + '\n' for v in (new or b'').decode('utf-8-sig').splitlines()],
++                    fromfile='before/' + name if old is not None else '/dev/null',
++                    tofile='after/' + name if new is not None else '/dev/null'))
++(OUT / 'phase6-source.diff').write_text(''.join(diff), encoding='utf-8')
++(OUT / 'phase6-change-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
++suite = ET.parse(OUT / 'phase6-test-results.xml').getroot().find('testsuite')
++assert suite.get('failures') == suite.get('errors') == '0'
++installed = json.loads((OUT / 'phase6-install-results.json').read_text(encoding='utf-8'))
++assert installed['complete'] and installed['disposable_tree_removed']
++assert all(c['exit_code'] == c['expected_exit'] for c in installed['checks'])
++wheel = ROOT / 'dist/taskmaster-2.0.1-py3-none-any.whl'
++assert installed['wheel_sha256'] == sha(wheel.read_bytes())
++assert installed['runtime_lock_sha256'] == sha((ROOT / 'requirements/runtime.txt').read_bytes())
++assert before['requirements/runtime.txt'] == (ROOT / 'requirements/runtime.txt').read_bytes()
++assert before['requirements/dev.txt'] == (ROOT / 'requirements/dev.txt').read_bytes()
++coverage = json.loads((OUT / 'phase6-coverage.json').read_text(encoding='utf-8'))
++summary = {'tests_passed': int(suite.get('tests')) - int(suite.get('skipped')),
++           'tests_skipped': int(suite.get('skipped')), 'installed_checks': len(installed['checks']),
++           'coverage_percent': coverage['totals']['percent_covered'],
++           'wheel_sha256': installed['wheel_sha256'], 'dependencies_unchanged': True,
++           'installed_check_execution': 'Windows host process-control access; the restricted-sandbox run timed out',
++           'hosted_ci_executed': False, 'release_published': False}
++(OUT / 'phase6-verification.json').write_text(json.dumps(summary, indent=2) + '\n', encoding='utf-8')
++print(json.dumps(summary, indent=2))
+--- /dev/null
++++ after/examples/workflows/scheduled-project-review.json
+@@ -0,0 +1,9 @@
++{
++  "version": 1,
++  "name": "Recurring project review",
++  "on_failure": "continue",
++  "steps": [
++    {"id": "inspect", "operation": "inspect", "parameters": {"source": "../fixtures/workspace", "top": 5}},
++    {"id": "duplicates", "operation": "duplicates", "parameters": {"source": "../fixtures/workspace", "includes": ["*.log"]}}
++  ]
++}
+--- before/scripts/verify_install.py
++++ after/scripts/verify_install.py
+@@ -167,6 +167,27 @@
+         assert not absent_db.exists() and (move_source / 'one.log').exists()
+         assert cli('approved direct move', *flags, '--apply', '--yes')['complete']
+         assert not (move_source / 'one.log').exists()
++        review = base / 'examples/workflows/scheduled-project-review.json'
++        scheduled = cli('register durable project review', 'task', 'add', '--name', 'Scheduled review',
++                        '--workflow', review, '--schedule', '2020-01-01T00:00:00+00:00',
++                        '--recurrence', 'minutely', '--max-retries', '1')
++        task_id = scheduled['task_id']
++        review.unlink()  # Registration must keep the validated snapshot.
++        saved = cli('restore schedule in another process', 'task', 'list')['tasks'][0]
++        assert saved['id'] == task_id and saved['run_count'] == 0
++        due = cli('dispatch saved review without original config', 'task', 'run-due')
++        assert due['complete'] and due['dispatched'] == 1
++        attempts = cli('durable attempt history', 'task', 'attempts')['attempts']
++        assert attempts[0]['status'] == 'SUCCESS'
++        assert attempts[0]['report']['workflow_report']['steps'][0]['report']['summary']['file_count'] == 4
++        cli('pause durable task', 'task', 'pause', task_id)
++        cli('resume durable task', 'task', 'resume', task_id)
++        cli('cancel durable task', 'task', 'cancel', task_id)
++        assert cli('cancelled task persists', 'task', 'list')['tasks'][0]['status'] == 'CANCELLED'
++        assert cli('cancelled task not dispatched', 'task', 'run-due')['dispatched'] == 0
++        cli('unknown scheduled dependency rejected', 'task', 'add', '--name', 'bad dependency',
++            '--operation', 'inspect', '--source', source, '--schedule', '2020-01-01T00:00:00+00:00',
++            '--depends-on', 'missing', expected=1)
+         check('installed runtime inventory', [python, '-I', '-c',
+               "import importlib.metadata,json; print(json.dumps(sorted((d.metadata['Name'],d.version) "
+               "for d in importlib.metadata.distributions())))"])
+--- before/taskmaster/cli.py
++++ after/taskmaster/cli.py
+@@ -6,8 +6,9 @@
+ import argparse
+ import sqlite3
+ import logging
++import json
+ import sys
+-from datetime import datetime
++from datetime import datetime, timezone
+ from pathlib import Path
+ from functools import cached_property
+ from typing import Optional, List
+@@ -21,7 +22,7 @@
+ from rich.tree import Tree
+ from rich import box
+ 
+-from .models import Task, TaskPriority, RecurrenceType
++from .models import TaskPriority, RecurrenceType
+ from .database import Database
+ from .scheduler import TaskScheduler
+ from .organizer import FileOrganizer
+@@ -30,6 +31,7 @@
+ from .config import load_workflow, validate_workflow
+ from .operations import prepare_operation, run_prepared
+ from .workflows import run_workflow, safe_message
++from .schedules import ScheduledTask, utc
+ 
+ console = Console()
+ 
+@@ -58,7 +60,7 @@
+         if "organizer" in self.__dict__:
+             self.organizer.close()
+         if "scheduler" in self.__dict__:
+-            self.scheduler._executor.shutdown(wait=True)
++            self.scheduler.close()
+ 
+     def print_banner(self):
+         """Print application banner."""
+@@ -80,6 +82,10 @@
+     def show_dashboard(self):
+         """Show live dashboard with task and file stats."""
+         stats = self.db.get_stats()
++        scheduled = self.db.schedules()
++        stats['total_tasks'] += len(scheduled)
++        for key, state in [('pending_tasks', 'PENDING'), ('completed_tasks', 'COMPLETED'), ('failed_tasks', 'FAILED')]:
++            stats[key] += sum(task.status == state for task in scheduled)
+ 
+         layout = Layout()
+         layout.split_column(
+@@ -130,7 +136,7 @@
+ 
+     def show_tasks(self, status_filter: Optional[str] = None):
+         """Display tasks in a formatted table."""
+-        tasks = self.db.get_all_tasks()
++        tasks = [task.to_dict() for task in self.db.schedules()] + self.db.get_all_tasks()
+ 
+         if status_filter:
+             tasks = [t for t in tasks if t["status"] == status_filter.upper()]
+@@ -210,11 +216,11 @@
+ 
+         # Schedule time
+         if recurrence == RecurrenceType.ONCE:
+-            schedule_str = Prompt.ask("Schedule time (YYYY-MM-DD HH:MM)", 
+-                                    default=datetime.now().strftime("%Y-%m-%d %H:%M"))
+-            schedule_time = datetime.strptime(schedule_str, "%Y-%m-%d %H:%M")
++            schedule_str = Prompt.ask("UTC schedule time (YYYY-MM-DD HH:MM)",
++                                    default=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M"))
++            schedule_time = datetime.strptime(schedule_str, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+         else:
+-            schedule_time = datetime.now()
++            schedule_time = datetime.now(timezone.utc)
+ 
+         # Priority
+         console.print("\n[bold]Priority:[/bold]")
+@@ -242,25 +248,21 @@
+ 
+         if cmd_choice == "1":
+             command_str = Prompt.ask("Enter shell command")
+-            import subprocess
+-            def command():
+-                result = subprocess.run(command_str, shell=True, capture_output=True, text=True, check=True)
+-                return result.stdout
+ 
+         elif cmd_choice == "2":
+             raise ValueError("Interactive Python expressions are disabled. Use a shell command or the Python API.")
+ 
+         else:
+-            raise ValueError("Scheduled file organization is unavailable until scheduler approval and recovery are designed. Use organize to preview and apply a plan.")
++            raise ValueError('Use task add --workflow FILE --apply --yes for approved scheduled organization')
+ 
+         # Create task
+-        task = Task(
++        task = ScheduledTask(
+             name=name,
+-            command=command,
+-            schedule_time=schedule_time,
+-            recurrence=recurrence,
+-            interval_minutes=interval,
+-            priority=priority
++            operation='subprocess', parameters={'command': command_str}, base_dir=str(Path.cwd()),
++            schedule_time=schedule_time.isoformat(),
++            recurrence=recurrence.value,
++            interval_minutes=interval or 1,
++            priority=priority.value
+         )
+ 
+         task_id = self.scheduler.register_task(task)
+@@ -424,11 +426,14 @@
+ 
+     async def _run_scheduler_live(self):
+         """Run scheduler with live status updates."""
+-        console.print("[yellow]Experimental scheduler: commands are not restored; retry and shutdown behavior is unverified.[/yellow]")
++        console.print('Running durable scheduler; Ctrl+C pauses and terminates active attempts.')
+         await self.scheduler.start()
+ 
+         try:
+             while True:
++                if self.scheduler._loop_task.done():
++                    self.scheduler._loop_task.result()
++                    break
+                 console.clear()
+                 self.show_dashboard()
+                 await asyncio.sleep(2)
+@@ -465,14 +470,36 @@
+ 
+         task_add = task_sub.add_parser("add", help="Add a new task")
+         task_add.add_argument("--name", required=True)
+-        task_add.add_argument("--command", required=True)
+-        task_add.add_argument("--schedule", required=True, help="YYYY-MM-DD HH:MM")
+-        task_add.add_argument("--recurrence", choices=["once","minutely","hourly","daily","weekly"],
++        task_kind = task_add.add_mutually_exclusive_group(required=True)
++        task_kind.add_argument('--command', help='Explicit trusted shell command; persisted verbatim')
++        task_kind.add_argument('--workflow', type=Path, help='Save a validated workflow snapshot')
++        task_kind.add_argument('--operation', choices=['inspect', 'duplicates'])
++        task_add.add_argument('--source')
++        task_add.add_argument('--include', action='append', default=[])
++        task_add.add_argument('--apply', action='store_true')
++        task_add.add_argument('--yes', action='store_true', help='Approve scheduled file-changing workflow')
++        task_add.add_argument('--interval-minutes', type=int, default=1)
++        task_add.add_argument('--max-retries', type=int, default=0, help='Additional attempts per occurrence')
++        task_add.add_argument('--retry-delay', type=int, default=1)
++        task_add.add_argument('--timeout', type=int, default=300)
++        task_add.add_argument('--retry-safe', action='store_true')
++        task_add.add_argument('--depends-on', action='append', default=[])
++        task_add.add_argument("--schedule", required=True, help="ISO date/time with UTC offset; legacy YYYY-MM-DD HH:MM is UTC")
++        task_add.add_argument("--recurrence", choices=["once","minutely","hourly","daily","weekly","monthly","custom"],
+                              default="once")
+         task_add.add_argument("--priority", type=int, choices=[1,2,3,4], default=2)
+ 
+-        task_sub.add_parser("list", help="List all tasks")
+-        task_sub.add_parser("start", help="Start scheduler")
++        task_commands = [task_sub.add_parser('list'), task_sub.add_parser('start'),
++                         task_sub.add_parser('run-due'), task_sub.add_parser('attempts')]
++        for action in ('pause', 'cancel', 'resume', 'recover'):
++            command_parser = task_sub.add_parser(action)
++            command_parser.add_argument('task_id')
++            if action == 'recover':
++                command_parser.add_argument('--acknowledge', action='store_true')
++            task_commands.append(command_parser)
++        task_commands.append(task_add)
++        for command_parser in task_commands:
++            command_parser.add_argument('--format', choices=['text', 'json'], default='text')
+ 
+         def scan_options(command_parser):
+             command_parser.add_argument("--exclude", action="append", default=[], help="Repeatable basename or root-relative glob")
+@@ -621,37 +648,60 @@
+ 
+         if parsed.subcommand == "task":
+             if parsed.task_cmd == "add":
+-                from .models import Task
+                 try:
+-                    schedule_time = datetime.strptime(parsed.schedule, "%Y-%m-%d %H:%M")
++                    schedule_time = (datetime.strptime(parsed.schedule, '%Y-%m-%d %H:%M').replace(tzinfo=timezone.utc)
++                                     if len(parsed.schedule) == 16 else utc(parsed.schedule))
+                 except ValueError:
+-                    parser.error("Invalid schedule; use YYYY-MM-DD HH:MM with a valid date and time.")
+-
+-                import subprocess
+-                def cmd():
+-                    result = subprocess.run(parsed.command, shell=True, capture_output=True, text=True, check=True)
+-                    return result.stdout
+-
+-                task = Task(
+-                    name=parsed.name,
+-                    command=cmd,
+-                    schedule_time=schedule_time,
+-                    recurrence=RecurrenceType(parsed.recurrence),
+-                    priority=TaskPriority(parsed.priority)
+-                )
++                    parser.error('Invalid schedule; use an ISO UTC offset or YYYY-MM-DD HH:MM (UTC)')
++                if parsed.yes and not parsed.apply or parsed.apply and not parsed.workflow:
++                    parser.error('--apply/--yes are only for scheduled workflow application')
++                base_dir = Path.cwd()
++                if parsed.workflow:
++                    workflow = load_workflow(parsed.workflow)
++                    operation = 'workflow'
++                    parameters = {'workflow': workflow.to_dict(), 'apply': parsed.apply, 'confirmed': parsed.yes}
++                    base_dir = parsed.workflow.expanduser().absolute().parent
++                elif parsed.command:
++                    operation, parameters = 'subprocess', {'command': parsed.command}
++                else:
++                    if not parsed.source:
++                        parser.error('--operation requires --source')
++                    operation, parameters = parsed.operation, {'source': parsed.source, 'includes': parsed.include}
++                task = ScheduledTask(name=parsed.name, operation=operation, parameters=parameters,
++                    config_path=str(parsed.workflow.expanduser().absolute()) if parsed.workflow else None,
++                    schedule_time=schedule_time.isoformat(), base_dir=str(base_dir), recurrence=parsed.recurrence,
++                    priority=parsed.priority, interval_minutes=parsed.interval_minutes, dependencies=parsed.depends_on,
++                    max_retries=parsed.max_retries, retry_delay_seconds=parsed.retry_delay,
++                    timeout_seconds=parsed.timeout, retry_safe=parsed.retry_safe)
+                 task_id = self.scheduler.register_task(task)
+-                console.print(f"[green]Task created: {task_id}[/green]")
+-                console.print("[yellow]Experimental: commands cannot be restored after this process exits.[/yellow]")
+-
++                report = {'complete': True, 'task_id': task_id}
+             elif parsed.task_cmd == "list":
+-                self.show_tasks()
+-
++                report = {'complete': True, 'tasks': [task.to_dict() for task in self.db.schedules()],
++                          'legacy_tasks': self.db.get_all_tasks()}
++            elif parsed.task_cmd == 'attempts':
++                report = {'complete': True, 'attempts': self.db.schedule_attempts()}
++            elif parsed.task_cmd == 'run-due':
++                before = {a['id'] for a in self.db.schedule_attempts()}
++                count = asyncio.run(self.scheduler.run_due())
++                attempts = [a for a in self.db.schedule_attempts() if a['id'] not in before]
++                report = {'complete': all(a['status'] == 'SUCCESS' for a in attempts),
++                          'dispatched': count, 'attempt_ids': [a['id'] for a in attempts]}
+             elif parsed.task_cmd == "start":
+-                console.print("[yellow]Experimental scheduler: stored commands are not restored; due-time/retry behavior remains unreliable.[/yellow]")
++                if self.output_format == 'json':
++                    parser.error('task start uses text output; use task run-due --format json for a bounded run')
+                 try:
+                     asyncio.run(self._run_scheduler_live())
+                 except KeyboardInterrupt:
+-                    console.print("[red]Stopped.[/red]")
++                    console.print('Stopped; inspect attempts for partial outcomes.')
++                return 0
++            elif parsed.task_cmd == 'recover':
++                self.scheduler.recover_task(parsed.task_id, acknowledged=parsed.acknowledge)
++                report = {'complete': True, 'status': 'PAUSED'}
++            else:
++                getattr(self.scheduler, parsed.task_cmd + '_task')(parsed.task_id)
++                report = {'complete': True, 'requested': parsed.task_cmd}
++            emit_json(report) if self.output_format == 'json' else console.print(json.dumps(report, indent=2), markup=False)
++            return 0 if report['complete'] else 1
+ 
+         elif parsed.subcommand == "organize":
+             parameters = {"source": parsed.source, "destination": parsed.destination,
+@@ -699,7 +749,7 @@
+     cli = TaskMasterCLI()
+     try:
+         return cli.run_cli(args) or 0
+-    except (OSError, ValueError, sqlite3.Error) as error:
++    except (OSError, ValueError, RuntimeError, sqlite3.Error) as error:
+         if cli.output_format == "json":
+             emit_json({"schema_version": 1, "command": cli.report_command, "complete": False, "error": safe_message(str(error))})
+         else:
+--- before/taskmaster/database.py
++++ after/taskmaster/database.py
+@@ -14,7 +14,7 @@
+ class Database:
+     """Versioned SQLite persistence; one connection per operation."""
+ 
+-    SCHEMA_VERSION = 1
++    SCHEMA_VERSION = 2
+ 
+     def __init__(self, db_path: str = "taskmaster.db"):
+         self.db_path = db_path
+@@ -121,6 +121,15 @@
+                 PRIMARY KEY (run_id, step_id))""")
+             conn.execute("CREATE INDEX IF NOT EXISTS idx_file_ops_run ON file_operations(run_id, step_id)")
+             conn.execute("CREATE INDEX IF NOT EXISTS idx_runs_started ON runs(started_at)")
++            conn.execute("""CREATE TABLE IF NOT EXISTS scheduled_tasks (
++                id TEXT PRIMARY KEY, status TEXT NOT NULL, next_run TEXT,
++                requested_state TEXT, document TEXT NOT NULL)""")
++            conn.execute("""CREATE TABLE IF NOT EXISTS scheduled_attempts (
++                id TEXT PRIMARY KEY, task_id TEXT NOT NULL, occurrence_time TEXT NOT NULL,
++                attempt_number INTEGER NOT NULL, started_at TEXT NOT NULL, finished_at TEXT,
++                status TEXT NOT NULL, pid INTEGER, report_json TEXT,
++                UNIQUE(task_id, occurrence_time, attempt_number))""")
++            conn.execute("CREATE INDEX IF NOT EXISTS idx_scheduled_due ON scheduled_tasks(status, next_run)")
+             conn.execute(f"PRAGMA user_version = {self.SCHEMA_VERSION}")
+ 
+     # Task operations
+@@ -168,7 +177,7 @@
+             cursor = conn.execute("""
+                 SELECT * FROM tasks 
+                 WHERE status = 'PENDING' 
+-                AND schedule_time <= ?
++                AND next_run <= ?
+                 ORDER BY priority DESC, schedule_time ASC
+             """, (before.isoformat(),))
+             return [dict(row) for row in cursor.fetchall()]
+@@ -205,6 +214,102 @@
+             return [dict(row) for row in cursor.fetchall()]
+ 
+     # File operations
++    def schedules(self):
++        from .schedules import ScheduledTask
++        with self._connection() as conn:
++            return [ScheduledTask(**json.loads(row['document'])) for row in
++                    conn.execute('SELECT document FROM scheduled_tasks ORDER BY id')]
++
++    def add_schedule(self, task):
++        with self._connection() as conn:
++            conn.execute('INSERT INTO scheduled_tasks(id,status,next_run,document) VALUES (?,?,?,?)',
++                         (task.id, task.status, task.next_run, json.dumps(task.to_dict())))
++
++    def schedule_request(self, task_id, state):
++        if state not in ('PAUSED', 'CANCELLED', 'PENDING'):
++            raise ValueError('Invalid requested state')
++        with self._connection() as conn:
++            row = conn.execute('SELECT document,status FROM scheduled_tasks WHERE id=?', (task_id,)).fetchone()
++            if row is None:
++                raise ValueError('Task was not found')
++            if row['status'] == 'INTERRUPTED':
++                raise ValueError('Interrupted tasks require explicit recovery acknowledgement')
++            document = json.loads(row['document'])
++            if row['status'] == 'RUNNING':
++                if state == 'PENDING':
++                    raise ValueError('Cannot resume a running task')
++                conn.execute('UPDATE scheduled_tasks SET requested_state=? WHERE id=?', (state, task_id))
++            else:
++                if state == 'PENDING' and row['status'] != 'PAUSED':
++                    raise ValueError('Only paused tasks can be resumed')
++                document['status'] = state
++                if state == 'PENDING':
++                    document['next_run'] = document.get('next_run') or document['occurrence_time']
++                conn.execute('UPDATE scheduled_tasks SET status=?,next_run=?,requested_state=NULL,document=? WHERE id=?',
++                             (state, document['next_run'], json.dumps(document), task_id))
++
++    def claim_schedule(self, task, now, attempt_id):
++        with self._connection() as conn:
++            conn.execute('BEGIN IMMEDIATE')
++            row = conn.execute('SELECT status,next_run,requested_state FROM scheduled_tasks WHERE id=?', (task.id,)).fetchone()
++            if not row or row['status'] not in ('PENDING', 'BLOCKED') or row['next_run'] > now or row['requested_state']:
++                return False
++            task.status, task.blocked_reason = 'RUNNING', None
++            task.run_count += 1
++            task.attempt_count += 1
++            conn.execute('UPDATE scheduled_tasks SET status=?,document=? WHERE id=?',
++                         (task.status, json.dumps(task.to_dict()), task.id))
++            conn.execute('INSERT INTO scheduled_attempts(id,task_id,occurrence_time,attempt_number,started_at,status) VALUES (?,?,?,?,?,?)',
++                         (attempt_id, task.id, task.occurrence_time, task.attempt_count, now, 'RUNNING'))
++            return True
++
++    def schedule_state(self, task_id):
++        with self._connection() as conn:
++            row = conn.execute('SELECT requested_state FROM scheduled_tasks WHERE id=?', (task_id,)).fetchone()
++            return row['requested_state'] if row else 'CANCELLED'
++
++    def finish_schedule(self, task, attempt_id, report, now):
++        with self._connection() as conn:
++            conn.execute('BEGIN IMMEDIATE')
++            row = conn.execute('SELECT requested_state FROM scheduled_tasks WHERE id=?', (task.id,)).fetchone()
++            if row and row['requested_state']:
++                task.status = row['requested_state']
++            conn.execute('UPDATE scheduled_tasks SET status=?,next_run=?,requested_state=NULL,document=? WHERE id=?',
++                         (task.status, task.next_run, json.dumps(task.to_dict()), task.id))
++            conn.execute('UPDATE scheduled_attempts SET status=?,finished_at=?,report_json=? WHERE id=?',
++                         (report['status'], now, json.dumps(report), attempt_id))
++
++    def block_schedule(self, task):
++        with self._connection() as conn:
++            # A concurrent pause/cancel wins over this diagnostic update.
++            conn.execute("UPDATE scheduled_tasks SET status='BLOCKED',document=? WHERE id=? AND status IN ('PENDING','BLOCKED')",
++                         (json.dumps(task.to_dict()), task.id))
++
++    def recover_schedules(self):
++        with self._connection() as conn:
++            conn.execute('BEGIN IMMEDIATE')
++            for row in conn.execute("SELECT id,document FROM scheduled_tasks WHERE status='RUNNING'").fetchall():
++                document = json.loads(row['document'])
++                document['status'] = 'INTERRUPTED'
++                document['blocked_reason'] = 'Previous owner exited during an attempt; inspect outputs and child processes before recovery'
++                conn.execute("UPDATE scheduled_tasks SET status='INTERRUPTED',document=? WHERE id=?", (json.dumps(document), row['id']))
++            conn.execute("UPDATE scheduled_attempts SET status='INTERRUPTED' WHERE status='RUNNING'")
++
++    def acknowledge_schedule(self, task_id):
++        with self._connection() as conn:
++            row = conn.execute("SELECT document FROM scheduled_tasks WHERE id=? AND status='INTERRUPTED'", (task_id,)).fetchone()
++            if not row:
++                raise ValueError('Task is not interrupted')
++            document = json.loads(row['document'])
++            document['status'], document['blocked_reason'] = 'PAUSED', None
++            conn.execute("UPDATE scheduled_tasks SET status='PAUSED',requested_state=NULL,document=? WHERE id=?", (json.dumps(document), task_id))
++
++    def schedule_attempts(self, task_id=None):
++        with self._connection() as conn:
++            rows = conn.execute('SELECT * FROM scheduled_attempts WHERE (? IS NULL OR task_id=?) ORDER BY started_at,task_id,occurrence_time,attempt_number,id',
++                                (task_id, task_id)).fetchall()
++            return [{**dict(row), 'report': json.loads(row['report_json']) if row['report_json'] else None} for row in rows]
++
+     def log_file_operation(self, op: FileOperation) -> None:
+         """Log a file operation."""
+         with self._connection() as conn:
+--- before/taskmaster/organizer.py
++++ after/taskmaster/organizer.py
+@@ -149,7 +149,7 @@
+         return execute_plan(plan, confirmed=confirmed, history_recorder=self.history_recorder)
+ 
+     def _history_files(self) -> set[Path]:
+-        return {Path(str(self.history_path) + suffix) for suffix in ("", "-wal", "-shm", "-journal")}
++        return {Path(str(self.history_path) + suffix) for suffix in ("", "-wal", "-shm", "-journal", ".scheduler.lock")}
+ 
+     def _check_history_location(self, source_root: Path, destination_root: Path, operations=()) -> None:
+         if self.history_path is not None and (self.history_path.is_relative_to(absolute_path(destination_root))
+--- /dev/null
++++ after/taskmaster/processes.py
+@@ -0,0 +1,111 @@
++"""Bounded subprocess output and process-tree cleanup for scheduled attempts."""
++import asyncio
++import os
++import signal
++import subprocess
++
++
++class WindowsJob:
++    """Kill descendants when this Job Object closes, including after parent exit."""
++    def __init__(self):
++        import ctypes as c
++        from ctypes import wintypes as w
++
++        class Basic(c.Structure):
++            _fields_ = [('process_time', c.c_int64), ('job_time', c.c_int64), ('flags', w.DWORD),
++                        ('min_working', c.c_size_t), ('max_working', c.c_size_t), ('active', w.DWORD),
++                        ('affinity', c.c_size_t), ('priority', w.DWORD), ('scheduling', w.DWORD)]
++
++        class IO(c.Structure):
++            _fields_ = [(name, c.c_uint64) for name in ('read_ops', 'write_ops', 'other_ops', 'read', 'write', 'other')]
++
++        class Extended(c.Structure):
++            _fields_ = [('basic', Basic), ('io', IO), ('process_memory', c.c_size_t),
++                        ('job_memory', c.c_size_t), ('peak_process', c.c_size_t), ('peak_job', c.c_size_t)]
++
++        self.api = c.WinDLL('kernel32', use_last_error=True)
++        self.api.CreateJobObjectW.argtypes, self.api.CreateJobObjectW.restype = [c.c_void_p, w.LPCWSTR], w.HANDLE
++        self.api.SetInformationJobObject.argtypes = [w.HANDLE, c.c_int, c.c_void_p, w.DWORD]
++        self.api.AssignProcessToJobObject.argtypes = [w.HANDLE, w.HANDLE]
++        self.api.OpenProcess.argtypes, self.api.OpenProcess.restype = [w.DWORD, w.BOOL, w.DWORD], w.HANDLE
++        self.api.CloseHandle.argtypes = [w.HANDLE]
++        self.handle = self.api.CreateJobObjectW(None, None)
++        limits = Extended()
++        limits.basic.flags = 0x2000  # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
++        if not self.handle or not self.api.SetInformationJobObject(self.handle, 9, c.byref(limits), c.sizeof(limits)):
++            self.close()
++            raise OSError('Cannot create process-tree containment job')
++
++    def assign(self, pid):
++        handle = self.api.OpenProcess(0x0101, False, pid)
++        try:
++            if not handle or not self.api.AssignProcessToJobObject(self.handle, handle):
++                raise OSError('Cannot assign scheduled process to containment job')
++        finally:
++            if handle:
++                self.api.CloseHandle(handle)
++
++    def close(self):
++        if getattr(self, 'handle', None):
++            self.api.CloseHandle(self.handle)
++            self.handle = None
++
++
++async def run_process(*, argv=None, shell=None, cwd, payload=None, on_pid=None, output_limit=None):
++    """Cancellation closes the process tree before this coroutine returns."""
++    job = WindowsJob() if os.name == 'nt' else None
++    options = {'cwd': cwd, 'stdin': asyncio.subprocess.PIPE if payload is not None else asyncio.subprocess.DEVNULL,
++               'stdout': asyncio.subprocess.PIPE, 'stderr': asyncio.subprocess.PIPE}
++    if os.name == 'nt':
++        options['creationflags'] = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW
++    else:
++        options['start_new_session'] = True
++    process, readers = None, []
++    buffers, exceeded = [bytearray(), bytearray()], [False, False]
++    limit = output_limit or (4 * 1024 * 1024 if payload is not None else 4096)
++
++    async def drain(stream, index):
++        while chunk := await stream.read(65536):
++            buffers[index].extend(chunk)
++            if len(buffers[index]) > limit:
++                exceeded[index] = True
++                del buffers[index][:-limit]
++
++    try:
++        process = (await asyncio.create_subprocess_shell(shell, **options) if shell is not None
++                   else await asyncio.create_subprocess_exec(*argv, **options))
++        if job:
++            job.assign(process.pid)
++        if on_pid:
++            on_pid(process.pid)
++        readers = [asyncio.create_task(drain(process.stdout, 0)), asyncio.create_task(drain(process.stderr, 1))]
++        if payload is not None:
++            try:
++                process.stdin.write(payload)
++                await process.stdin.drain()
++            except (BrokenPipeError, ConnectionResetError):
++                pass
++            finally:
++                process.stdin.close()
++        await process.wait()
++    finally:
++        # Also remove descendants left behind by a successfully exited shell.
++        if job:
++            job.close()
++        if process is not None:
++            if os.name != 'nt':
++                try:
++                    os.killpg(process.pid, signal.SIGKILL)
++                except ProcessLookupError:
++                    pass
++            elif process.returncode is None:
++                # Fallback if assignment failed before containment was established.
++                killer = await asyncio.create_subprocess_exec('taskkill', '/PID', str(process.pid), '/T', '/F',
++                    stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL,
++                    creationflags=subprocess.CREATE_NO_WINDOW)
++                await killer.wait()
++            await process.wait()
++        if readers:
++            await asyncio.gather(*readers)
++    return {'returncode': process.returncode, 'stdout': buffers[0].decode('utf-8', errors='replace'),
++            'stderr': buffers[1].decode('utf-8', errors='replace'), 'output_truncated': any(exceeded)}
+--- /dev/null
++++ after/taskmaster/scheduled_worker.py
+@@ -0,0 +1,41 @@
++"""Internal process boundary for a persisted, validated named workflow attempt."""
++import json
++from pathlib import Path
++import sys
++import subprocess
++
++from .config import validate_workflow
++from .schedules import ScheduledTask
++from .workflows import run_workflow, safe_message
++
++
++def main():
++    try:
++        payload = sys.stdin.buffer.read(2 * 1024 * 1024 + 1)
++        if len(payload) > 2 * 1024 * 1024:
++            raise ValueError('Worker payload exceeds 2 MiB')
++        document = json.loads(payload)
++        task = ScheduledTask(**document['task']).validate()
++        if task.operation == 'subprocess':
++            # Parent contains this worker before sending stdin. The shell and all
++            # descendants therefore start inside its Job Object/process group.
++            return subprocess.run(task.parameters['command'], shell=True, check=False).returncode
++        if task.operation == 'workflow':
++            workflow = validate_workflow(task.parameters['workflow'])
++            apply, confirmed = task.parameters['apply'], task.parameters['confirmed']
++        else:
++            workflow = validate_workflow({'version': 1, 'name': task.name, 'steps': [
++                {'id': 'review', 'operation': task.operation, 'parameters': task.parameters}]})
++            apply, confirmed = False, False
++        report = run_workflow(workflow, base_dir=Path(task.base_dir), apply=apply,
++                              confirmed=confirmed, history_path=Path(document['database']),
++                              config_path=Path(task.config_path) if task.config_path else None)
++        print(json.dumps(report))
++        return 0 if report['complete'] else 1
++    except Exception as error:
++        print(json.dumps({'complete': False, 'error': safe_message(str(error))}))
++        return 1
++
++
++if __name__ == '__main__':
++    raise SystemExit(main())
+--- before/taskmaster/scheduler.py
++++ after/taskmaster/scheduler.py
+@@ -1,269 +1,280 @@
+-"""
+-TaskMaster - Async Task Scheduler Engine
+-Handles task execution, scheduling, and lifecycle management.
+-"""
++"""Single-owner durable scheduler for named, isolated process attempts."""
+ import asyncio
+-from datetime import datetime, timedelta
+-from typing import Dict, List, Optional, Callable, Any
+-from concurrent.futures import ThreadPoolExecutor
++from contextlib import contextmanager
++from datetime import timedelta
++import json
+ import logging
+-
+-from .models import Task, TaskStatus
+-from .database import Database
+-
+-logger = logging.getLogger("TaskMaster")
++import os
++from pathlib import Path
++import sys
++import time
++import uuid
++
++from .planning import reject_links
++from .processes import run_process
++from .schedules import ScheduledTask, utc, utcnow
++from .workflows import safe_message, clean_diagnostics
++
++logger = logging.getLogger(__name__)
++
++
++class SchedulerLock:
++    def __init__(self, database):
++        self.path = Path(str(Path(database).absolute()) + '.scheduler.lock')
++        self.stream = None
++
++    def acquire(self):
++        reject_links(self.path)
++        stream = self.path.open('a+b')
++        try:
++            if self.path.stat().st_size == 0:
++                stream.write(b'0')
++                stream.flush()
++            stream.seek(0)
++            if os.name == 'nt':
++                import msvcrt
++                msvcrt.locking(stream.fileno(), msvcrt.LK_NBLCK, 1)
++            else:
++                import fcntl
++                fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
++        except OSError as error:
++            stream.close()
++            raise RuntimeError('Another scheduler owns this database') from error
++        self.stream = stream
++
++    def release(self):
++        if self.stream:
++            self.stream.close()
++            self.stream = None
++
+ 
+ class TaskScheduler:
+-    """Advanced async task scheduler with priority queue and dependency resolution."""
+-
+-    def __init__(self, db: Database, max_workers: int = 4):
+-        self.db = db
+-        self.max_workers = max_workers
+-        self.tasks: Dict[str, Task] = {}
+-        self._running = False
+-        self._task_queue: asyncio.PriorityQueue = asyncio.PriorityQueue()
+-        self._executor = ThreadPoolExecutor(max_workers=max_workers)
+-        self._lock = asyncio.Lock()
+-        self._watcher_task: Optional[asyncio.Task] = None
+-        self._workers: List[asyncio.Task] = []
+-        self._callbacks: Dict[str, List[Callable]] = {}
+-
+-    def register_task(self, task: Task) -> str:
+-        """Register a new task and persist to database."""
+-        task.next_run = task.schedule_time
+-        self.tasks[task.id] = task
+-        self.db.save_task(task)
+-
+-        # Register callbacks
+-        if task.id not in self._callbacks:
+-            self._callbacks[task.id] = []
+-
+-        logger.info(f"Registered task: {task.name} (ID: {task.id})")
++    """One active attempt per database; atomic claims and explicit crash review."""
++    def __init__(self, db, max_workers=1, *, clock=utcnow, poll_interval=0.25, timer=time.monotonic):
++        if max_workers != 1:
++            raise ValueError('Exactly one worker is supported to prevent overlapping attempts')
++        if db.db_path == ':memory:':
++            raise ValueError('Scheduling requires file-backed SQLite')
++        reject_links(Path(db.db_path).absolute())
++        if Path(db.db_path).stat().st_nlink != 1:
++            raise ValueError('Scheduler databases must not have filesystem hard-link aliases')
++        if not isinstance(poll_interval, (int, float)) or not .01 <= poll_interval <= 60:
++            raise ValueError('poll_interval must be between 0.01 and 60 seconds')
++        self.db, self.clock, self.poll_interval = db, clock, poll_interval
++        self.timer = timer
++        self.lock = SchedulerLock(db.db_path)
++        self._running, self._loop_task, self._stopping = False, None, False
++
++    @property
++    def tasks(self):
++        return {task.id: task for task in self.db.schedules()}
++
++    def _validate_graph(self, tasks):
++        visiting, done = set(), set()
++
++        def visit(task_id):
++            if task_id in visiting:
++                raise ValueError('Scheduled task dependencies contain a cycle')
++            if task_id not in tasks:
++                raise ValueError('Dependency task was not found')
++            if task_id in done:
++                return
++            visiting.add(task_id)
++            for dependency in tasks[task_id].dependencies:
++                visit(dependency)
++            visiting.remove(task_id)
++            done.add(task_id)
++        for task_id in tasks:
++            visit(task_id)
++
++    def register_task(self, task):
++        if not isinstance(task, ScheduledTask):
++            raise ValueError('Persist a ScheduledTask with a named operation; Python callables cannot be restored')
++        task = ScheduledTask(**task.to_dict()).validate()
++        if task.status != 'PENDING' or task.run_count or task.fail_count or task.attempt_count or task.last_success:
++            raise ValueError('New schedules must have clean pending state')
++        if len(json.dumps(task.to_dict()).encode('utf-8')) > 1024 * 1024:
++            raise ValueError('Scheduled task exceeds the 1 MiB limit')
++        tasks = self.tasks
++        if task.id in tasks:
++            raise ValueError('Task ID already exists')
++        tasks[task.id] = task
++        self._validate_graph(tasks)
++        self.db.add_schedule(task)
+         return task.id
+ 
+-    def on_complete(self, task_id: str, callback: Callable) -> None:
+-        """Register a callback for task completion."""
+-        if task_id not in self._callbacks:
+-            self._callbacks[task_id] = []
+-        self._callbacks[task_id].append(callback)
+-
+-    def _check_dependencies(self, task: Task) -> bool:
+-        """Check if all dependencies are completed."""
+-        for dep_id in task.dependencies:
+-            dep_task = self.tasks.get(dep_id)
+-            if not dep_task:
+-                # Check database
+-                dep_data = self.db.get_task(dep_id)
+-                if not dep_data or dep_data["status"] != "COMPLETED":
+-                    return False
+-            elif dep_task.status != TaskStatus.COMPLETED:
+-                return False
+-        return True
+-
+-    async def _execute_task(self, task: Task) -> Any:
+-        """Execute a single task with timeout and retry logic."""
+-        async with self._lock:
+-            task.status = TaskStatus.RUNNING
+-            task.last_run = datetime.now()
+-            task.run_count += 1
+-            self.db.save_task(task)
+-
+-        try:
+-            # Check dependencies first
+-            if not self._check_dependencies(task):
+-                raise Exception("Dependencies not satisfied")
+-
+-            # Execute with timeout
+-            if task.timeout_seconds:
+-                result = await asyncio.wait_for(
+-                    self._run_command(task.command),
+-                    timeout=task.timeout_seconds
+-                )
++    def _restore(self):
++        self.db.recover_schedules()
++        tasks = self.tasks
++        for task in tasks.values():
++            task.validate()
++        self._validate_graph(tasks)
++        if any(task.status == 'INTERRUPTED' for task in tasks.values()):
++            raise RuntimeError('Interrupted attempts require task recover --acknowledge before dispatch')
++
++    @contextmanager
++    def ownership(self):
++        self.lock.acquire()
++        try:
++            yield
++        finally:
++            self.lock.release()
++
++    def recover_task(self, task_id, *, acknowledged=False):
++        if acknowledged is not True:
++            raise ValueError('Recovery requires acknowledgement after checking outputs and child processes')
++        with self.ownership():
++            self.db.recover_schedules()
++            self.db.acknowledge_schedule(task_id)
++
++    async def _execute(self, task):
++        attempt_id = str(uuid.uuid4())
++        if not self.db.claim_schedule(task, utc(self.clock()).isoformat(), attempt_id):
++            return False
++        report, running = {'status': 'FAILED', 'complete': False}, None
++        try:
++            def record_pid(pid):
++                with self.db._connection() as conn:
++                    conn.execute('UPDATE scheduled_attempts SET pid=? WHERE id=?', (pid, attempt_id))
++            payload = json.dumps({'task': task.to_dict(), 'database': str(Path(self.db.db_path).absolute())}).encode()
++            command = run_process(argv=[sys.executable, '-m', 'taskmaster.scheduled_worker'],
++                                  cwd=task.base_dir, payload=payload, on_pid=record_pid,
++                                  output_limit=4096 if task.operation == 'subprocess' else None)
++            running = asyncio.create_task(command)
++            deadline = self.timer() + task.timeout_seconds
++            while not running.done():
++                if self.db.schedule_state(task.id):
++                    raise asyncio.CancelledError
++                if self.timer() >= deadline:
++                    raise TimeoutError('Scheduled attempt timed out; process tree terminated')
++                await asyncio.wait({running}, timeout=min(self.poll_interval, 0.25))
++            result = await running
++            report = {'status': 'SUCCESS' if result['returncode'] == 0 else 'FAILED',
++                      'complete': result['returncode'] == 0, **result}
++            if task.operation != 'subprocess':
++                if result['output_truncated']:
++                    raise ValueError('Workflow report exceeded 4 MiB; inspect workflow history before retrying')
++                report['workflow_report'] = json.loads(result['stdout'])
++                report['complete'] = report['complete'] and report['workflow_report']['complete']
++                report['status'] = 'SUCCESS' if report['complete'] else 'FAILED'
++                del report['stdout']
+             else:
+-                result = await self._run_command(task.command)
+-
+-            # Success
+-            async with self._lock:
+-                task.status = TaskStatus.COMPLETED
+-                task.next_run = task.calculate_next_run()
+-                if task.next_run:
+-                    task.status = TaskStatus.PENDING  # Reset for next run
+-                self.db.save_task(task)
+-
+-            # Trigger callbacks
+-            for callback in self._callbacks.get(task.id, []):
++                report['stdout'], report['stderr'] = safe_message(report['stdout']), safe_message(report['stderr'])
++        except asyncio.CancelledError:
++            report = {'status': 'CANCELLED', 'complete': False, 'error': 'Attempt cancelled; inspect partial outputs before resuming'}
++            task.status = self.db.schedule_state(task.id) or 'PAUSED'
++        except Exception as error:
++            report = {'status': 'FAILED', 'complete': False, 'error': safe_message(str(error))}
++        finally:
++            if running and not running.done():
++                running.cancel()
+                 try:
+-                    if asyncio.iscoroutinefunction(callback):
+-                        await callback(task, result)
+-                    else:
+-                        callback(task, result)
+-                except Exception as e:
+-                    logger.error(f"Callback error for task {task.id}: {e}")
+-
+-            logger.info(f"Task completed: {task.name} (ID: {task.id})")
+-            return result
+-
+-        except asyncio.TimeoutError:
+-            error_msg = f"Task timed out after {task.timeout_seconds}s"
+-            await self._handle_failure(task, error_msg)
+-            raise TimeoutError(error_msg)
+-
+-        except Exception as e:
+-            error_msg = str(e)
+-            await self._handle_failure(task, error_msg)
+-            raise
+-
+-    async def _run_command(self, command: Callable) -> Any:
+-        """Run a command, handling both sync and async functions."""
+-        if asyncio.iscoroutinefunction(command):
+-            return await command()
+-        else:
+-            # Run sync function in thread pool
+-            loop = asyncio.get_event_loop()
+-            return await loop.run_in_executor(self._executor, command)
+-
+-    async def _handle_failure(self, task: Task, error: str) -> None:
+-        """Handle task failure with retry logic."""
+-        task.fail_count += 1
+-
+-        if task.fail_count < task.max_retries:
+-            # Retry with exponential backoff
+-            backoff = min(2 ** task.fail_count, 300)  # Max 5 minutes
+-            task.next_run = datetime.now() + timedelta(seconds=backoff)
+-            task.status = TaskStatus.PENDING
+-            logger.warning(f"Task {task.id} failed (attempt {task.fail_count}), retrying in {backoff}s")
+-        else:
+-            task.status = TaskStatus.FAILED
+-            logger.error(f"Task {task.id} failed permanently after {task.max_retries} retries")
+-
+-        self.db.update_task_status(task.id, task.status, error)
+-        self.db.save_task(task)
+-
+-    async def _watcher(self) -> None:
+-        """Background watcher that queues due tasks."""
+-        while self._running:
+-            try:
+-                now = datetime.now()
+-                due_tasks = self.db.get_due_tasks(now)
+-
+-                for task_data in due_tasks:
+-                    task_id = task_data["id"]
+-                    if task_id in self.tasks and self.tasks[task_id].status == TaskStatus.PENDING:
+-                        task = self.tasks[task_id]
+-                        # Priority: lower number = higher priority (PriorityQueue behavior)
+-                        priority_value = -task.priority.value
+-                        await self._task_queue.put((priority_value, task_id))
+-
+-                await asyncio.sleep(1)  # Check every second
+-            except Exception as e:
+-                logger.error(f"Watcher error: {e}")
+-                await asyncio.sleep(5)
+-
+-    async def _worker(self) -> None:
+-        """Worker that processes tasks from the queue."""
+-        while self._running:
+-            try:
+-                # Wait for a task with timeout
+-                try:
+-                    priority, task_id = await asyncio.wait_for(
+-                        self._task_queue.get(), timeout=1.0
+-                    )
+-                except asyncio.TimeoutError:
+-                    continue
+-
+-                task = self.tasks.get(task_id)
+-                if not task or task.status != TaskStatus.PENDING:
+-                    continue
+-
+-                # Execute the task
+-                try:
+-                    await self._execute_task(task)
+-                except Exception as e:
+-                    logger.error(f"Task execution error: {e}")
+-                finally:
+-                    self._task_queue.task_done()
+-
+-            except Exception as e:
+-                logger.error(f"Worker error: {e}")
+-                await asyncio.sleep(1)
+-
+-    async def start(self) -> None:
+-        """Start the scheduler."""
++                    await running
++                except asyncio.CancelledError:
++                    pass
++            now = utc(self.clock())
++            if report['status'] == 'CANCELLED':
++                pass
++            elif report['complete']:
++                task.last_success = now.isoformat()
++                task.next_run = task.following(now)
++                task.occurrence_time = task.next_run or task.occurrence_time
++                task.attempt_count = 0
++                task.status = 'PENDING' if task.next_run else 'COMPLETED'
++            else:
++                task.fail_count += 1
++                error = safe_message(report.get('error') or report.get('stderr') or 'Operation reported failure; inspect attempt report')
++                task.error_log = [*task.error_log, f'{now.isoformat()}: {error}'][-10:]
++                if task.attempt_count <= task.max_retries:
++                    delay = min(task.retry_delay_seconds * 2 ** (task.attempt_count - 1), 300)
++                    task.next_run, task.status = (now + timedelta(seconds=delay)).isoformat(), 'PENDING'
++                else:
++                    task.status, task.next_run = 'FAILED', None
++            # A failed final transaction deliberately leaves RUNNING for recovery.
++            self.db.finish_schedule(task, attempt_id, clean_diagnostics(report), now.isoformat())
++            logger.info('task=%s attempt=%s status=%s', task.id, attempt_id, task.status)
++        return True
++
++    async def _dispatch(self):
++        tasks = self.tasks
++        self._validate_graph(tasks)
++        count = 0
++        for task in sorted(tasks.values(), key=lambda t: (-t.priority, t.next_run or '', t.id)):
++            if self._stopping:
++                break
++            task.validate()
++            if task.status not in ('PENDING', 'BLOCKED') or utc(task.next_run) > utc(self.clock()):
++                continue
++            current = self.tasks
++            blocked = [dep for dep in task.dependencies if not current[dep].last_success
++                       or utc(current[dep].last_success) < utc(task.occurrence_time)]
++            if blocked:
++                task.status, task.blocked_reason = 'BLOCKED', 'Waiting for successful dependency occurrence'
++                self.db.block_schedule(task)
++                continue
++            if await self._execute(task):
++                count += 1
++        return count
++
++    async def run_due(self):
++        if self._running:
++            raise RuntimeError('Scheduler is already running')
++        with self.ownership():
++            self._stopping = False
++            self._restore()
++            return await self._dispatch()
++
++    async def _loop(self):
++        try:
++            while self._running:
++                await self._dispatch()
++                await asyncio.sleep(self.poll_interval)
++        finally:
++            self._running = False
++            self.lock.release()
++
++    async def start(self):
+         if self._running:
+             return
+-
+-        self._running = True
+-
+-        # Load existing tasks from database
+-        for task_data in self.db.get_pending_tasks():
+-            # Tasks loaded from DB need to be re-registered with their commands
+-            # This is handled by the CLI layer
+-            pass
+-
+-        # Start watcher
+-        self._watcher_task = asyncio.create_task(self._watcher())
+-
+-        # Start workers
+-        for i in range(self.max_workers):
+-            worker = asyncio.create_task(self._worker())
+-            self._workers.append(worker)
+-
+-        logger.info(f"Scheduler started with {self.max_workers} workers")
+-
+-    async def stop(self) -> None:
+-        """Gracefully stop the scheduler."""
++        self.lock.acquire()
++        try:
++            self._restore()
++            self._running = True
++            self._stopping = False
++            self._loop_task = asyncio.create_task(self._loop())
++        except BaseException:
++            self.lock.release()
++            raise
++
++    async def stop(self):
++        self._stopping = True
+         self._running = False
+-
+-        if self._watcher_task:
+-            self._watcher_task.cancel()
++        if self._loop_task:
++            self._loop_task.cancel()
+             try:
+-                await self._watcher_task
++                await self._loop_task
+             except asyncio.CancelledError:
+                 pass
+-
+-        for worker in self._workers:
+-            worker.cancel()
+-            try:
+-                await worker
+-            except asyncio.CancelledError:
+-                pass
+-
+-        self._workers.clear()
+-        self._executor.shutdown(wait=True)
+-        logger.info("Scheduler stopped")
+-
+-    def cancel_task(self, task_id: str) -> bool:
+-        """Cancel a pending task."""
+-        if task_id in self.tasks:
+-            task = self.tasks[task_id]
+-            if task.status == TaskStatus.PENDING:
+-                task.status = TaskStatus.CANCELLED
+-                self.db.update_task_status(task_id, TaskStatus.CANCELLED)
+-                return True
+-        return False
+-
+-    def pause_task(self, task_id: str) -> bool:
+-        """Pause a task."""
+-        if task_id in self.tasks:
+-            task = self.tasks[task_id]
+-            task.status = TaskStatus.PAUSED
+-            self.db.update_task_status(task_id, TaskStatus.PAUSED)
+-            return True
+-        return False
+-
+-    def resume_task(self, task_id: str) -> bool:
+-        """Resume a paused task."""
+-        if task_id in self.tasks:
+-            task = self.tasks[task_id]
+-            task.status = TaskStatus.PENDING
+-            task.next_run = datetime.now()
+-            self.db.update_task_status(task_id, TaskStatus.PENDING)
+-            return True
+-        return False
+-
+-    def get_task_status(self, task_id: str) -> Optional[Dict[str, Any]]:
+-        """Get detailed status of a task."""
++            self._loop_task = None
++        self.lock.release()
++
++    def close(self):
++        if self._running:
++            raise RuntimeError('Await scheduler.stop() before closing')
++        self.lock.release()
++
++    def pause_task(self, task_id):
++        self.db.schedule_request(task_id, 'PAUSED')
++        return True
++
++    def cancel_task(self, task_id):
++        self.db.schedule_request(task_id, 'CANCELLED')
++        return True
++
++    def resume_task(self, task_id):
++        self.db.schedule_request(task_id, 'PENDING')
++        return True
++
++    def get_task_status(self, task_id):
+         task = self.tasks.get(task_id)
+-        if task:
+-            return task.to_dict()
+-        return self.db.get_task(task_id)
++        return task.to_dict() if task else None
+--- /dev/null
++++ after/taskmaster/schedules.py
+@@ -0,0 +1,125 @@
++"""Serializable UTC schedules; no persisted Python callables."""
++import calendar
++from dataclasses import asdict, dataclass, field
++from datetime import datetime, timedelta, timezone
++import json
++from pathlib import Path
++import uuid
++
++from .config import validate_workflow
++from .operations import normalize_parameters
++
++
++def utcnow():
++    return datetime.now(timezone.utc)
++
++
++def utc(value):
++    date = datetime.fromisoformat(value) if isinstance(value, str) else value
++    if not isinstance(date, datetime) or date.tzinfo is None or date.utcoffset() is None:
++        raise ValueError('Schedule times require an explicit UTC offset')
++    return date.astimezone(timezone.utc)
++
++
++@dataclass
++class ScheduledTask:
++    name: str
++    operation: str
++    parameters: dict
++    schedule_time: str
++    base_dir: str
++    recurrence: str = 'once'
++    interval_minutes: int = 1
++    priority: int = 2
++    dependencies: list[str] = field(default_factory=list)
++    max_retries: int = 0
++    retry_delay_seconds: int = 1
++    timeout_seconds: int = 300
++    retry_safe: bool = False
++    config_path: str | None = None
++    id: str = field(default_factory=lambda: str(uuid.uuid4()))
++    status: str = 'PENDING'
++    next_run: str | None = None
++    occurrence_time: str | None = None
++    run_count: int = 0
++    fail_count: int = 0
++    attempt_count: int = 0
++    last_success: str | None = None
++    error_log: list[str] = field(default_factory=list)
++    blocked_reason: str | None = None
++
++    def to_dict(self):
++        return json.loads(json.dumps(asdict(self)))
++
++    def validate(self):
++        if not isinstance(self.name, str) or not self.name.strip() or len(self.name) > 256:
++            raise ValueError('Task name must contain 1–256 characters')
++        if not isinstance(self.id, str) or not self.id or len(self.id) > 64:
++            raise ValueError('Invalid task ID')
++        self.schedule_time = utc(self.schedule_time).isoformat()
++        self.base_dir = str(Path(self.base_dir).expanduser().absolute())
++        if self.config_path is not None:
++            self.config_path = str(Path(self.config_path).expanduser().absolute())
++        for name, low, high in [('interval_minutes', 1, 525600), ('priority', 1, 4),
++                                ('max_retries', 0, 10), ('retry_delay_seconds', 1, 300),
++                                ('timeout_seconds', 1, 86400)]:
++            value = getattr(self, name)
++            if type(value) is not int or not low <= value <= high:
++                raise ValueError(f'{name} must be an integer from {low} to {high}')
++        if self.recurrence not in ('once', 'minutely', 'hourly', 'daily', 'weekly', 'monthly', 'custom'):
++            raise ValueError('Unsupported recurrence')
++        if (type(self.dependencies) is not list or any(not isinstance(d, str) or not d for d in self.dependencies)
++                or len(set(self.dependencies)) != len(self.dependencies) or self.id in self.dependencies):
++            raise ValueError('Dependencies must be distinct task IDs without self references')
++        if type(self.retry_safe) is not bool:
++            raise ValueError('retry_safe must be a boolean')
++        mutating = False
++        if self.operation == 'workflow':
++            if type(self.parameters) is not dict or set(self.parameters) != {'workflow', 'apply', 'confirmed'}:
++                raise ValueError('Workflow task requires workflow, apply and confirmed parameters')
++            workflow = validate_workflow(self.parameters['workflow'])
++            if type(self.parameters['apply']) is not bool or type(self.parameters['confirmed']) is not bool:
++                raise ValueError('Workflow apply/confirmed flags must be booleans')
++            mutating = self.parameters['apply'] and any(s.operation == 'organize' for s in workflow.steps)
++            if mutating and not self.parameters['confirmed']:
++                raise ValueError('Scheduled organization requires persistent explicit approval')
++            self.parameters = {**self.parameters, 'workflow': workflow.to_dict()}
++        elif self.operation == 'subprocess':
++            if (type(self.parameters) is not dict or set(self.parameters) != {'command'}
++                    or not isinstance(self.parameters['command'], str) or not self.parameters['command'].strip()
++                    or '\0' in self.parameters['command']):
++                raise ValueError('Subprocess task requires a nonempty shell command')
++            if self.max_retries and not self.retry_safe:
++                raise ValueError('Subprocess retries require explicit retry_safe acknowledgement')
++        elif self.operation in ('inspect', 'duplicates'):
++            self.parameters = normalize_parameters(self.operation, self.parameters)
++        else:
++            raise ValueError('Scheduled operations are inspect, duplicates, workflow or subprocess')
++        if mutating and self.max_retries:
++            raise ValueError('Automatic retries of file-changing workflows are disabled')
++        self.next_run = utc(self.next_run or self.schedule_time).isoformat()
++        self.occurrence_time = utc(self.occurrence_time or self.schedule_time).isoformat()
++        if self.last_success is not None:
++            self.last_success = utc(self.last_success).isoformat()
++        return self
++
++    def following(self, after):
++        """Fixed UTC cadence, skip missed ticks; monthly retains original day anchor."""
++        if self.recurrence == 'once':
++            return None
++        after = utc(after)
++        anchor = utc(self.schedule_time)
++        if self.recurrence == 'monthly':
++            months = max(1, (after.year - anchor.year) * 12 + after.month - anchor.month)
++            while True:
++                year, month = divmod(anchor.year * 12 + anchor.month - 1 + months, 12)
++                month += 1
++                candidate = anchor.replace(year=year, month=month,
++                                           day=min(anchor.day, calendar.monthrange(year, month)[1]))
++                if candidate > after:
++                    return candidate.isoformat()
++                months += 1
++        seconds = {'minutely': self.interval_minutes * 60, 'custom': self.interval_minutes * 60,
++                   'hourly': 3600, 'daily': 86400, 'weekly': 604800}[self.recurrence]
++        ticks = max(1, int((after - anchor).total_seconds() // seconds) + 1)
++        return (anchor + timedelta(seconds=ticks * seconds)).isoformat()
+--- before/tests/test_baseline.py
++++ after/tests/test_baseline.py
+@@ -156,11 +156,10 @@
+         assert cli.run_cli(["task", "add", "--name", "probe", "--command", "echo correct",
+                             "--schedule", "2026-10-15 12:00"]) == 0
+         task = next(iter(cli.scheduler.tasks.values()))
+-        with pytest.MonkeyPatch.context() as patch:
+-            run = Mock(return_value=Mock(stdout="correct"))
+-            patch.setattr(subprocess, "run", run)
+-            assert task.command() == "correct"
+-            run.assert_called_once_with("echo correct", shell=True, capture_output=True, text=True, check=True)
++        assert task.operation == 'subprocess'
++        assert task.parameters == {'command': 'echo correct'}
++        restored = cli.db.schedules()[0]
++        assert restored.parameters == task.parameters
+     finally:
+         cli.close()
+ 
+--- /dev/null
++++ after/tests/test_scheduler.py
+@@ -0,0 +1,382 @@
++import asyncio
++from datetime import datetime, timedelta, timezone
++import json
++import os
++import sqlite3
++import subprocess
++import sys
++import uuid
++
++import pytest
++
++from taskmaster.cli import main
++from taskmaster.database import Database
++from taskmaster.schedules import ScheduledTask, utc
++from taskmaster.scheduler import TaskScheduler
++
++NOW = datetime(2026, 10, 15, 12, tzinfo=timezone.utc)
++
++
++@pytest.fixture
++def setup(tmp_path):
++    source = tmp_path / 'source'
++    source.mkdir()
++    (source / 'a.log').write_bytes(b'same')
++    (source / 'b.log').write_bytes(b'same')
++    db = Database(str(tmp_path / 'history.sqlite'))
++    return source, db
++
++
++def job(source, **options):
++    return ScheduledTask('review', 'inspect', {'source': str(source)}, NOW.isoformat(), str(source.parent), **options)
++
++
++def shell(source, code, **options):
++    script = source.parent / (str(uuid.uuid4()) + '.py')
++    script.write_text(code, encoding='utf-8')
++    command = subprocess.list2cmdline([sys.executable, str(script)]) if os.name == 'nt' else __import__('shlex').join([sys.executable, str(script)])
++    return ScheduledTask('command', 'subprocess', {'command': command}, NOW.isoformat(), str(source.parent), **options)
++
++
++def run(scheduler):
++    return asyncio.run(scheduler.run_due())
++
++
++def test_future_next_run_restores_and_does_not_repeat(setup):
++    source, db = setup
++    clock = [NOW - timedelta(seconds=1)]
++    scheduler = TaskScheduler(db, clock=lambda: clock[0])
++    task = job(source)
++    scheduler.register_task(task)
++    assert run(scheduler) == 0
++    clock[0] = NOW
++    restored = TaskScheduler(Database(db.db_path), clock=lambda: clock[0])
++    assert run(restored) == 1
++    assert run(restored) == 0
++    saved = restored.get_task_status(task.id)
++    assert saved['status'] == 'COMPLETED' and saved['run_count'] == 1
++    attempt = db.schedule_attempts()[0]
++    assert attempt['report']['workflow_report']['steps'][0]['report']['summary']['file_count'] == 2
++
++
++@pytest.mark.parametrize('recurrence,after,expected', [
++    ('minutely', '2026-01-31T12:05:33+00:00', '2026-01-31T12:06:00+00:00'),
++    ('hourly', '2026-01-31T13:00:00+00:00', '2026-01-31T14:00:00+00:00'),
++    ('daily', '2026-02-02T12:00:00+00:00', '2026-02-03T12:00:00+00:00'),
++    ('weekly', '2026-02-07T12:00:00+00:00', '2026-02-14T12:00:00+00:00'),
++    ('monthly', '2026-01-31T12:00:00+00:00', '2026-02-28T12:00:00+00:00'),
++    ('monthly', '2026-02-28T12:00:00+00:00', '2026-03-31T12:00:00+00:00'),
++])
++def test_cadence_boundaries_and_month_end(setup, recurrence, after, expected):
++    source, _ = setup
++    task = job(source, recurrence=recurrence)
++    task.schedule_time = '2026-01-31T12:00:00+00:00'
++    assert task.validate().following(utc(after)) == expected
++
++
++def test_timezone_and_bad_schedule_fields(setup):
++    source, _ = setup
++    task = job(source)
++    task.schedule_time = '2026-10-15T17:30:00+05:30'
++    assert task.validate().schedule_time == NOW.isoformat()
++    with pytest.raises(ValueError, match='offset'):
++        utc(datetime(2026, 1, 1))
++    for options in ({'max_retries': -1}, {'interval_minutes': 0}, {'timeout_seconds': True}, {'priority': 9}):
++        with pytest.raises(ValueError):
++            job(source, **options).validate()
++
++
++def test_retry_budget_backoff_and_logs_survive_restart(setup):
++    source, db = setup
++    clock = [NOW]
++    task = job(source / 'missing', max_retries=2)
++    scheduler = TaskScheduler(db, clock=lambda: clock[0])
++    scheduler.register_task(task)
++    for number, seconds in ((1, 1), (2, 2)):
++        assert run(scheduler) == 1
++        saved = scheduler.tasks[task.id]
++        assert saved.run_count == number and saved.fail_count == number
++        assert utc(saved.next_run) == clock[0] + timedelta(seconds=seconds)
++        assert run(scheduler) == 0
++        clock[0] = utc(saved.next_run)
++        scheduler = TaskScheduler(Database(db.db_path), clock=lambda: clock[0])
++    assert run(scheduler) == 1
++    saved = scheduler.tasks[task.id]
++    assert saved.status == 'FAILED' and saved.run_count == 3 and len(saved.error_log) == 3
++    assert len(db.schedule_attempts()) == 3
++
++
++def test_success_resets_occurrence_retry_budget_and_skips_missed_ticks(setup):
++    source, db = setup
++    clock = [NOW + timedelta(minutes=7, seconds=3)]
++    scheduler = TaskScheduler(db, clock=lambda: clock[0])
++    review = source / 'generated'
++    task = job(review, recurrence='minutely', max_retries=1)
++    scheduler.register_task(task)
++    assert run(scheduler) == 1
++    assert scheduler.tasks[task.id].attempt_count == 1
++    clock[0] = utc(scheduler.tasks[task.id].next_run)
++    review.mkdir()
++    assert run(scheduler) == 1
++    saved = scheduler.tasks[task.id]
++    assert saved.attempt_count == 0 and saved.fail_count == 1
++    assert utc(saved.next_run) == NOW + timedelta(minutes=8)
++    assert run(scheduler) == 0
++    clock[0] = utc(saved.next_run)
++    assert run(scheduler) == 1
++    assert len({a['occurrence_time'] for a in db.schedule_attempts()}) == 2
++
++
++def test_dependencies_block_without_consuming_attempts_and_then_unblock(setup):
++    source, db = setup
++    scheduler = TaskScheduler(db, clock=lambda: NOW)
++    parent = job(source, priority=1)
++    child = job(source, dependencies=[parent.id], priority=4)
++    scheduler.register_task(parent)
++    scheduler.register_task(child)
++    assert run(scheduler) == 1
++    assert scheduler.tasks[child.id].status == 'BLOCKED' and scheduler.tasks[child.id].run_count == 0
++    assert run(scheduler) == 1
++    assert scheduler.tasks[child.id].status == 'COMPLETED'
++
++
++def test_cycles_missing_dependencies_and_callables_rejected(setup):
++    source, db = setup
++    scheduler = TaskScheduler(db)
++    task = job(source, dependencies=['absent'])
++    with pytest.raises(ValueError, match='not found'):
++        scheduler.register_task(task)
++    task.dependencies = [task.id]
++    with pytest.raises(ValueError, match='self'):
++        scheduler.register_task(task)
++    with pytest.raises(ValueError, match='callables'):
++        scheduler.register_task(lambda: None)
++    first, second = job(source), job(source)
++    first.dependencies, second.dependencies = [second.id], [first.id]
++    db.add_schedule(first.validate())
++    db.add_schedule(second.validate())
++    with pytest.raises(ValueError, match='cycle'):
++        run(scheduler)
++    assert not db.schedule_attempts()
++
++
++def test_single_owner_and_atomic_claim_prevent_duplicates(setup):
++    source, db = setup
++    scheduler = TaskScheduler(db, clock=lambda: NOW)
++    task = job(source)
++    scheduler.register_task(task)
++    other = TaskScheduler(Database(db.db_path), clock=lambda: NOW)
++    with scheduler.ownership():
++        with pytest.raises(RuntimeError, match='owns'):
++            run(other)
++    assert db.claim_schedule(task.validate(), NOW.isoformat(), 'first')
++    assert not db.claim_schedule(job(source), NOW.isoformat(), 'second')
++    assert not db.claim_schedule(task, NOW.isoformat(), 'second')
++    with pytest.raises(RuntimeError, match='Interrupted'):
++        run(other)
++    assert len(db.schedule_attempts()) == 1
++
++
++def test_crash_requires_review_then_explicit_resume(setup):
++    source, db = setup
++    task = job(source)
++    scheduler = TaskScheduler(db, clock=lambda: NOW)
++    scheduler.register_task(task)
++    assert db.claim_schedule(task.validate(), NOW.isoformat(), 'crashed')
++    with pytest.raises(RuntimeError, match='Interrupted'):
++        run(scheduler)
++    assert scheduler.tasks[task.id].status == 'INTERRUPTED'
++    with pytest.raises(ValueError, match='acknowledgement'):
++        scheduler.recover_task(task.id)
++    scheduler.recover_task(task.id, acknowledged=True)
++    assert run(scheduler) == 0
++    scheduler.resume_task(task.id)
++    assert run(scheduler) == 1
++    assert [a['status'] for a in db.schedule_attempts()] == ['INTERRUPTED', 'SUCCESS']
++
++
++def test_pause_cancel_resume_pending_and_restart(setup):
++    source, db = setup
++    scheduler = TaskScheduler(db, clock=lambda: NOW)
++    task = job(source)
++    scheduler.register_task(task)
++    scheduler.pause_task(task.id)
++    assert run(scheduler) == 0
++    scheduler = TaskScheduler(Database(db.db_path), clock=lambda: NOW)
++    scheduler.resume_task(task.id)
++    scheduler.cancel_task(task.id)
++    assert run(scheduler) == 0
++    assert scheduler.tasks[task.id].status == 'CANCELLED'
++
++
++def test_timeout_terminates_child_tree_before_delayed_side_effect(setup):
++    source, db = setup
++    child = source.parent / 'child.py'
++    marker = source.parent / 'late.txt'
++    started = source.parent / 'child-started'
++    child.write_text('import time\nfrom pathlib import Path\nPath(' + repr(str(started)) + ').write_text("ready")\ntime.sleep(4)\nPath(' + repr(str(marker)) + ').write_text("late")\n')
++    code = 'import subprocess,sys,time\nsubprocess.Popen([sys.executable,' + repr(str(child)) + '])\ntime.sleep(20)\n'
++    scheduler = TaskScheduler(db, clock=lambda: NOW, poll_interval=0.02,
++                              timer=lambda: 10 if started.exists() else 0)
++    task = shell(source, code, timeout_seconds=2)
++    scheduler.register_task(task)
++    async def scenario():
++        await asyncio.wait_for(scheduler.run_due(), timeout=30)
++        await asyncio.sleep(4.2)
++    asyncio.run(scenario())
++    assert scheduler.tasks[task.id].status == 'FAILED'
++    assert 'timed out' in db.schedule_attempts()[0]['report']['error']
++    assert started.exists(), 'Fixture must actually launch a descendant before timeout'
++    assert not marker.exists()
++
++
++def test_active_cancel_and_shutdown_pause_without_dispatching_next_job(setup):
++    source, db = setup
++    scheduler = TaskScheduler(db, clock=lambda: NOW, poll_interval=0.02)
++    first = shell(source, 'import time\ntime.sleep(20)\n', priority=4)
++    second = job(source)
++    scheduler.register_task(first)
++    scheduler.register_task(second)
++    async def scenario():
++        await scheduler.start()
++        for _ in range(300):
++            if db.schedule_attempts() and db.schedule_attempts()[0]['pid']:
++                break
++            await asyncio.sleep(.01)
++        await scheduler.stop()
++    asyncio.run(scenario())
++    assert scheduler.tasks[first.id].status == 'PAUSED'
++    assert scheduler.tasks[second.id].run_count == 0
++    assert db.schedule_attempts()[0]['status'] == 'CANCELLED'
++    assert run(TaskScheduler(db, clock=lambda: NOW)) == 1
++
++
++def test_subprocess_output_is_bounded_and_credentials_redacted(setup):
++    source, db = setup
++    scheduler = TaskScheduler(db, clock=lambda: NOW)
++    task = shell(source, 'print("x"*10000)\nprint("token=never-echo-this")\n')
++    scheduler.register_task(task)
++    run(scheduler)
++    report = db.schedule_attempts()[0]['report']
++    assert report['output_truncated'] and len(report['stdout']) <= 4096
++    assert 'never-echo-this' not in json.dumps(report)
++
++
++def test_mutating_workflow_approval_and_retry_guard(setup):
++    source, db = setup
++    workflow = {'version': 1, 'name': 'copy', 'steps': [{'id': 'copy', 'operation': 'organize',
++        'parameters': {'source': str(source), 'destination': str(source.parent / 'output'),
++                       'includes': ['*.log'], 'action': 'copy'}}]}
++    task = ScheduledTask('copy', 'workflow', {'workflow': workflow, 'apply': True, 'confirmed': False}, NOW.isoformat(), str(source.parent))
++    scheduler = TaskScheduler(db, clock=lambda: NOW)
++    with pytest.raises(ValueError, match='approval'):
++        scheduler.register_task(task)
++    task.parameters['confirmed'], task.max_retries = True, 1
++    with pytest.raises(ValueError, match='retries'):
++        scheduler.register_task(task)
++    task.max_retries = 0
++    scheduler.register_task(task)
++    assert run(scheduler) == 1
++    assert len(list((source.parent / 'output').rglob('*.log'))) == 2
++    assert len(Database.read_runs(db.db_path)) == 1
++
++
++def test_cli_snapshot_is_restored_after_config_removed(setup, capsys):
++    source, db = setup
++    path = source.parent / 'review.json'
++    path.write_text(json.dumps({'version': 1, 'name': 'review', 'steps': [
++        {'id': 'inspect', 'operation': 'inspect', 'parameters': {'source': 'source'}}]}))
++    prefix = ['--database', db.db_path]
++    assert main([*prefix, 'task', 'add', '--name', 'review', '--workflow', str(path),
++                 '--schedule', '2020-01-01T00:00:00+00:00', '--format', 'json']) == 0
++    task_id = json.loads(capsys.readouterr().out)['task_id']
++    path.unlink()
++    assert main([*prefix, 'task', 'run-due', '--format', 'json']) == 0
++    assert json.loads(capsys.readouterr().out)['dispatched'] == 1
++    assert main([*prefix, 'task', 'list', '--format', 'json']) == 0
++    assert json.loads(capsys.readouterr().out)['tasks'][0]['id'] == task_id
++    assert main([*prefix, 'task', 'attempts', '--format', 'json']) == 0
++    assert json.loads(capsys.readouterr().out)['attempts'][0]['status'] == 'SUCCESS'
++
++
++def test_active_cancel_request_terminates_without_retry(setup):
++    source, db = setup
++    scheduler = TaskScheduler(db, clock=lambda: NOW, poll_interval=.02)
++    task = shell(source, 'import time\ntime.sleep(20)\n')
++    scheduler.register_task(task)
++    async def scenario():
++        await scheduler.start()
++        for _ in range(300):
++            if db.schedule_attempts() and db.schedule_attempts()[0]['pid']:
++                break
++            await asyncio.sleep(.01)
++        scheduler.cancel_task(task.id)
++        for _ in range(300):
++            if scheduler.tasks[task.id].status == 'CANCELLED':
++                break
++            await asyncio.sleep(.01)
++        await scheduler.stop()
++    asyncio.run(scenario())
++    assert scheduler.tasks[task.id].status == 'CANCELLED'
++    assert db.schedule_attempts()[0]['status'] == 'CANCELLED'
++    assert run(scheduler) == 0
++
++
++def test_real_monotonic_timeout_reaps_worker(setup):
++    source, db = setup
++    scheduler = TaskScheduler(db, clock=lambda: NOW, poll_interval=.02)
++    task = shell(source, 'import time\ntime.sleep(20)\n', timeout_seconds=1)
++    scheduler.register_task(task)
++    assert run(scheduler) == 1
++    assert scheduler.tasks[task.id].status == 'FAILED'
++    assert 'timed out' in db.schedule_attempts()[0]['report']['error']
++
++
++def test_claim_journal_failure_prevents_subprocess(setup, monkeypatch):
++    source, db = setup
++    marker = source.parent / 'unwritten'
++    scheduler = TaskScheduler(db, clock=lambda: NOW)
++    task = shell(source, 'from pathlib import Path\nPath(' + repr(str(marker)) + ').write_text("bad")\n')
++    scheduler.register_task(task)
++    def denied(*args):
++        raise sqlite3.OperationalError('claim journal denied')
++    monkeypatch.setattr(db, 'claim_schedule', denied)
++    with pytest.raises(sqlite3.OperationalError):
++        run(scheduler)
++    assert not marker.exists() and not db.schedule_attempts()
++
++
++def test_finish_failure_keeps_running_for_recovery_and_actual_output(setup, monkeypatch):
++    source, db = setup
++    marker = source.parent / 'written'
++    scheduler = TaskScheduler(db, clock=lambda: NOW)
++    task = shell(source, 'from pathlib import Path\nPath(' + repr(str(marker)) + ').write_text("done")\n')
++    scheduler.register_task(task)
++    def denied(*args):
++        raise sqlite3.OperationalError('finish journal denied')
++    monkeypatch.setattr(db, 'finish_schedule', denied)
++    with pytest.raises(sqlite3.OperationalError):
++        run(scheduler)
++    assert marker.read_text() == 'done'
++    assert db.schedule_attempts()[0]['status'] == 'RUNNING'
++    with pytest.raises(RuntimeError, match='Interrupted'):
++        run(TaskScheduler(Database(db.db_path), clock=lambda: NOW))
++    assert marker.read_text() == 'done'
++
++
++def test_owner_lock_is_enforced_in_another_process(setup):
++    _, db = setup
++    scheduler = TaskScheduler(db)
++    with scheduler.ownership():
++        result = subprocess.run([sys.executable, '-m', 'taskmaster', '--database', db.db_path,
++                                 'task', 'run-due', '--format', 'json'], capture_output=True, text=True, timeout=30)
++    assert result.returncode == 1 and 'owns this database' in json.loads(result.stdout)['error']
++
++
++def test_legacy_rows_are_preserved_without_inventing_commands(setup):
++    _, db = setup
++    with db._connection() as conn:
++        conn.execute("INSERT INTO tasks(id,name,schedule_time) VALUES ('legacy','legacy','2020-01-01')")
++    assert run(TaskScheduler(db)) == 0
++    assert db.get_task('legacy')['name'] == 'legacy'
++    assert not db.schedule_attempts()
+--- before/tests/test_workflows.py
++++ after/tests/test_workflows.py
+@@ -151,7 +151,7 @@
+     assert all(str(uuid.UUID(entry["id"])) == entry["id"] for entry in operations)
+     with sqlite3.connect(history) as connection:
+         assert connection.execute("SELECT COUNT(*) FROM run_steps").fetchone()[0] == 3
+-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 1
++        assert connection.execute("PRAGMA user_version").fetchone()[0] == 2
+     second = run_workflow(workflow, base_dir=root, history_path=history, apply=True)
+     assert second["run_id"] != report["run_id"]
+     assert not second["complete"]  # Copy conflicts remain failures, never overwrites.
+@@ -346,7 +346,7 @@
+     assert old["run_id"] is None and old["step_id"] is None
+     Database(str(path))
+     with sqlite3.connect(path) as connection:
+-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 1
++        assert connection.execute("PRAGMA user_version").fetchone()[0] == 2
+     assert db.get_stats()["file_operations"] == 1
+ 
+ 

@@ -1,0 +1,16 @@
+{
+  "python_modules": 22,
+  "name": "taskmaster",
+  "version": "2.0.1",
+  "artifacts": [
+    {
+      "file": "taskmaster-2.0.1-py3-none-any.whl",
+      "sha256": "cf057f6eaecdf35beebd8bf7e7151fe9b64181578773810e4dc5ed7f385d52df"
+    },
+    {
+      "file": "taskmaster-2.0.1.tar.gz",
+      "sha256": "bd1a3f09a8b797eda4dda39f3e8c10606e999dc0dedd9175b91e6beb4230ce02"
+    }
+  ],
+  "complete": true
+}

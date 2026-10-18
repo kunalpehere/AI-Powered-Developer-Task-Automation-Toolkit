@@ -1,0 +1,1 @@
+{"dependencies": [{"name": "markdown-it-py", "version": "4.2.0", "vulns": []}, {"name": "mdurl", "version": "0.1.2", "vulns": []}, {"name": "pygments", "version": "2.21.0", "vulns": []}, {"name": "rich", "version": "13.9.4", "vulns": []}], "fixes": []}

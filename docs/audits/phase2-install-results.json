@@ -1,0 +1,297 @@
+{
+  "cwd": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside",
+  "checks": [
+    {
+      "check": "wheel module help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "taskmaster",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: __main__.py [-h] [--interactive] {task,organize,duplicates} ...\n\nTaskMaster - Advanced Task Scheduler & File Organizer\n\npositional arguments:\n  {task,organize,duplicates}\n                        Available commands\n    task                Task management\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  __main__.py --interactive              Launch interactive mode\n  __main__.py task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  __main__.py task list\n  __main__.py organize --source ./sample-artifacts --destination ./organized --dry-run\n  __main__.py duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel taskmaster.exe help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\taskmaster.exe",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: taskmaster [-h] [--interactive] {task,organize,duplicates} ...\n\nTaskMaster - Advanced Task Scheduler & File Organizer\n\npositional arguments:\n  {task,organize,duplicates}\n                        Available commands\n    task                Task management\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  taskmaster --interactive              Launch interactive mode\n  taskmaster task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  taskmaster task list\n  taskmaster organize --source ./sample-artifacts --destination ./organized --dry-run\n  taskmaster duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel tm.exe help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\tm.exe",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: tm [-h] [--interactive] {task,organize,duplicates} ...\n\nTaskMaster - Advanced Task Scheduler & File Organizer\n\npositional arguments:\n  {task,organize,duplicates}\n                        Available commands\n    task                Task management\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  tm --interactive              Launch interactive mode\n  tm task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  tm task list\n  tm organize --source ./sample-artifacts --destination ./organized --dry-run\n  tm duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "editable module help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "taskmaster",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: __main__.py [-h] [--interactive] {task,organize,duplicates} ...\n\nTaskMaster - Advanced Task Scheduler & File Organizer\n\npositional arguments:\n  {task,organize,duplicates}\n                        Available commands\n    task                Task management\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  __main__.py --interactive              Launch interactive mode\n  __main__.py task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  __main__.py task list\n  __main__.py organize --source ./sample-artifacts --destination ./organized --dry-run\n  __main__.py duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "editable taskmaster.exe help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv\\Scripts\\taskmaster.exe",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: taskmaster [-h] [--interactive] {task,organize,duplicates} ...\n\nTaskMaster - Advanced Task Scheduler & File Organizer\n\npositional arguments:\n  {task,organize,duplicates}\n                        Available commands\n    task                Task management\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  taskmaster --interactive              Launch interactive mode\n  taskmaster task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  taskmaster task list\n  taskmaster organize --source ./sample-artifacts --destination ./organized --dry-run\n  taskmaster duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "editable tm.exe help",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv\\Scripts\\tm.exe",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "usage: tm [-h] [--interactive] {task,organize,duplicates} ...\n\nTaskMaster - Advanced Task Scheduler & File Organizer\n\npositional arguments:\n  {task,organize,duplicates}\n                        Available commands\n    task                Task management\n    organize            Organize files\n    duplicates          Find duplicates\n\noptions:\n  -h, --help            show this help message and exit\n  --interactive, -i     Launch interactive mode\n\nExamples:\n  tm --interactive              Launch interactive mode\n  tm task add --name \"Backup\" --command \"rsync -a ~/docs /backup\" --schedule \"2024-01-01 00:00\"\n  tm task list\n  tm organize --source ./sample-artifacts --destination ./organized --dry-run\n  tm duplicates --dir ./sample-artifacts\n            \n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel new-module imports outside source",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\python.exe",
+        "-I",
+        "-c",
+        "import taskmaster, taskmaster.planning, taskmaster.execution, taskmaster.errors, importlib.util; print(taskmaster.__file__); assert '.venv-phase2' in taskmaster.__file__; assert importlib.util.find_spec('PIL') is None; assert importlib.util.find_spec('PyPDF2') is None"
+      ],
+      "exit_code": 0,
+      "stdout": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Lib\\site-packages\\taskmaster\\__init__.py\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel disposable preview demo",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "taskmaster.demo",
+        "--directory",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside"
+      ],
+      "exit_code": 0,
+      "stdout": "{'total_files': 2, 'history_failed': 0, 'filesystem_changed': 0, 'successful': 0, 'failed': 0, 'skipped': 0, 'dry_run': 2, 'total_size_mb': 0.0, 'timestamp': '2026-10-15T16:11:55.826916'}\nFull SHA-256 duplicate groups: 1\nPreview and duplicate report created no output files or database.\nDemo complete; disposable fixtures removed.\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel default preview",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output"
+      ],
+      "exit_code": 0,
+      "stdout": "Plan: 2 operations | C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input -> \nC:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\nmove C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\one.log \n-> C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\\misc\\on\ne.log | conflict=error\nmove C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\two.log \n-> C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\\misc\\tw\no.log | conflict=error\ndry_run: C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\one.log \n| files=unchanged | history=not_requested\ndry_run: C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\two.log \n| files=unchanged | history=not_requested\nSuccessful: 0; failed: 0; skipped: 0; history failures: 0\nPreviewed 2 files; no file or history changes applied.\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel read-only duplicate report",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\tm.exe",
+        "duplicates",
+        "--dir",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input"
+      ],
+      "exit_code": 0,
+      "stdout": "Found 1 duplicate groups\nC:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\one.log\nC:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\two.log\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel move without confirmation",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output",
+        "--apply"
+      ],
+      "exit_code": 1,
+      "stdout": "Plan: 2 operations | C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input -> \nC:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\nmove C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\one.log \n-> C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\\misc\\on\ne.log | conflict=error\nmove C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\two.log \n-> C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\\misc\\tw\no.log | conflict=error\nError: Confirmation required; inspect preview, then use --apply --yes\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel missing destination argument",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "usage: tm organize [-h] --source SOURCE --destination DESTINATION\n                   [--action {copy,move}] [--conflict {error,skip}]\n                   [--template TEMPLATE] [--yes] [--strategy {type,date,size}]\n                   [--dry-run | --apply]\ntm organize: error: the following arguments are required: --destination\n"
+    },
+    {
+      "check": "wheel approved move",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output",
+        "--apply",
+        "--yes"
+      ],
+      "exit_code": 0,
+      "stdout": "Plan: 2 operations | C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input -> \nC:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\nmove C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\one.log \n-> C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\\misc\\on\ne.log | conflict=error\nmove C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\two.log \n-> C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\\misc\\tw\no.log | conflict=error\nsuccess: C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\one.log \n| files=moved | history=recorded\nsuccess: C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\two.log \n| files=moved | history=recorded\nSuccessful: 2; failed: 0; skipped: 0; history failures: 0\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel conflict preserves source and destination",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output",
+        "--apply",
+        "--yes"
+      ],
+      "exit_code": 1,
+      "stdout": "Plan: 1 operations | C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input -> \nC:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\nmove C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\one.log \n-> C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\\misc\\on\ne.log | conflict=error | Destination already exists; leaving it unchanged: \nC:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\\misc\\on\ne.log\nfailed: C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\one.log \n| files=unchanged | history=recorded | Destination already exists; leaving it \nunchanged: C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\\misc\\on\ne.log\nSuccessful: 0; failed: 1; skipped: 0; history failures: 0\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel conflict skip",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output",
+        "--conflict",
+        "skip",
+        "--apply",
+        "--yes"
+      ],
+      "exit_code": 0,
+      "stdout": "Plan: 1 operations | C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input -> \nC:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\nmove C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\one.log \n-> C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\\misc\\on\ne.log | conflict=skip | Destination already exists: \nC:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\\misc\\on\ne.log\nskipped: C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\one.log \n| files=unchanged | history=recorded | Destination already exists: \nC:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\\misc\\on\ne.log\nSuccessful: 0; failed: 0; skipped: 1; history failures: 0\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel traversal refused",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output",
+        "--template",
+        "../escape.log"
+      ],
+      "exit_code": 1,
+      "stdout": "Plan: 1 operations | C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input -> \nC:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output\nmove C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\one.log \n-> (invalid destination) | conflict=error | Destination traversal (..) is not \nallowed\nfailed: C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input\\one.log \n| files=unchanged | history=not_requested | Destination traversal (..) is not \nallowed\nSuccessful: 0; failed: 1; skipped: 0; history failures: 0\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel duplicate deletion stays disabled",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\tm.exe",
+        "duplicates",
+        "--dir",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\input",
+        "--delete"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "usage: tm [-h] [--interactive] {task,organize,duplicates} ...\ntm: error: Duplicate deletion is disabled; omit --delete to report full SHA-256 matches.\n"
+    },
+    {
+      "check": "wheel missing source exit",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\tm.exe",
+        "organize",
+        "--source",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\missing",
+        "--destination",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\output"
+      ],
+      "exit_code": 1,
+      "stdout": "Error: Source directory does not exist: C:\\Users\\LOCAL_USER\\Desktop\\Resume \nProject\\1_404Minds\\taskmaster-main\\.install-check\\phase2-outside\\missing\n",
+      "stderr": ""
+    },
+    {
+      "check": "wheel retained task dispatch",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\tm.exe",
+        "task",
+        "add",
+        "--name",
+        "probe",
+        "--command",
+        "echo phase2",
+        "--schedule",
+        "2026-10-15 12:00"
+      ],
+      "exit_code": 0,
+      "stdout": "Task created: a6343abc\nExperimental: commands cannot be restored after this process exits.\n",
+      "stderr": "INFO:TaskMaster:Registered task: probe (ID: a6343abc)\n"
+    },
+    {
+      "check": "wheel retained task list",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\tm.exe",
+        "task",
+        "list"
+      ],
+      "exit_code": 0,
+      "stdout": "                                Tasks (1 total)                                \n+-----------------------------------------------------------------------------+\n| ID      || Status      | Priori\u2026 | Schedule        | Runs | Next Run        |\n|---------++-------------+---------+-----------------+------+-----------------|\n| a6343a\u2026 || PENDING     | 2       | 2026-10-15T12:\u2026 | 0    | 2026-10-15T12:\u2026 |\n+-----------------------------------------------------------------------------+\n",
+      "stderr": ""
+    },
+    {
+      "check": "installed plan API and state revalidation",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\python.exe",
+        "-I",
+        "-c",
+        "from pathlib import Path; from taskmaster.organizer import FileOrganizer; from taskmaster.models import FileRule; root=Path.cwd(); org=FileOrganizer(); org.add_rule(FileRule('x','*','{filename}',action='copy')); plan=org.plan_directory(root/'input',root/'api-output'); assert org.preview(plan)[0].status=='dry_run'; (root/'input/one.log').write_text('changed after planning'); result=org.apply(plan)[0]; assert result.status=='failed' and 'changed' in result.error; assert not (root/'api-output').exists(); org.close(); print('Captured plan rejects changed source')"
+      ],
+      "exit_code": 0,
+      "stdout": "Captured plan rejects changed source\n",
+      "stderr": ""
+    },
+    {
+      "check": "clean runtime dependency consistency",
+      "argv": [
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pip",
+        "--python",
+        "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.venv-phase2\\Scripts\\python.exe",
+        "check"
+      ],
+      "exit_code": 0,
+      "stdout": "No broken requirements found.\n",
+      "stderr": ""
+    }
+  ]
+}

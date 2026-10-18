@@ -1,0 +1,81 @@
+{
+  "command": "inspect",
+  "complete": true,
+  "errors": [],
+  "extensions": [
+    {
+      "extension": "",
+      "file_count": 3,
+      "size_bytes": 7
+    },
+    {
+      "extension": ".csv",
+      "file_count": 1,
+      "size_bytes": 8
+    },
+    {
+      "extension": ".log",
+      "file_count": 2,
+      "size_bytes": 8
+    },
+    {
+      "extension": ".py",
+      "file_count": 1,
+      "size_bytes": 14
+    }
+  ],
+  "largest_files": [
+    {
+      "path": "src/main.py",
+      "size_bytes": 14
+    },
+    {
+      "path": "reports/\u603b\u7ed3.csv",
+      "size_bytes": 8
+    },
+    {
+      "path": "LICENSE",
+      "size_bytes": 7
+    },
+    {
+      "path": "logs/app.log",
+      "size_bytes": 4
+    },
+    {
+      "path": "logs/nested/app.log",
+      "size_bytes": 4
+    },
+    {
+      "path": "empty/a",
+      "size_bytes": 0
+    },
+    {
+      "path": "empty/b",
+      "size_bytes": 0
+    }
+  ],
+  "root": "C:\\Users\\LOCAL_USER\\Desktop\\Resume Project\\1_404Minds\\taskmaster-main\\.install-check\\phase3-outside\\verified-cajx4s68\\workspace",
+  "schema_version": 1,
+  "scope": {
+    "exclusions": [
+      ".git",
+      ".venv*",
+      "venv",
+      "__pycache__",
+      "node_modules",
+      ".pytest_cache",
+      ".mypy_cache",
+      ".ruff_cache",
+      ".tox",
+      ".nox"
+    ],
+    "includes": []
+  },
+  "summary": {
+    "directories_visited": 6,
+    "error_count": 0,
+    "excluded_entries": 2,
+    "file_count": 7,
+    "size_bytes": 37
+  }
+}

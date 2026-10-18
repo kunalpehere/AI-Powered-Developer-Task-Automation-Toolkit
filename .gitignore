@@ -1,0 +1,57 @@
+# Local Python environments
+.venv*/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+# Local task history and database sidecars
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+.test-tmp/
+.test-phase6/
+*.scheduler.lock
+.test-links/
+.coverage
+.coverage.*
+htmlcov/
+.ruff_cache/
+/reports/
+examples/fixtures/organized/
+.install-check/
+
+# Local secrets and machine configuration; share only deliberate templates
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.pfx
+*.p12
+.aws/
+.ssh/
+.netrc
+_netrc
+.pypirc
+credentials.json
+secrets.json
+.codex/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+.mypy_cache/
+.tox/
+.nox/
+
+# Bundled example logs are intentional test fixtures, not runtime output
+*.log
+!examples/fixtures/workspace/logs/**/*.log

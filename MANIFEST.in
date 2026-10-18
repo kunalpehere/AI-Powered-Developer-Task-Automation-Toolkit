@@ -1,0 +1,10 @@
+include README.md ATTRIBUTION.md DEVELOPMENT_PLAN.md
+include pyproject.toml MANIFEST.in
+recursive-include requirements *.txt *.md
+recursive-include scripts *.py
+recursive-include tests *.py
+recursive-include examples *.json *.log *.csv *.py
+include docs/*.md
+prune examples/fixtures/organized
+prune docs/audits
+global-exclude __pycache__ *.py[cod]

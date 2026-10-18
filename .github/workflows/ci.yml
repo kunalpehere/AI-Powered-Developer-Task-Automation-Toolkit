@@ -1,0 +1,82 @@
+name: Validate package
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.12', '3.13', '3.14']
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install hashed development baseline
+        run: python -m pip install --require-hashes -r requirements/dev.txt
+      - name: Install editable project
+        run: python -m pip install --no-deps --no-build-isolation -e .
+      - name: Verify dependency consistency
+        run: python -m pip check
+      - name: Check source correctness
+        run: python -m ruff check taskmaster tests scripts
+      - name: Check pins, documentation, and workflow structure
+        run: python scripts/check_project.py
+      - name: Tests with branch coverage
+        run: python -m pytest -q --cov --cov-report=term-missing --cov-report=xml:reports/coverage.xml --cov-report=json:reports/coverage.json --junitxml=reports/tests.xml
+      - name: Build wheel and source archive
+        run: python -m build --no-isolation
+      - name: Verify distribution contents
+        run: python scripts/check_dist.py
+      - name: Verify clean wheel and editable install outside checkout
+        run: python scripts/verify_install.py --wheel dist/taskmaster-2.0.1-py3-none-any.whl --editable
+      - name: Preserve verification reports
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: reports-${{ matrix.os }}-py${{ matrix.python }}
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 14
+
+  dependencies:
+    name: Dependency advisory review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --require-hashes -r requirements/dev.txt
+      - name: Audit runtime dependencies
+        run: python -m pip_audit -r requirements/runtime.txt --require-hashes --disable-pip --progress-spinner off --format json --output runtime-audit.json
+      - name: Audit development dependencies
+        if: ${{ !cancelled() }}
+        run: python -m pip_audit -r requirements/dev.txt --require-hashes --disable-pip --progress-spinner off --format json --output dev-audit.json
+      - name: Preserve advisory results
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: dependency-advisories
+          path: '*-audit.json'
+          if-no-files-found: warn
+          retention-days: 14

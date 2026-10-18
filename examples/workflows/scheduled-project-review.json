@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "name": "Recurring project review",
+  "on_failure": "continue",
+  "steps": [
+    {"id": "inspect", "operation": "inspect", "parameters": {"source": "../fixtures/workspace", "top": 5}},
+    {"id": "duplicates", "operation": "duplicates", "parameters": {"source": "../fixtures/workspace", "includes": ["*.log"]}}
+  ]
+}
